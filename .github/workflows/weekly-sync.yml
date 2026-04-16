@@ -46,10 +46,18 @@ jobs:
           if-no-files-found: error
 
       - name: Configure SSH for Namecheap
+        env:
+          NAMECHEAP_SSH_KEY: ${{ secrets.NAMECHEAP_SSH_KEY }}
+          NAMECHEAP_SSH_KEY_B64: ${{ secrets.NAMECHEAP_SSH_KEY_B64 }}
         run: |
           install -m 700 -d ~/.ssh
-          printf '%s\n' "${{ secrets.NAMECHEAP_SSH_KEY }}" > ~/.ssh/id_rsa
+          if [ -n "${NAMECHEAP_SSH_KEY_B64}" ]; then
+            printf '%s' "${NAMECHEAP_SSH_KEY_B64}" | base64 -d > ~/.ssh/id_rsa
+          else
+            printf '%s' "${NAMECHEAP_SSH_KEY}" | tr -d '\r' > ~/.ssh/id_rsa
+          fi
           chmod 600 ~/.ssh/id_rsa
+          ssh-keygen -y -f ~/.ssh/id_rsa > /dev/null
           cat > ~/.ssh/config <<EOF
           Host namecheap-shared
             HostName ${{ secrets.NAMECHEAP_HOST }}
