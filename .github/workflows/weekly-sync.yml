@@ -52,7 +52,7 @@ jobs:
         run: |
           install -m 700 -d ~/.ssh
           if [ -n "${NAMECHEAP_SSH_KEY_B64}" ]; then
-            printf '%s' "${NAMECHEAP_SSH_KEY_B64}" | base64 -d > ~/.ssh/id_rsa
+            printf '%s' "${NAMECHEAP_SSH_KEY_B64}" | tr -d '\r\n\t ' | base64 -d > ~/.ssh/id_rsa
           else
             printf '%s' "${NAMECHEAP_SSH_KEY}" | tr -d '\r' > ~/.ssh/id_rsa
           fi
