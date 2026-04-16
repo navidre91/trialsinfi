@@ -1,0 +1,1477 @@
+{
+  "disease": "kidney",
+  "nccn_version": "1.2026",
+  "nccn_date": "2026-07-24",
+  "guidelines_title": "NCCN Clinical Practice Guidelines in Oncology: Kidney Cancer",
+  "created_date": "2026-04-02",
+  "updated_date": "2026-04-02",
+  "created_by": "GU Oncology SoCal Pipeline v2.0",
+  "changelog": [
+    {
+      "date": "2026-04-02",
+      "version": "1.0",
+      "changes": [
+        "Initial kidney taxonomy built from NCCN Kidney Cancer v1.2026 (92 pages). Covers KID-1 through KID-E.",
+        "17 disease categories across histology \u00d7 stage \u00d7 IMDC risk \u00d7 treatment-line axes.",
+        "9 clinical axes: histology, imdc_risk, prior_systemic_lines, prior_io, prior_vegf_tki, nephrectomy_status, vhl_status, met_alteration, sarcomatoid.",
+        "Belzutifan (VHL/HIF-2\u03b1) axis captured under vhl_status and hereditary_rcc category.",
+        "nccRCC subtypes split into 4 histology-specific categories plus general catchall \u2014 reflecting trial enrollment patterns (SWOG 1500 for papillary; chromophobe treated differently).",
+        "Adjuvant post-nephrectomy split from localized surgery categories \u2014 matches KEYNOTE-564 trial enrollment criteria."
+      ]
+    }
+  ],
+  "pathway_namespace": "KID",
+  "classification_philosophy": "Inclusive \u2014 when ambiguous, include in adjacent categories. Better to over-tag than miss a trial. Multi-label: one trial may appear under localized, adjuvant, and/or metastatic settings if eligibility spans states. nccRCC trials should be tagged under both the specific subtype (papillary, chromophobe) AND metastatic_ncrcc_general unless explicitly restricted.",
+  "sections_order": [
+    "Localized",
+    "Adjuvant",
+    "Metastatic_ccRCC",
+    "Metastatic_nccRCC",
+    "Hereditary"
+  ],
+  "section_colors": {
+    "Localized": "1B5E3B",
+    "Adjuvant": "4A7C59",
+    "Metastatic_ccRCC": "1B3A6B",
+    "Metastatic_nccRCC": "6B3A1B",
+    "Hereditary": "5C1B6B"
+  },
+  "categories": [
+    {
+      "id": "localized_t1a",
+      "label": "Localized \u2014 Stage I (T1a, \u22644 cm)",
+      "short": "Localized T1a",
+      "section": "Localized",
+      "nccn_page": "KID-1",
+      "order": 1,
+      "color_hex": "2E9E60",
+      "confidence_base": "HIGH",
+      "include_patterns": [
+        "T1a.*renal",
+        "renal.*T1a",
+        "stage.I.*renal.*T1a",
+        "T1a.*kidney",
+        "kidney.*T1a",
+        "small.renal.mass",
+        "small.*renal.*tumor",
+        "renal.mass.*\\b[1-4]\\s*cm\\b",
+        "partial.nephrectomy.*localized",
+        "nephron.sparing.*stage.I",
+        "ablation.*renal.*T1",
+        "cryotherapy.*kidney.*localized",
+        "radiofrequency.ablation.*kidney",
+        "thermal.ablation.*renal",
+        "active.surveillance.*renal.*T1a",
+        "active.surveillance.*small.renal.mass",
+        "SBRT.*T1.*kidney",
+        "stereotactic.*kidney.*stage.I",
+        "SBRT.*renal.*stage.I",
+        "localized.kidney.*T1a",
+        "localized.RCC.*T1a"
+      ],
+      "exclude_patterns": [
+        "metastatic.*renal",
+        "stage.IV.*kidney",
+        "stage.III.*kidney",
+        "stage.II.*kidney",
+        "advanced.*RCC",
+        "\\bmRCC\\b",
+        "castration",
+        "prostate",
+        "T1b.*primary",
+        "T2.*renal",
+        "T3.*renal",
+        "T4.*renal"
+      ],
+      "description": "Clinical stage I T1a (\u22644 cm) renal cell carcinoma \u2014 partial nephrectomy preferred; ablation, active surveillance, and SBRT as alternatives for medically inoperable patients"
+    },
+    {
+      "id": "localized_t1b",
+      "label": "Localized \u2014 Stage I (T1b, 4\u20137 cm)",
+      "short": "Localized T1b",
+      "section": "Localized",
+      "nccn_page": "KID-1",
+      "order": 2,
+      "color_hex": "258A52",
+      "confidence_base": "HIGH",
+      "include_patterns": [
+        "T1b.*renal",
+        "renal.*T1b",
+        "stage.I.*renal.*T1b",
+        "T1b.*kidney",
+        "kidney.*T1b",
+        "localized.RCC.*T1b",
+        "localized.kidney.*T1b",
+        "partial.nephrectomy.*T1b",
+        "radical.nephrectomy.*T1b",
+        "stage.I.*kidney.*4.*7.cm",
+        "stage.I.*renal.*4.*7.cm",
+        "renal.mass.*T1b",
+        "small.*renal.*T1b"
+      ],
+      "exclude_patterns": [
+        "metastatic.*renal",
+        "stage.IV.*kidney",
+        "stage.III.*kidney",
+        "stage.II.*kidney",
+        "T2.*renal",
+        "T3.*renal",
+        "T4.*renal",
+        "advanced.*RCC",
+        "\\bmRCC\\b"
+      ],
+      "description": "Clinical stage I T1b (4\u20137 cm) renal cell carcinoma \u2014 partial or radical nephrectomy; ablation for select patients not fit for surgery"
+    },
+    {
+      "id": "localized_stage2_3",
+      "label": "Localized \u2014 Stage II / III",
+      "short": "Localized Stage II\u2013III",
+      "section": "Localized",
+      "nccn_page": "KID-2",
+      "order": 3,
+      "color_hex": "1B7A4E",
+      "confidence_base": "HIGH",
+      "include_patterns": [
+        "stage.II.*kidney",
+        "stage.II.*renal",
+        "stage.III.*kidney",
+        "stage.III.*renal",
+        "stage.II.*RCC",
+        "stage.III.*RCC",
+        "T2.*renal.*localized",
+        "T3.*renal.*localized",
+        "T2a.*kidney",
+        "T2b.*kidney",
+        "T3a.*kidney",
+        "T3b.*kidney",
+        "T3c.*kidney",
+        "T4.*localized",
+        "locally.advanced.*resectable.*kidney",
+        "locally.advanced.*resectable.*RCC",
+        "resectable.*stage.II",
+        "resectable.*stage.III.*kidney",
+        "radical.nephrectomy.*stage.II",
+        "radical.nephrectomy.*stage.III",
+        "nephrectomy.*high.risk.*localized",
+        "high.risk.*localized.*RCC",
+        "vena.cava.*thrombus.*resectable",
+        "caval.thrombus.*nephrectomy"
+      ],
+      "exclude_patterns": [
+        "metastatic.*renal",
+        "stage.IV.*kidney",
+        "\\bmRCC\\b",
+        "\\bM1\\b.*kidney",
+        "advanced.*metastatic",
+        "castration",
+        "prostate"
+      ],
+      "description": "Localized stage II\u2013III RCC \u2014 radical nephrectomy \u00b1 partial nephrectomy; includes vena cava extension if resectable. Adjuvant pembrolizumab discussed separately."
+    },
+    {
+      "id": "adjuvant_post_nephrectomy",
+      "label": "Adjuvant \u2014 Post-Nephrectomy, High-Risk ccRCC",
+      "short": "Adjuvant Post-Nephrectomy",
+      "section": "Adjuvant",
+      "nccn_page": "KID-2/KID-D",
+      "order": 4,
+      "color_hex": "4A7C59",
+      "confidence_base": "HIGH",
+      "include_patterns": [
+        "adjuvant.*kidney",
+        "adjuvant.*renal",
+        "adjuvant.*RCC",
+        "adjuvant.*nephrectomy",
+        "post.nephrectomy.*adjuvant",
+        "after.nephrectomy.*adjuvant",
+        "adjuvant.*pembrolizumab.*kidney",
+        "adjuvant.*pembrolizumab.*RCC",
+        "KEYNOTE.564",
+        "adjuvant.*checkpoint.*kidney",
+        "adjuvant.*IO.*RCC",
+        "adjuvant.*sunitinib.*kidney",
+        "adjuvant.*sorafenib.*kidney",
+        "adjuvant.*pazopanib.*kidney",
+        "S-TRAC",
+        "adjuvant.*TKI.*kidney",
+        "high.risk.*localized.*adjuvant",
+        "intermediate.high.risk.*adjuvant.*RCC",
+        "resected.*RCC.*adjuvant",
+        "resected.*kidney.*adjuvant",
+        "stage.II.*sarcomatoid.*adjuvant",
+        "stage.III.*adjuvant.*ccRCC",
+        "disease.free.*post.resection.*RCC",
+        "NED.*nephrectomy.*adjuvant.*RCC",
+        "M1.*NED.*adjuvant.*kidney",
+        "complete.resection.*metastatic.*adjuvant.*RCC"
+      ],
+      "exclude_patterns": [
+        "metastatic.*active",
+        "\\bmRCC\\b.*first.line",
+        "systemic.*naive.*metastatic",
+        "unresectable.*advanced",
+        "stage.IV.*untreated",
+        "non.clear.cell.*adjuvant",
+        "nccRCC.*adjuvant"
+      ],
+      "description": "Adjuvant therapy after complete nephrectomy for high-risk/high-grade clear cell RCC \u2014 pembrolizumab is the standard (KEYNOTE-564). Does NOT apply to non-clear cell histology."
+    },
+    {
+      "id": "locally_advanced_unresectable",
+      "label": "Locally Advanced \u2014 Unresectable",
+      "short": "Locally Advanced Unresectable",
+      "section": "Localized",
+      "nccn_page": "KID-3",
+      "order": 5,
+      "color_hex": "1B5E3B",
+      "confidence_base": "MEDIUM",
+      "include_patterns": [
+        "locally.advanced.*unresectable.*kidney",
+        "unresectable.*locally.advanced.*RCC",
+        "unresectable.*primary.*RCC",
+        "T4.*unresectable",
+        "locally.advanced.*RCC.*systemic",
+        "neoadjuvant.*kidney",
+        "neoadjuvant.*RCC",
+        "presurgical.*RCC",
+        "downsizing.*nephrectomy",
+        "conversion.*surgery.*RCC",
+        "induction.*therapy.*before.*nephrectomy"
+      ],
+      "exclude_patterns": [
+        "metastatic.*RCC.*first.line",
+        "\\bmRCC\\b.*systemic.naive",
+        "stage.IV.*metastatic.*established"
+      ],
+      "description": "Locally advanced RCC not amenable to upfront surgery \u2014 systemic or neoadjuvant therapy trials; overlaps with stage IV if distant mets develop"
+    },
+    {
+      "id": "metastatic_ccrcc_favorable_1l",
+      "label": "Metastatic ccRCC \u2014 IMDC Favorable Risk, 1st Line",
+      "short": "mccRCC Favorable 1L",
+      "section": "Metastatic_ccRCC",
+      "nccn_page": "KID-3/KID-D",
+      "order": 6,
+      "color_hex": "1A56DB",
+      "confidence_base": "HIGH",
+      "include_patterns": [
+        "clear.cell.*favorable.*first.line",
+        "favorable.*risk.*clear.cell.*first.line",
+        "IMDC.*favorable.*first.line",
+        "IMDC.*favorable.*1L",
+        "favorable.risk.*metastatic.*clear.cell",
+        "favorable.risk.*mRCC.*clear.cell",
+        "favorable.risk.*RCC.*systemic.*naive",
+        "MSKCC.*good.risk.*clear.cell",
+        "good.risk.*metastatic.*RCC",
+        "low.risk.*metastatic.*kidney",
+        "first.line.*favorable.*ccRCC",
+        "first.line.*clear.cell.*favorable",
+        "treatment.naive.*favorable.*ccRCC",
+        "systemic.naive.*favorable.*kidney",
+        "axitinib.*pembrolizumab.*favorable",
+        "sunitinib.*favorable.*RCC",
+        "CheckMate.*214.*favorable",
+        "KEYNOTE.426.*favorable",
+        "CLEAR.*favorable",
+        "CheckMate.9ER.*favorable",
+        "active.surveillance.*asymptomatic.*metastatic.*ccRCC"
+      ],
+      "exclude_patterns": [
+        "intermediate.*risk",
+        "poor.*risk",
+        "IMDC.*intermediate",
+        "IMDC.*poor",
+        "second.line",
+        "second.line.*RCC",
+        "2L.*RCC",
+        "after.*checkpoint",
+        "prior.*\\bIO\\b",
+        "non.clear.cell",
+        "papillary",
+        "chromophobe",
+        "collecting.duct",
+        "nccRCC"
+      ],
+      "description": "Metastatic or advanced clear cell RCC, IMDC favorable risk (0 factors), treatment-na\u00efve \u2014 axitinib/pembrolizumab, cabozantinib/nivolumab, lenvatinib/pembrolizumab (all Cat 1 preferred); sunitinib, pazopanib, IO/IO as alternatives"
+    },
+    {
+      "id": "metastatic_ccrcc_int_poor_1l",
+      "label": "Metastatic ccRCC \u2014 IMDC Intermediate/Poor Risk, 1st Line",
+      "short": "mccRCC Int/Poor 1L",
+      "section": "Metastatic_ccRCC",
+      "nccn_page": "KID-3/KID-D",
+      "order": 7,
+      "color_hex": "1440A0",
+      "confidence_base": "HIGH",
+      "include_patterns": [
+        "clear.cell.*intermediate.*first.line",
+        "clear.cell.*poor.*first.line",
+        "IMDC.*intermediate.*first.line",
+        "IMDC.*poor.*first.line",
+        "IMDC.*intermediate.*1L",
+        "IMDC.*poor.*1L",
+        "intermediate.risk.*metastatic.*clear.cell",
+        "poor.risk.*metastatic.*clear.cell",
+        "intermediate.*poor.*risk.*ccRCC",
+        "intermediate.poor.*metastatic.*kidney",
+        "ipilimumab.*nivolumab.*first.line.*RCC",
+        "CheckMate.214.*intermediate",
+        "CheckMate.214.*poor",
+        "nivo.*ipi.*first.line.*kidney",
+        "cabozantinib.*first.line.*intermediate",
+        "CABOSUN",
+        "IMDC.*1.*2.*factors",
+        "IMDC.*3.*factors",
+        "IMDC.*\u22651",
+        "treatment.naive.*intermediate.*ccRCC",
+        "treatment.naive.*poor.*ccRCC",
+        "first.line.*poor.risk.*RCC",
+        "systemic.naive.*intermediate.*kidney",
+        "KEYNOTE.426.*all.risk",
+        "CheckMate.9ER.*intermediate",
+        "CLEAR.*intermediate"
+      ],
+      "exclude_patterns": [
+        "favorable.risk.*only",
+        "IMDC.*0.*factors.*favorable.*only",
+        "second.line",
+        "2L",
+        "after.*checkpoint",
+        "prior.*\\bIO\\b",
+        "prior.*TKI",
+        "non.clear.cell",
+        "papillary",
+        "chromophobe",
+        "nccRCC"
+      ],
+      "description": "Metastatic or advanced clear cell RCC, IMDC intermediate or poor risk (1\u20136 factors), treatment-na\u00efve \u2014 IO/IO (ipilimumab/nivolumab) or IO/TKI doublets preferred"
+    },
+    {
+      "id": "metastatic_ccrcc_1l_all_risk",
+      "label": "Metastatic ccRCC \u2014 1st Line, All Risk Groups",
+      "short": "mccRCC 1L All Risk",
+      "section": "Metastatic_ccRCC",
+      "nccn_page": "KID-3/KID-D",
+      "order": 8,
+      "color_hex": "1A4DB0",
+      "confidence_base": "HIGH",
+      "include_patterns": [
+        "clear.cell.*first.line.*all.risk",
+        "first.line.*ccRCC.*all.risk",
+        "first.line.*clear.cell.*regardless.*IMDC",
+        "first.line.*RCC.*all.risk.groups",
+        "metastatic.*clear.cell.*systemic.naive",
+        "treatment.naive.*advanced.*ccRCC",
+        "treatment.naive.*clear.cell.*RCC",
+        "first.line.*metastatic.*clear.cell",
+        "KEYNOTE.426",
+        "CheckMate.9ER",
+        "CLEAR.*trial",
+        "CheckMate.214",
+        "axitinib.*pembrolizumab.*first.line",
+        "cabozantinib.*nivolumab.*first.line",
+        "lenvatinib.*pembrolizumab.*first.line",
+        "sunitinib.*first.line.*clear.cell",
+        "pazopanib.*first.line.*RCC",
+        "IO.*TKI.*first.line.*kidney",
+        "IO.*IO.*first.line.*kidney",
+        "checkpoint.*naive.*advanced.*ccRCC"
+      ],
+      "exclude_patterns": [
+        "second.line",
+        "2L.*RCC",
+        "prior.*\\bIO\\b",
+        "after.*checkpoint",
+        "prior.{0,50}nivolumab|nivolumab.*prior.line|progression.*on.*nivolumab",
+        "prior.{0,50}pembrolizumab|pembrolizumab.*prior.line|progression.*on.*pembrolizumab",
+        "non.clear.cell",
+        "papillary",
+        "chromophobe",
+        "nccRCC"
+      ],
+      "description": "Metastatic clear cell RCC, first-line, all IMDC risk groups \u2014 trials that do not restrict by IMDC score. Preferred IO/TKI doublets apply across all risk groups."
+    },
+    {
+      "id": "metastatic_ccrcc_2l_io_experienced",
+      "label": "Metastatic ccRCC \u2014 2nd Line+, Post-IO",
+      "short": "mccRCC 2L+ Post-IO",
+      "section": "Metastatic_ccRCC",
+      "nccn_page": "KID-D",
+      "order": 9,
+      "color_hex": "0D3080",
+      "confidence_base": "HIGH",
+      "include_patterns": [
+        "clear.cell.*prior.*IO",
+        "clear.cell.*prior.*checkpoint",
+        "ccRCC.*prior.*IO",
+        "RCC.*prior.*immunotherapy",
+        "RCC.*post.*checkpoint",
+        "post.IO.*clear.cell",
+        "second.line.*prior.*IO.*RCC",
+        "2L.*post.IO.*kidney",
+        "second.line.*after.*IO",
+        "after.*nivolumab.*RCC",
+        "after.*pembrolizumab.*RCC",
+        "after.*avelumab.*RCC",
+        "post.*ipilimumab.*nivolumab.*RCC",
+        "prior.*PD.1.*RCC",
+        "prior.*PD-L1.*RCC",
+        "IO.refractory.*RCC",
+        "IO.resistant.*kidney",
+        "checkpoint.refractory.*RCC",
+        "Litespark.005",
+        "belzutifan.*prior.*IO",
+        "cabozantinib.*second.line.*IO",
+        "lenvatinib.*everolimus.*second.line.*RCC",
+        "tivozanib.*prior.*IO",
+        "tivozanib.*2.*prior.*systemic",
+        "TIVO.3",
+        "METEOR.*second.line",
+        "RECORD.1"
+      ],
+      "exclude_patterns": [
+        "treatment.naive",
+        "systemic.naive",
+        "first.line.*IO",
+        "favorable.1L",
+        "non.clear.cell.*only",
+        "papillary.*only",
+        "chromophobe.*only",
+        "nccRCC.*only"
+      ],
+      "description": "Metastatic clear cell RCC after prior IO-containing regimen \u2014 cabozantinib, lenvatinib/everolimus, belzutifan, tivozanib, nivolumab/cabozantinib; clinical trial preferred"
+    },
+    {
+      "id": "metastatic_ccrcc_2l_io_naive",
+      "label": "Metastatic ccRCC \u2014 2nd Line+, IO-Na\u00efve (Prior TKI)",
+      "short": "mccRCC 2L IO-Naive",
+      "section": "Metastatic_ccRCC",
+      "nccn_page": "KID-D",
+      "order": 10,
+      "color_hex": "0A2468",
+      "confidence_base": "HIGH",
+      "include_patterns": [
+        "clear.cell.*IO.naive.*second.line",
+        "ccRCC.*IO.naive.*2L",
+        "prior.*sunitinib.*RCC",
+        "prior.*pazopanib.*RCC",
+        "prior.*sorafenib.*RCC",
+        "prior.*VEGF.*TKI.*RCC",
+        "prior.*TKI.*IO.naive.*RCC",
+        "second.line.*IO.naive.*clear.cell",
+        "after.*VEGF.*targeted.*kidney",
+        "VEGF.TKI.refractory.*IO.naive",
+        "anti.VEGF.*prior.*no.prior.IO",
+        "CheckMate.025",
+        "nivolumab.*second.line.*IO.naive",
+        "METEOR.*cabozantinib",
+        "cabozantinib.*prior.*VEGF",
+        "axitinib.*second.line.*sunitinib",
+        "AXIS.*trial",
+        "lenvatinib.*everolimus.*second.line.*IO.naive",
+        "everolimus.*second.line.*kidney",
+        "RECORD.1.*second.line",
+        "tivozanib.*IO.naive.*2.*prior"
+      ],
+      "exclude_patterns": [
+        "treatment.naive",
+        "systemic.naive",
+        "first.line.*only",
+        "prior.*PD.1",
+        "prior.*checkpoint",
+        "post.*IO",
+        "non.clear.cell",
+        "non-clear.cell",
+        "papillary.*RCC",
+        "papillary.*renal",
+        "chromophobe",
+        "collecting.duct",
+        "\\bnccRCC\\b",
+        "non.clear.cell.*only",
+        "papillary.*only",
+        "chromophobe.*only"
+      ],
+      "description": "Metastatic clear cell RCC, second line or later, IO-na\u00efve \u2014 patients who received a VEGF-TKI as first-line without checkpoint inhibitor. Nivolumab, cabozantinib, lenvatinib/everolimus are category 2A preferred."
+    },
+    {
+      "id": "metastatic_ccrcc_3l_plus",
+      "label": "Metastatic ccRCC \u2014 3rd Line and Beyond",
+      "short": "mccRCC 3L+",
+      "section": "Metastatic_ccRCC",
+      "nccn_page": "KID-D",
+      "order": 11,
+      "color_hex": "071850",
+      "confidence_base": "MEDIUM",
+      "include_patterns": [
+        "third.line.*RCC",
+        "3rd.line.*kidney",
+        "3L.*kidney.*RCC",
+        "heavily.pretreated.*RCC",
+        "\u22652.*prior.*systemic.*RCC",
+        "at.least.2.*prior.*regimen.*RCC",
+        "two.or.more.*prior.*therapy.*RCC",
+        "prior.*IO.*prior.*TKI.*RCC",
+        "refractory.*IO.*TKI.*kidney",
+        "tivozanib.*2.*prior.*IO",
+        "belzutifan.*\u22652.*prior",
+        "belzutifan.*multiple.*prior.*lines",
+        "3.*or.more.*prior.*RCC",
+        "multi.refractory.*kidney",
+        "prior.*IO.*and.*TKI.*RCC",
+        "sequenced.*therapy.*RCC"
+      ],
+      "exclude_patterns": [
+        "treatment.naive",
+        "first.line",
+        "second.line.*only",
+        "1L.*only",
+        "2L.*only",
+        "non.clear.cell.*only",
+        "nccRCC.*only"
+      ],
+      "description": "Metastatic clear cell RCC, third line and beyond \u2014 tivozanib (\u22652 prior including IO), belzutifan, clinical trial strongly preferred"
+    },
+    {
+      "id": "metastatic_ccrcc_general",
+      "label": "Metastatic ccRCC \u2014 General (Any Line / Unspecified Risk)",
+      "short": "mccRCC General",
+      "section": "Metastatic_ccRCC",
+      "nccn_page": "KID-3/KID-D",
+      "order": 12,
+      "color_hex": "2850A0",
+      "confidence_base": "MEDIUM",
+      "include_patterns": [
+        "(?<!non-)(?<!non )clear.cell.*RCC",
+        "(?<!non-)(?<!non )clear.cell.*renal.cell",
+        "\\bccRCC\\b",
+        "metastatic.*(?<!non-)(?<!non )clear.cell",
+        "advanced.*(?<!non-)(?<!non )clear.cell",
+        "relapsed.*(?<!non-)(?<!non )clear.cell",
+        "stage.IV.*(?<!non-)(?<!non )clear.cell",
+        "metastatic.*kidney.*(?<!non-)(?<!non )clear",
+        "VHL.mutant.*RCC",
+        "VHL.*clear.cell",
+        "hypoxia.inducible.*RCC",
+        "HIF.2.*RCC",
+        "HIF2.*kidney",
+        "belzutifan.*ccRCC",
+        "VEGFR.*kidney",
+        "VEGF.*targeted.*kidney",
+        "anti.angiogenic.*RCC"
+      ],
+      "exclude_patterns": [
+        "non.clear.cell",
+        "papillary.*RCC",
+        "chromophobe",
+        "collecting.duct",
+        "TFE3",
+        "TFEB",
+        "translocation.*RCC",
+        "nccRCC",
+        "prostate",
+        "bladder",
+        "urothelial"
+      ],
+      "description": "Metastatic clear cell RCC \u2014 general/unspecified treatment line or IMDC risk. Use when trial does not restrict by risk or prior-line. Multi-label with specific 1L/2L categories."
+    },
+    {
+      "id": "metastatic_ncrcc_papillary",
+      "label": "Metastatic nccRCC \u2014 Papillary (Type 1/2, HLRCC)",
+      "short": "Papillary RCC",
+      "section": "Metastatic_nccRCC",
+      "nccn_page": "KID-D",
+      "order": 13,
+      "color_hex": "8B3A1B",
+      "confidence_base": "HIGH",
+      "include_patterns": [
+        "papillary.*RCC",
+        "papillary.*renal.cell",
+        "papillary.*kidney",
+        "type.1.*papillary",
+        "type.2.*papillary",
+        "papillary.type.1",
+        "papillary.type.2",
+        "HLRCC",
+        "hereditary.leiomyomatosis.*RCC",
+        "fumarate.hydratase",
+        "FH.mutant.*kidney",
+        "HLRCC.associated.*RCC",
+        "FH.deficient.*RCC",
+        "MET.*papillary",
+        "MET.*amplif.*RCC",
+        "MET.*mutant.*RCC",
+        "MET.*exon.*RCC",
+        "crizotinib.*papillary",
+        "savolitinib.*papillary",
+        "MET.targeted.*kidney",
+        "SWOG.1500",
+        "bevacizumab.*erlotinib.*papillary",
+        "cabozantinib.*papillary",
+        "papillary.*non.clear.cell"
+      ],
+      "exclude_patterns": [
+        "clear.cell.*only",
+        "ccRCC.*only",
+        "chromophobe.*only",
+        "collecting.duct.*only",
+        "prostate",
+        "bladder"
+      ],
+      "description": "Metastatic papillary RCC (type 1 MET-driven, type 2, or HLRCC-associated) \u2014 cabozantinib preferred (SWOG 1500); bevacizumab/erlotinib for HLRCC; MET-targeted for type 1. Clinical trial enrollment strongly encouraged."
+    },
+    {
+      "id": "metastatic_ncrcc_chromophobe",
+      "label": "Metastatic nccRCC \u2014 Chromophobe",
+      "short": "Chromophobe RCC",
+      "section": "Metastatic_nccRCC",
+      "nccn_page": "KID-D",
+      "order": 14,
+      "color_hex": "7A2E14",
+      "confidence_base": "HIGH",
+      "include_patterns": [
+        "chromophobe.*RCC",
+        "chromophobe.*renal.cell",
+        "chromophobe.*kidney",
+        "chRCC",
+        "chromophobe.*non.clear.cell",
+        "metastatic.*chromophobe",
+        "advanced.*chromophobe.*renal",
+        "Birt.Hogg.Dube",
+        "BHD.*RCC",
+        "folliculin.*mutation.*RCC",
+        "FLCN.*kidney"
+      ],
+      "exclude_patterns": [
+        "clear.cell.*only",
+        "ccRCC.*only",
+        "papillary.*only",
+        "collecting.duct.*only",
+        "prostate",
+        "bladder"
+      ],
+      "description": "Metastatic chromophobe RCC \u2014 sunitinib, cabozantinib (activity more limited); IO combinations have modest activity. Clinical trial preferred. Associated with Birt-Hogg-Dub\u00e9 syndrome."
+    },
+    {
+      "id": "metastatic_ncrcc_collecting_duct",
+      "label": "Metastatic nccRCC \u2014 Collecting Duct / Medullary",
+      "short": "Collecting Duct / Medullary",
+      "section": "Metastatic_nccRCC",
+      "nccn_page": "KID-D",
+      "order": 15,
+      "color_hex": "6B2A10",
+      "confidence_base": "MEDIUM",
+      "include_patterns": [
+        "collecting.duct.*carcinoma",
+        "collecting.duct.*kidney",
+        "collecting.duct.*RCC",
+        "Bellini.duct",
+        "medullary.*carcinoma.*kidney",
+        "renal.medullary.*carcinoma",
+        "RMC",
+        "medullary.*RCC",
+        "SMARCB1.*kidney",
+        "INI1.*deficient.*kidney",
+        "sickle.cell.*kidney.*cancer",
+        "sickle.cell.*RMC"
+      ],
+      "exclude_patterns": [
+        "clear.cell.*only",
+        "ccRCC.*only",
+        "papillary.*only",
+        "chromophobe.*only",
+        "prostate",
+        "bladder"
+      ],
+      "description": "Metastatic collecting duct carcinoma or renal medullary carcinoma (SMARCB1/INI1-deficient) \u2014 aggressive; chemotherapy-based regimens and clinical trials. Renal medullary carcinoma often associated with sickle cell trait."
+    },
+    {
+      "id": "metastatic_ncrcc_tfe3_tfeb",
+      "label": "Metastatic nccRCC \u2014 Translocation (TFE3/TFEB, Xp11)",
+      "short": "Translocation RCC",
+      "section": "Metastatic_nccRCC",
+      "nccn_page": "KID-D",
+      "order": 16,
+      "color_hex": "5C2010",
+      "confidence_base": "MEDIUM",
+      "include_patterns": [
+        "TFE3.*RCC",
+        "TFEB.*RCC",
+        "translocation.*RCC",
+        "Xp11.*translocation.*kidney",
+        "Xp11.*RCC",
+        "MiT.*family.*translocation",
+        "TFE3.*translocation",
+        "TFEB.*translocation.*kidney",
+        "Xp11.2.*renal",
+        "microphthalmia.transcription.factor.*kidney"
+      ],
+      "exclude_patterns": [
+        "clear.cell.*only",
+        "ccRCC.*only",
+        "papillary.*only",
+        "chromophobe.*only",
+        "prostate",
+        "bladder"
+      ],
+      "description": "Metastatic translocation RCC (Xp11.2/TFE3 or t(6;11)/TFEB) \u2014 rare; mTOR inhibitors have some activity; clinical trial enrollment strongly preferred"
+    },
+    {
+      "id": "metastatic_ncrcc_general",
+      "label": "Metastatic nccRCC \u2014 General / Unclassified",
+      "short": "nccRCC General",
+      "section": "Metastatic_nccRCC",
+      "nccn_page": "KID-D",
+      "order": 17,
+      "color_hex": "8B5E3A",
+      "confidence_base": "MEDIUM",
+      "include_patterns": [
+        "non.clear.cell.*RCC",
+        "non.clear.cell.*renal",
+        "nccRCC",
+        "non.clear.*kidney",
+        "non-clear.cell.*renal.cell",
+        "unclassified.*RCC",
+        "unclassified.*renal",
+        "unclassified.*kidney.*cancer",
+        "rare.*RCC.*histology",
+        "rare.*kidney.*cancer",
+        "rare.*renal.*histology",
+        "advanced.*nccRCC",
+        "metastatic.*nccRCC",
+        "relapsed.*nccRCC",
+        "kidney.*cancer.*non.clear.cell",
+        "renal.*cancer.*non.clear",
+        "KEYNOTE.427.*cohort.B",
+        "pembrolizumab.*nccRCC",
+        "nivolumab.*nccRCC",
+        "nivolumab.*cabozantinib.*nccRCC"
+      ],
+      "exclude_patterns": [
+        "clear.cell.*only",
+        "ccRCC.*only",
+        "prostate",
+        "bladder",
+        "urothelial"
+      ],
+      "description": "Metastatic non-clear cell RCC, unspecified or unclassified subtype \u2014 trials enrolling broad nccRCC populations. Multi-label with specific subtype categories when applicable."
+    },
+    {
+      "id": "hereditary_rcc",
+      "label": "Hereditary RCC Syndromes (VHL, HLRCC, Hereditary Papillary)",
+      "short": "Hereditary RCC",
+      "section": "Hereditary",
+      "nccn_page": "KID-E",
+      "order": 18,
+      "color_hex": "7B2D8B",
+      "confidence_base": "HIGH",
+      "include_patterns": [
+        "VHL.*disease",
+        "von.Hippel.Lindau",
+        "VHL.syndrome",
+        "VHL.*mutation.*germline",
+        "germline.*VHL.*kidney",
+        "belzutifan.*VHL",
+        "HIF.2.*inhibitor.*VHL",
+        "HIF2.*VHL.*disease",
+        "HLRCC",
+        "hereditary.leiomyomatosis.*renal.cell",
+        "FH.deficient",
+        "fumarate.hydratase.*deficient.*kidney",
+        "FH.mutant.*RCC",
+        "hereditary.papillary.*RCC",
+        "hereditary.papillary.*renal",
+        "MET.*germline.*papillary",
+        "germline.*MET.*kidney",
+        "Birt.Hogg.Dube",
+        "BHD.*syndrome",
+        "FLCN.*germline",
+        "PTEN.*hamartoma.*kidney",
+        "tuberous.sclerosis.*kidney",
+        "TSC.*RCC",
+        "BAP1.*germline.*RCC",
+        "BAP1.*hereditary.*kidney",
+        "succinate.dehydrogenase.*kidney",
+        "SDH.*RCC",
+        "SDHB.*kidney",
+        "hereditary.*kidney.*cancer",
+        "hereditary.*renal.*cancer",
+        "familial.*RCC",
+        "familial.*kidney.*cancer",
+        "genetic.counseling.*kidney",
+        "genetic.testing.*renal.*cancer",
+        "germline.*testing.*kidney",
+        "\u226446.*years.*kidney.*cancer"
+      ],
+      "exclude_patterns": [
+        "sporadic.*only",
+        "no.hereditary",
+        "prostate",
+        "bladder"
+      ],
+      "description": "Hereditary kidney cancer syndromes \u2014 VHL disease (belzutifan), HLRCC (FH-deficient), hereditary papillary RCC (MET), Birt-Hogg-Dub\u00e9 (FLCN), SDH-deficient RCC. Genetic counseling and nephron-sparing surgery principles apply."
+    }
+  ],
+  "clinical_axes": {
+    "histology": {
+      "description": "Tumor histology on pathology \u2014 the single most important axis for kidney cancer trial eligibility. Clear cell vs non-clear cell determines which regimens apply. Non-clear cell subtypes each have distinct biology and trial populations.",
+      "values": [
+        "clear_cell",
+        "papillary_type1",
+        "papillary_type2",
+        "papillary_unspecified",
+        "chromophobe",
+        "collecting_duct",
+        "medullary",
+        "tfe3_tfeb_translocation",
+        "unclassified",
+        "mixed_or_sarcomatoid",
+        "unknown"
+      ],
+      "detection_rules": {
+        "clear_cell": [
+          "(?<!non-)(?<!non )clear.cell.*renal",
+          "(?<!non-)(?<!non )clear.cell.*RCC",
+          "\\bccRCC\\b",
+          "(?<!non-)(?<!non )clear.cell.*kidney",
+          "(?<!non-)(?<!non )clear.cell.*histology",
+          "(?<!non-)(?<!non )clear.cell.*carcinoma"
+        ],
+        "papillary_type1": [
+          "papillary.*type.1",
+          "type.1.*papillary",
+          "MET.driven.*papillary",
+          "MET.amplif.*papillary",
+          "MET.mutant.*papillary",
+          "papillary.*MET.driven",
+          "papillary.*MET.amplif",
+          "papillary.*MET.mutant",
+          "type.I.*papillary",
+          "papillary.type.I",
+          "papillary.*MET.target.*RCC",
+          "hereditary.*papillary.*MET"
+        ],
+        "papillary_type2": [
+          "papillary.*type.2",
+          "type.2.*papillary",
+          "HLRCC.*papillary",
+          "FH.deficient.*papillary",
+          "papillary.type.II",
+          "type.II.*papillary"
+        ],
+        "papillary_unspecified": [
+          "papillary.*RCC",
+          "papillary.*renal.cell",
+          "papillary.*kidney",
+          "\\bpRCC\\b",
+          "papillary.*non.clear"
+        ],
+        "chromophobe": [
+          "chromophobe.*RCC",
+          "chromophobe.*renal",
+          "\\bchRCC\\b",
+          "chromophobe.*kidney"
+        ],
+        "collecting_duct": [
+          "collecting.duct.*carcinoma",
+          "Bellini.*duct",
+          "collecting.duct.*kidney",
+          "collecting.duct.*RCC"
+        ],
+        "medullary": [
+          "renal.medullary.*carcinoma",
+          "medullary.*carcinoma.*kidney",
+          "\\bRMC\\b",
+          "SMARCB1.*kidney",
+          "INI1.deficient.*kidney"
+        ],
+        "tfe3_tfeb_translocation": [
+          "TFE3.*RCC",
+          "TFEB.*RCC",
+          "Xp11.*translocation",
+          "translocation.*RCC",
+          "MiT.*family.*RCC"
+        ],
+        "unclassified": [
+          "unclassified.*RCC",
+          "unclassified.*renal",
+          "unclassified.*kidney"
+        ],
+        "mixed_or_sarcomatoid": [
+          "sarcomatoid.*RCC",
+          "sarcomatoid.*differentiation",
+          "sarcomatoid.*kidney",
+          "sarcomatoid.*renal",
+          "sarcomatoid.*component",
+          "rhabdoid.*kidney",
+          "rhabdoid.*RCC"
+        ]
+      },
+      "_ui_note": "If histology=unknown: surface both ccRCC and nccRCC trials with flag 'Confirm histology from pathology report \u2014 clear cell vs non-clear cell subtype determines which trials the patient qualifies for. This is the most critical eligibility axis for kidney cancer trials.'"
+    },
+    "imdc_risk": {
+      "description": "IMDC (International Metastatic RCC Database Consortium) risk score for metastatic RCC. 6 factors: Karnofsky PS <80%, diagnosis-to-treatment <1 year, anemia, hypercalcemia, neutrophilia, thrombocytosis. 0 factors = favorable; 1\u20132 = intermediate; 3\u20136 = poor.",
+      "values": [
+        "favorable",
+        "intermediate",
+        "poor",
+        "intermediate_poor",
+        "unknown"
+      ],
+      "detection_rules": {
+        "favorable": [
+          "IMDC.*favorable",
+          "IMDC.*good.risk",
+          "IMDC.*0.*factor",
+          "MSKCC.*good.risk",
+          "good.risk.*RCC",
+          "favorable.*risk.*RCC",
+          "favorable.*risk.*kidney",
+          "0.*IMDC.*factor"
+        ],
+        "intermediate": [
+          "IMDC.*intermediate",
+          "intermediate.risk.*RCC",
+          "intermediate.risk.*kidney",
+          "1.*2.*IMDC",
+          "IMDC.*1.2.*factor"
+        ],
+        "poor": [
+          "IMDC.*poor",
+          "poor.risk.*RCC",
+          "poor.risk.*kidney",
+          "3.*6.*IMDC",
+          "IMDC.*3.*factor",
+          "IMDC.*4.*factor",
+          "IMDC.*5.*factor",
+          "IMDC.*6.*factor"
+        ],
+        "intermediate_poor": [
+          "intermediate.*poor.*risk",
+          "intermediate.or.poor",
+          "intermediate.*poor.*RCC",
+          "int.*poor.*kidney",
+          "1.*or.more.*IMDC",
+          "\u22651.*IMDC.*factor"
+        ]
+      },
+      "_ui_note": "If imdc_risk=unknown and trial restricts to a specific risk group: surface trial with flag 'IMDC risk score not confirmed \u2014 calculate using KPS, time to treatment, hemoglobin, calcium, neutrophils, and platelets. 0 factors = favorable; 1\u20132 = intermediate; 3+ = poor.'"
+    },
+    "prior_systemic_lines": {
+      "description": "Number of prior systemic therapy regimens for metastatic/advanced RCC",
+      "values": [
+        "0",
+        "1",
+        "2",
+        "3_plus",
+        "unknown"
+      ],
+      "detection_rules": {
+        "0": [
+          "treatment.naive",
+          "systemic.naive",
+          "first.line.*RCC",
+          "therapy.naive.*kidney",
+          "no.*prior.*systemic.*RCC",
+          "previously.untreated.*kidney",
+          "untreated.*advanced.*RCC"
+        ],
+        "1": [
+          "one.*prior.*systemic",
+          "1.*prior.*line",
+          "second.line.*RCC",
+          "2L.*kidney",
+          "one.*prior.*regimen.*kidney",
+          "previously.treated.*one.*RCC"
+        ],
+        "2": [
+          "two.*prior.*systemic",
+          "2.*prior.*lines",
+          "third.line.*kidney",
+          "\u22652.*prior.*RCC",
+          "at.least.2.*prior.*RCC",
+          "second.*third.*line.*kidney"
+        ],
+        "3_plus": [
+          "three.or.more.*prior",
+          "\u22653.*prior.*line.*kidney",
+          "heavily.pretreated.*RCC",
+          "multiple.prior.*RCC",
+          "\u22652.*prior.*IO.*kidney"
+        ]
+      },
+      "_ui_note": "If prior_systemic_lines=unknown and trial targets a specific line: surface trial with flag 'Confirm number of prior systemic regimens \u2014 trial eligibility depends on treatment line (1st-line naive vs. 2nd-line vs. 3rd-line+).'"
+    },
+    "prior_io": {
+      "description": "Prior immune checkpoint inhibitor therapy (anti-PD-1, anti-PD-L1, or anti-CTLA-4) for RCC. NOTE: detection_rules are ordered no\u2192yes so that 'no prior systemic treatment' context is caught before drug-name patterns that could span the text blob.",
+      "values": [
+        "no",
+        "yes",
+        "unknown"
+      ],
+      "detection_rules": {
+        "no": [
+          "IO.naive",
+          "checkpoint.naive",
+          "checkpoint-naive",
+          "immunotherapy.naive",
+          "IO-naive",
+          "no.*prior.*IO",
+          "no.*prior.*immunotherapy",
+          "no.*prior.*checkpoint",
+          "no.*prior.*PD.1",
+          "no.*prior.*PD-1",
+          "no.*prior.*systemic.*treatment",
+          "no.*prior.*systemic.*therapy",
+          "immunotherapy.not.*received",
+          "not.*received.*immunotherapy",
+          "without.*prior.*IO"
+        ],
+        "yes": [
+          "IO.refractory",
+          "checkpoint.refractory",
+          "IO.resistant",
+          "checkpoint.resistant",
+          "prior.*IO.therapy",
+          "prior.*checkpoint.inhibitor",
+          "post.*checkpoint.inhibitor",
+          "after.*checkpoint.inhibitor",
+          "after.*IO.therapy",
+          "prior.{0,60}nivolumab",
+          "prior.{0,60}pembrolizumab",
+          "prior.{0,60}ipilimumab",
+          "prior.{0,60}avelumab",
+          "prior.{0,60}atezolizumab",
+          "prior.{0,60}durvalumab",
+          "prior.{0,60}PD.1.inhibitor",
+          "prior.{0,60}PD-L1.inhibitor",
+          "post.{0,60}nivolumab",
+          "post.{0,60}pembrolizumab",
+          "prior.*immunotherapy.*RCC",
+          "received.*prior.*IO"
+        ]
+      },
+      "_ui_note": "If prior_io=unknown and trial stratifies by IO status: surface trial with flag 'Confirm prior IO therapy \u2014 has the patient received any PD-1, PD-L1, or CTLA-4 inhibitor? This determines second-line regimen eligibility (belzutifan, tivozanib, and others differ by IO history).'"
+    },
+    "prior_vegf_tki": {
+      "description": "Prior VEGF-targeted therapy (TKI or anti-VEGF antibody) for RCC. detection_rules ordered no\u2192yes to avoid false positives when study drug appears in text alongside negated 'prior' context.",
+      "values": [
+        "no",
+        "yes",
+        "unknown"
+      ],
+      "detection_rules": {
+        "no": [
+          "VEGF.TKI.naive",
+          "TKI.naive",
+          "anti.angiogenic.naive",
+          "sunitinib.naive",
+          "VEGFR.naive",
+          "anti.VEGF.naive",
+          "no.*prior.*VEGF",
+          "no.*prior.*TKI",
+          "no.*prior.*anti.angiogenic",
+          "no.*prior.*systemic.*treatment",
+          "no.*prior.*systemic.*therapy",
+          "without.*prior.*TKI",
+          "without.*prior.*VEGF",
+          "not.*received.*TKI"
+        ],
+        "yes": [
+          "VEGF.TKI.refractory",
+          "TKI.refractory.*kidney",
+          "anti.angiogenic.*prior",
+          "VEGFR.refractory",
+          "prior.{0,60}sunitinib",
+          "prior.{0,60}pazopanib",
+          "prior.{0,60}sorafenib",
+          "prior.{0,60}axitinib",
+          "prior.{0,60}cabozantinib",
+          "prior.{0,60}tivozanib",
+          "prior.{0,60}lenvatinib",
+          "prior.{0,60}bevacizumab",
+          "prior.*TKI.*RCC",
+          "prior.*VEGF.*RCC",
+          "prior.*VEGFR.*RCC",
+          "prior.*anti.angiogenic.*RCC",
+          "received.*prior.*TKI",
+          "received.*prior.*VEGF"
+        ]
+      },
+      "_ui_note": "If prior_vegf_tki=unknown and trial requires or excludes prior anti-VEGF therapy: surface trial with flag 'Confirm prior VEGF/TKI therapy \u2014 has the patient received sunitinib, pazopanib, axitinib, cabozantinib, sorafenib, or bevacizumab?'"
+    },
+    "nephrectomy_status": {
+      "description": "Whether the patient has undergone nephrectomy and current candidacy for cytoreductive nephrectomy",
+      "values": [
+        "prior_nephrectomy",
+        "cytoreductive_candidate",
+        "no_nephrectomy_not_candidate",
+        "unknown"
+      ],
+      "detection_rules": {
+        "prior_nephrectomy": [
+          "after.*nephrectomy",
+          "post.nephrectomy",
+          "prior.*nephrectomy",
+          "nephrectomy.performed",
+          "status.post.*nephrectomy",
+          "s/p.*nephrectomy",
+          "underwent.*nephrectomy",
+          "following.*nephrectomy",
+          "following.*resection.*primary.tumor",
+          "following.*complete.*resection",
+          "complete.*resection.*primary.*tumor",
+          "adjuvant.*after.*nephrectomy",
+          "adjuvant.*following.*nephrectomy",
+          "radical.*nephrectomy",
+          "partial.*nephrectomy",
+          "resected.*primary",
+          "KEYNOTE.564",
+          "STRIKE.*adjuvant",
+          "post.resection.*RCC",
+          "after.resection.*RCC"
+        ],
+        "cytoreductive_candidate": [
+          "cytoreductive.nephrectomy",
+          "debulking.*nephrectomy",
+          "nephrectomy.followed.by",
+          "upfront.*nephrectomy.*metastatic",
+          "CARMENA",
+          "nephrectomy.*candidate.*metastatic"
+        ],
+        "no_nephrectomy_not_candidate": [
+          "intact.primary.*tumor",
+          "primary.*in.place",
+          "no.*nephrectomy.*candidate",
+          "medically.inoperable.*kidney",
+          "unresectable.*primary"
+        ]
+      },
+      "_ui_note": "If nephrectomy_status=unknown and trial requires or restricts by nephrectomy: surface trial with flag 'Confirm nephrectomy status \u2014 has the patient had the primary kidney tumor removed? Some adjuvant trials require prior nephrectomy; some metastatic trials stratify by cytoreductive nephrectomy candidacy.'"
+    },
+    "vhl_status": {
+      "description": "VHL gene status \u2014 relevant for belzutifan (HIF-2\u03b1 inhibitor) eligibility and hereditary syndrome management",
+      "values": [
+        "vhl_disease_germline",
+        "somatic_vhl_mutation",
+        "wild_type",
+        "unknown"
+      ],
+      "detection_rules": {
+        "vhl_disease_germline": [
+          "VHL.*disease",
+          "von.Hippel.Lindau",
+          "VHL.*germline",
+          "germline.*VHL",
+          "VHL.*syndrome",
+          "hereditary.*VHL",
+          "VHL.associated.*RCC",
+          "VHL.*disease.*related"
+        ],
+        "somatic_vhl_mutation": [
+          "VHL.*mutant",
+          "VHL.*mutation.*somatic",
+          "somatic.*VHL",
+          "VHL.mutated.*ccRCC",
+          "VHL.*loss",
+          "VHL.*inactivation",
+          "HIF.2.*RCC",
+          "HIF2.*kidney",
+          "belzutifan.*VHL.*mutant"
+        ]
+      },
+      "_ui_note": "If vhl_status=unknown and trial targets VHL/HIF-2\u03b1: surface trial with flag 'VHL mutation or disease status not confirmed \u2014 belzutifan trials may require confirmed VHL disease (germline) or somatic VHL mutation. Molecular testing recommended.'"
+    },
+    "met_alteration": {
+      "description": "MET gene alteration (amplification, mutation, exon skipping) \u2014 primary biomarker axis for papillary type 1 RCC; MET-targeted TKIs (savolitinib, crizotinib, cabozantinib) may be particularly active",
+      "values": [
+        "met_amplification",
+        "met_mutation",
+        "met_wild_type",
+        "unknown"
+      ],
+      "detection_rules": {
+        "met_amplification": [
+          "MET.*amplif",
+          "MET.amplified",
+          "MET.*copy.number",
+          "MET.*gain",
+          "high.level.*MET"
+        ],
+        "met_mutation": [
+          "MET.*mutant",
+          "MET.*mutation",
+          "MET.*exon.14",
+          "MET.*germline",
+          "MET.*somatic.*mutation",
+          "MET.*activating",
+          "germline.*MET.*papillary"
+        ],
+        "met_wild_type": [
+          "MET.*wild.type",
+          "MET.*negative",
+          "MET.*not.amplified",
+          "no.*MET.*alteration"
+        ]
+      },
+      "_ui_note": "If met_alteration=unknown and trial targets MET (especially for papillary RCC): surface trial with flag 'MET alteration status not confirmed \u2014 MET-directed trials (savolitinib, crizotinib, cabozantinib) may have enriched activity in MET-amplified or MET-mutant papillary type 1 RCC. Molecular testing recommended.'"
+    },
+    "sarcomatoid": {
+      "description": "Presence of sarcomatoid or rhabdoid differentiation \u2014 aggressive histologic feature; may predict improved response to IO-based regimens (particularly IO/IO combinations). Relevant across all histologic subtypes.",
+      "values": [
+        "yes",
+        "no",
+        "unknown"
+      ],
+      "detection_rules": {
+        "yes": [
+          "sarcomatoid.*differentiation",
+          "sarcomatoid.*RCC",
+          "sarcomatoid.*component",
+          "sarcomatoid.*kidney",
+          "rhabdoid.*differentiation",
+          "rhabdoid.*RCC",
+          "sarcomatoid.*renal",
+          "sarcomatoid.*features"
+        ],
+        "no": [
+          "no.*sarcomatoid",
+          "absence.*sarcomatoid",
+          "without.*sarcomatoid",
+          "sarcomatoid.*absent"
+        ]
+      },
+      "_ui_note": "If sarcomatoid=unknown and trial restricts to sarcomatoid-enriched population: surface trial with flag 'Confirm presence or absence of sarcomatoid differentiation \u2014 pathology review recommended. IO-based regimens (nivolumab/cabozantinib, nivolumab/ipilimumab) show enhanced activity in sarcomatoid RCC.'"
+    }
+  },
+  "standard_therapies_by_state": {
+    "localized_t1a": [
+      "Partial nephrectomy (preferred)",
+      "Radical nephrectomy (if nephron-sparing not feasible)",
+      "Active surveillance (small mass <3 cm, competing comorbidities)",
+      "Thermal ablation \u2014 cryotherapy or RFA (medically inoperable)",
+      "SBRT (category 2B, medically inoperable)"
+    ],
+    "localized_t1b": [
+      "Partial nephrectomy (preferred)",
+      "Radical nephrectomy",
+      "Active surveillance (select patients)",
+      "Ablative techniques (select patients not surgical candidates)"
+    ],
+    "localized_stage2_3": [
+      "Radical nephrectomy \u00b1 lymph node dissection",
+      "Partial nephrectomy (if technically feasible)",
+      "Adjuvant pembrolizumab for high-risk ccRCC (KEYNOTE-564)"
+    ],
+    "adjuvant_post_nephrectomy": [
+      "Pembrolizumab x 1 year (Stage II grade 4/sarcomatoid, Stage III ccRCC, or M1 NED)",
+      "Observation (non-clear cell or lower risk)"
+    ],
+    "locally_advanced_unresectable": [
+      "Systemic therapy as for metastatic disease",
+      "Neoadjuvant IO/TKI (investigational)",
+      "Palliative nephrectomy if symptomatic hematuria"
+    ],
+    "metastatic_ccrcc_favorable_1l": [
+      "Axitinib + pembrolizumab (Cat 1 preferred)",
+      "Cabozantinib + nivolumab (Cat 1 preferred)",
+      "Lenvatinib + pembrolizumab (Cat 1 preferred)",
+      "Sunitinib (Cat 2A)",
+      "Pazopanib (Cat 2A)",
+      "Ipilimumab + nivolumab (Cat 2A \u2014 FDA approval int/poor only)",
+      "Active surveillance (asymptomatic, select, Cat 2A)",
+      "High-dose IL-2 (Cat 2B, selected)"
+    ],
+    "metastatic_ccrcc_int_poor_1l": [
+      "Axitinib + pembrolizumab (Cat 1 preferred)",
+      "Cabozantinib + nivolumab (Cat 1 preferred)",
+      "Lenvatinib + pembrolizumab (Cat 1 preferred)",
+      "Ipilimumab + nivolumab (Cat 1 preferred, int/poor)",
+      "Cabozantinib monotherapy (Cat 2A)",
+      "Temsirolimus (Cat 3, poor/int)"
+    ],
+    "metastatic_ccrcc_2l_io_experienced": [
+      "Cabozantinib (Cat 2A)",
+      "Lenvatinib + everolimus (Cat 2A)",
+      "Cabozantinib + nivolumab (Cat 2A)",
+      "Axitinib + pembrolizumab (Cat 2A)",
+      "Ipilimumab + nivolumab (Cat 2A)",
+      "Lenvatinib + pembrolizumab (Cat 2A)",
+      "Belzutifan (Cat 2A)",
+      "Tivozanib (Cat 2A if \u22652 prior incl IO)",
+      "Axitinib (Cat 2A)",
+      "Everolimus (Cat 2A)",
+      "Pazopanib (useful in certain circumstances)"
+    ],
+    "metastatic_ccrcc_2l_io_naive": [
+      "Nivolumab (Cat 2A)",
+      "Cabozantinib (Cat 2A)",
+      "Lenvatinib + everolimus (Cat 2A)",
+      "Axitinib + pembrolizumab (Cat 2A)",
+      "Axitinib (Cat 2A)",
+      "Pazopanib (useful)",
+      "Sunitinib (useful)",
+      "Everolimus (Cat 2A)",
+      "Belzutifan (Cat 2B)"
+    ],
+    "metastatic_ccrcc_3l_plus": [
+      "Tivozanib (Cat 2A, \u22652 prior incl IO)",
+      "Belzutifan (Cat 2A if prior IO; Cat 2B if IO-naive)",
+      "Clinical trial (preferred)",
+      "Best supportive care"
+    ],
+    "metastatic_ncrcc_papillary": [
+      "Cabozantinib (Cat 2A preferred)",
+      "Sunitinib (Cat 2A)",
+      "Lenvatinib + everolimus (Cat 2A)",
+      "Nivolumab (Cat 2A)",
+      "Nivolumab + cabozantinib (Cat 2A)",
+      "Pembrolizumab (Cat 2A)",
+      "Bevacizumab + erlotinib (Cat 2A \u2014 HLRCC/papillary)",
+      "Clinical trial (strongly preferred)"
+    ],
+    "metastatic_ncrcc_chromophobe": [
+      "Clinical trial (strongly preferred)",
+      "Sunitinib (Cat 2A)",
+      "Lenvatinib + everolimus (Cat 2A)",
+      "Nivolumab + cabozantinib (Cat 2A)",
+      "Cabozantinib (Cat 2A)"
+    ],
+    "metastatic_ncrcc_collecting_duct": [
+      "Clinical trial (strongly preferred)",
+      "Platinum-based chemotherapy (gemcitabine + cisplatin)",
+      "Cabozantinib (extrapolation)"
+    ],
+    "metastatic_ncrcc_tfe3_tfeb": [
+      "Clinical trial (strongly preferred)",
+      "mTOR inhibitors (some activity)",
+      "Sunitinib (some activity)"
+    ],
+    "metastatic_ncrcc_general": [
+      "Clinical trial (preferred \u2014 NCCN guideline recommendation)",
+      "Cabozantinib (Cat 2A)",
+      "Sunitinib (Cat 2A)",
+      "Lenvatinib + everolimus (Cat 2A)",
+      "Nivolumab + cabozantinib (Cat 2A)",
+      "Pembrolizumab (Cat 2A)",
+      "Nivolumab (Cat 2A)"
+    ],
+    "hereditary_rcc": [
+      "Belzutifan (VHL disease \u2014 FDA approved)",
+      "Nephron-sparing surgery (preferred for all hereditary syndromes)",
+      "Genetic counseling and germline testing",
+      "Active surveillance for small lesions (<3 cm)",
+      "Bevacizumab + erlotinib (HLRCC)",
+      "MET-targeted therapy (hereditary papillary type 1)"
+    ]
+  },
+  "known_trial_anchors": {
+    "description": "Named landmark trials for cross-reference and classification validation",
+    "trials": [
+      {
+        "name": "KEYNOTE-564",
+        "state": "adjuvant_post_nephrectomy",
+        "intervention": "Pembrolizumab adjuvant after nephrectomy (ccRCC, high-risk)"
+      },
+      {
+        "name": "KEYNOTE-426",
+        "state": "metastatic_ccrcc_1l_all_risk",
+        "intervention": "Axitinib + pembrolizumab vs sunitinib, 1L ccRCC all risk"
+      },
+      {
+        "name": "CheckMate 9ER",
+        "state": "metastatic_ccrcc_1l_all_risk",
+        "intervention": "Cabozantinib + nivolumab vs sunitinib, 1L ccRCC all risk"
+      },
+      {
+        "name": "CLEAR",
+        "state": "metastatic_ccrcc_1l_all_risk",
+        "intervention": "Lenvatinib + pembrolizumab vs sunitinib, 1L ccRCC all risk"
+      },
+      {
+        "name": "CheckMate 214",
+        "state": "metastatic_ccrcc_int_poor_1l",
+        "intervention": "Ipilimumab + nivolumab vs sunitinib, 1L ccRCC int/poor risk"
+      },
+      {
+        "name": "CABOSUN",
+        "state": "metastatic_ccrcc_int_poor_1l",
+        "intervention": "Cabozantinib vs sunitinib, 1L ccRCC int/poor risk (phase II)"
+      },
+      {
+        "name": "METEOR",
+        "state": "metastatic_ccrcc_2l_io_naive",
+        "intervention": "Cabozantinib vs everolimus, 2L ccRCC after VEGF-TKI"
+      },
+      {
+        "name": "CheckMate 025",
+        "state": "metastatic_ccrcc_2l_io_naive",
+        "intervention": "Nivolumab vs everolimus, 2L ccRCC after anti-angiogenic"
+      },
+      {
+        "name": "RECORD-1",
+        "state": "metastatic_ccrcc_2l_io_naive",
+        "intervention": "Everolimus vs placebo, 2L ccRCC after TKI"
+      },
+      {
+        "name": "Litespark-005",
+        "state": "metastatic_ccrcc_2l_io_experienced",
+        "intervention": "Belzutifan vs everolimus, 2L ccRCC after IO and VEGF-TKI"
+      },
+      {
+        "name": "TIVO-3",
+        "state": "metastatic_ccrcc_3l_plus",
+        "intervention": "Tivozanib vs sorafenib, 3L ccRCC (\u22652 prior regimens)"
+      },
+      {
+        "name": "SWOG 1500",
+        "state": "metastatic_ncrcc_papillary",
+        "intervention": "Cabozantinib vs sunitinib vs crizotinib vs savolitinib, papillary RCC"
+      },
+      {
+        "name": "CARMENA",
+        "state": "metastatic_ccrcc_1l_all_risk",
+        "intervention": "Cytoreductive nephrectomy + sunitinib vs sunitinib alone, 1L ccRCC"
+      },
+      {
+        "name": "JAVELIN Renal 101",
+        "state": "metastatic_ccrcc_1l_all_risk",
+        "intervention": "Axitinib + avelumab vs sunitinib, 1L ccRCC all risk"
+      },
+      {
+        "name": "KEYNOTE-427 Cohort B",
+        "state": "metastatic_ncrcc_general",
+        "intervention": "Pembrolizumab monotherapy, 1L nccRCC"
+      }
+    ]
+  },
+  "imdc_risk_model": {
+    "description": "International Metastatic RCC Database Consortium (IMDC) prognostic model \u2014 6 independent adverse factors",
+    "factors": [
+      "Karnofsky Performance Status < 80%",
+      "Time from diagnosis to systemic therapy < 1 year",
+      "Hemoglobin < lower limit of normal",
+      "Corrected calcium > upper limit of normal",
+      "Absolute neutrophil count > upper limit of normal",
+      "Platelet count > upper limit of normal"
+    ],
+    "risk_groups": {
+      "favorable": {
+        "factors": 0,
+        "median_os_months": "Not reached",
+        "2yr_os_pct": 75
+      },
+      "intermediate": {
+        "factors": "1\u20132",
+        "median_os_months": 27,
+        "2yr_os_pct": 53
+      },
+      "poor": {
+        "factors": "3\u20136",
+        "median_os_months": 8.8,
+        "2yr_os_pct": 7
+      }
+    },
+    "reference": "Heng et al. Lancet Oncol 2013"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "primary_terms": [
+    "prostate cancer",
+    "prostate adenocarcinoma",
+    "metastatic castration resistant prostate cancer",
+    "castration sensitive prostate cancer",
+    "bladder cancer",
+    "urothelial carcinoma",
+    "upper tract urothelial",
+    "kidney cancer",
+    "renal cell carcinoma",
+    "testicular cancer",
+    "germ cell tumor",
+    "penile cancer",
+    "genitourinary cancer",
+    "adrenocortical carcinoma",
+    "pheochromocytoma"
+  ],
+  "basket_terms": [
+    "advanced solid tumors",
+    "metastatic solid tumors",
+    "advanced malignancies",
+    "solid tumors"
+  ],
+  "match_terms": [
+    "prostate",
+    "bladder",
+    "urothelial",
+    "kidney",
+    "renal",
+    "renal cell",
+    "rcc",
+    "testicular",
+    "germ cell",
+    "penile",
+    "genitourinary",
+    "gu cancer",
+    "gu malignanc",
+    "adrenal",
+    "adrenocortical",
+    "pheochromocytoma",
+    "paraganglioma"
+  ]
+}
