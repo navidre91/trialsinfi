@@ -1,6 +1,9 @@
 .DS_Store
 .claude/
 .private_docs/
+knowledgecenter/
+__pycache__/
+*.pyc
 
 # Local runtime data
 data/physician_forum.sqlite

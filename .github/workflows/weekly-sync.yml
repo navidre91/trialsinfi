@@ -23,17 +23,17 @@ jobs:
         with:
           python-version: "3.11"
           cache: "pip"
-          cache-dependency-path: knowledgecenter/production_ready_pipeline/requirements.txt
+          cache-dependency-path: production_ready_pipeline/requirements.txt
 
       - name: Install pipeline dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r knowledgecenter/production_ready_pipeline/requirements.txt
+          pip install -r production_ready_pipeline/requirements.txt
 
       - name: Generate website catalog
         run: |
           mkdir -p build
-          python knowledgecenter/production_ready_pipeline/gu_pipeline.py \
+          python production_ready_pipeline/gu_pipeline.py \
             --skip-excel \
             --skip-updates \
             --website-catalog-out build/website_trials.json
