@@ -86,22 +86,48 @@
                         <!-- Eligibility Criteria -->
                         <section class="trial-section" style="background: var(--card-background); border-radius: var(--border-radius); padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-sm);">
                             <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-primary);">Eligibility Criteria</h2>
-                            <ul id="eligibilityCriteria" class="eligibility-list" style="list-style: none; padding: 0; margin: 0;">
-                                <!-- Criteria items will be populated here -->
-                            </ul>
+                            <div id="eligibilitySummary" style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem;"></div>
+                            <div id="inclusionCriteriaSection" style="display: none; margin-bottom: 1rem;">
+                                <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">Inclusion Criteria</h3>
+                                <p id="inclusionCriteriaText" style="color: var(--text-secondary); line-height: 1.6; margin: 0; white-space: pre-wrap;"></p>
+                            </div>
+                            <div id="exclusionCriteriaSection" style="display: none;">
+                                <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">Exclusion Criteria</h3>
+                                <p id="exclusionCriteriaText" style="color: var(--text-secondary); line-height: 1.6; margin: 0; white-space: pre-wrap;"></p>
+                            </div>
+                            <ul id="eligibilityCriteria" class="eligibility-list" style="list-style: none; padding: 0; margin: 0; display: none;"></ul>
                         </section>
 
-                        <!-- Study Objectives -->
+                        <!-- Classification and Outcomes -->
                         <section class="trial-section" style="background: var(--card-background); border-radius: var(--border-radius); padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-sm);">
-                            <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-primary);">Study Objectives</h2>
+                            <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-primary);">Classification and Outcomes</h2>
+
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                                <div>
+                                    <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.025em; margin-bottom: 0.25rem;">Disease Setting</div>
+                                    <div id="diseaseSettingPrimary" style="font-weight: 500; color: var(--text-primary);"></div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.025em; margin-bottom: 0.25rem;">Confidence</div>
+                                    <div id="classificationConfidence" style="font-weight: 500; color: var(--text-primary);"></div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.025em; margin-bottom: 0.25rem;">Treatment Modality</div>
+                                    <div id="treatmentModality" style="font-weight: 500; color: var(--text-primary);"></div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.025em; margin-bottom: 0.25rem;">NCCN Taxonomy</div>
+                                    <div id="nccnTaxonomyVersion" style="font-weight: 500; color: var(--text-primary);"></div>
+                                </div>
+                            </div>
                             
                             <div style="margin-bottom: 1.5rem;">
-                                <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">Primary Objective</h3>
+                                <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">Primary Outcome</h3>
                                 <p id="primaryObjective" style="color: var(--text-secondary); line-height: 1.6; margin: 0;"></p>
                             </div>
                             
                             <div id="secondaryObjectivesSection" style="display: none;">
-                                <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--text-primary);">Secondary Objectives</h3>
+                                <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--text-primary);">Secondary Outcomes</h3>
                                 <ul id="secondaryObjectives" style="color: var(--text-secondary); line-height: 1.6; margin: 0; padding-left: 1.25rem;">
                                     <!-- Secondary objectives will be populated here -->
                                 </ul>
@@ -121,8 +147,12 @@
                                     <div id="lastWebsiteUpdate" style="font-weight: 500; color: var(--text-primary);"></div>
                                 </div>
                                 <div>
-                                    <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.025em; margin-bottom: 0.25rem;">Institute ID</div>
-                                    <div id="instituteId" style="font-weight: 500; color: var(--text-primary); word-break: break-word;"></div>
+                                    <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.025em; margin-bottom: 0.25rem;">Study First Posted</div>
+                                    <div id="studyFirstPosted" style="font-weight: 500; color: var(--text-primary); word-break: break-word;"></div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.025em; margin-bottom: 0.25rem;">Sites in SoCal</div>
+                                    <div id="siteCount" style="font-weight: 500; color: var(--text-primary); word-break: break-word;"></div>
                                 </div>
                             </div>
                         </section>
@@ -159,6 +189,7 @@
                                 <div id="hospitalName" style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;"></div>
                                 <div id="institutionMeta" style="color: var(--text-secondary); line-height: 1.4;"></div>
                             </div>
+                            <div id="availableSites" style="margin-top: 1rem; color: var(--text-secondary); line-height: 1.5;"></div>
                         </section>
 
                         <!-- Study Details -->
@@ -175,12 +206,20 @@
                                     <div id="studyPhase" style="color: var(--text-primary);"></div>
                                 </div>
                                 <div>
+                                    <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.025em; margin-bottom: 0.25rem;">Cancer Types</div>
+                                    <div id="cancerTypes" style="color: var(--text-primary);"></div>
+                                </div>
+                                <div>
                                     <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.025em; margin-bottom: 0.25rem;">Sponsor</div>
                                     <div id="sponsor" style="color: var(--text-primary); word-break: break-word;"></div>
                                 </div>
                                 <div>
                                     <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.025em; margin-bottom: 0.25rem;">NCTID</div>
                                     <div id="nctId" style="color: var(--text-primary); word-break: break-word;"></div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.025em; margin-bottom: 0.25rem;">CT.gov</div>
+                                    <a id="ctGovLink" href="#" target="_blank" rel="noopener noreferrer" style="color: var(--primary-color); text-decoration: none; word-break: break-word;">View source record</a>
                                 </div>
                             </div>
                         </section>
@@ -271,6 +310,16 @@
             displayTrial() {
                 const trial = this.currentTrial;
                 const statusConfig = Utils.getStatusConfig(trial.status);
+                const primaryEmail = Utils.getPrimaryContactEmail(trial);
+                const primaryPiName = Utils.getPrimaryPiName(trial) || 'Not specified';
+                const institutions = Utils.getTrialInstitutions(trial);
+                const primarySite = Utils.getPrimarySite(trial);
+                const secondaryItems = (Array.isArray(trial.secondaryOutcomes) && trial.secondaryOutcomes.length > 0)
+                    ? trial.secondaryOutcomes
+                    : (trial.secondaryObjectives || []);
+                const primaryOutcome = (Array.isArray(trial.primaryOutcomes) && trial.primaryOutcomes.length > 0)
+                    ? trial.primaryOutcomes[0]
+                    : (trial.primaryObjective || 'Not specified');
 
                 // Hide loading, show content
                 document.getElementById('loadingState').style.display = 'none';
@@ -284,47 +333,94 @@
                 document.getElementById('trialTitle').textContent = trial.title;
                 document.getElementById('trialStatus').className = `trial-status ${statusConfig.className}`;
                 document.getElementById('trialStatus').textContent = statusConfig.label;
-                document.getElementById('trialPhase').textContent = trial.phase || 'Not specified';
+                document.getElementById('trialPhase').textContent = Utils.getDisplayPhase(trial);
                 document.getElementById('trialDescription').textContent = trial.description;
                 document.getElementById('lastUpdated').textContent = Utils.formatDate(Utils.getDisplayWebsiteUpdate(trial));
 
                 // Eligibility
-                this.displayEligibilityCriteria(trial.eligibilityCriteria || []);
+                this.displayEligibilityCriteria(trial);
 
-                // Objectives
-                document.getElementById('primaryObjective').textContent = trial.primaryObjective;
-                this.displaySecondaryObjectives(trial.secondaryObjectives || []);
+                // Classification and outcomes
+                document.getElementById('diseaseSettingPrimary').textContent = Utils.getDiseaseSettingLabel(trial) || 'Not specified';
+                document.getElementById('classificationConfidence').textContent = trial.classificationConfidence || 'Not specified';
+                document.getElementById('treatmentModality').textContent = trial.treatmentModality || 'Not specified';
+                document.getElementById('nccnTaxonomyVersion').textContent = trial.nccnTaxonomyVersion || 'Not specified';
+                document.getElementById('primaryObjective').textContent = primaryOutcome;
+                this.displaySecondaryObjectives(secondaryItems);
 
                 // Timeline
                 document.getElementById('startDate').textContent = Utils.formatDate(trial.startDate);
                 document.getElementById('lastWebsiteUpdate').textContent = Utils.formatDate(Utils.getDisplayWebsiteUpdate(trial));
-                document.getElementById('instituteId').textContent = Utils.getDisplayInstituteId(trial) || 'Not specified';
+                document.getElementById('studyFirstPosted').textContent = Utils.formatDate(trial.studyFirstPosted);
+                document.getElementById('siteCount').textContent = String(trial.siteCount || institutions.length || 0);
 
                 // Contact information
                 const contactEmail = document.getElementById('contactEmail');
-                if (trial.contactEmail) {
-                    contactEmail.href = `mailto:${trial.contactEmail}?subject=Inquiry about ${trial.title}`;
-                    contactEmail.textContent = trial.contactEmail;
+                if (primaryEmail) {
+                    contactEmail.href = `mailto:${primaryEmail}?subject=Inquiry about ${trial.title}`;
+                    contactEmail.textContent = primaryEmail;
                 } else {
                     contactEmail.href = '#';
                     contactEmail.textContent = 'Not specified';
                 }
-                document.getElementById('piName').textContent = trial.piName || 'Not specified';
+                document.getElementById('piName').textContent = primaryPiName;
 
                 // Institution information
-                document.getElementById('hospitalName').textContent = trial.location.hospital || 'Not specified';
-                document.getElementById('institutionMeta').textContent = `Institute ID: ${Utils.getDisplayInstituteId(trial) || 'Not specified'}`;
+                document.getElementById('hospitalName').textContent = primarySite.institution || trial.location.hospital || 'Not specified';
+                document.getElementById('institutionMeta').textContent = [primarySite.city, primarySite.state].filter(Boolean).join(', ') || 'Southern California site';
+                this.displaySites(trial.sites || []);
 
                 // Study details
                 document.getElementById('studyType').textContent = trial.studyType || 'Not specified';
-                document.getElementById('studyPhase').textContent = trial.phase || 'Not specified';
+                document.getElementById('studyPhase').textContent = Utils.getDisplayPhase(trial);
+                document.getElementById('cancerTypes').textContent = Utils.getDisplayCancerTypes(trial);
                 document.getElementById('sponsor').textContent = trial.sponsor || 'Not specified';
                 document.getElementById('nctId').textContent = trial.nctId || 'Not specified';
+                const ctGovLink = document.getElementById('ctGovLink');
+                if (trial.ctGovUrl) {
+                    ctGovLink.href = trial.ctGovUrl;
+                    ctGovLink.textContent = 'View source record';
+                } else {
+                    ctGovLink.href = '#';
+                    ctGovLink.textContent = 'Not available';
+                }
             }
 
-            displayEligibilityCriteria(criteria) {
+            displayEligibilityCriteria(trial) {
                 const list = document.getElementById('eligibilityCriteria');
+                const inclusionSection = document.getElementById('inclusionCriteriaSection');
+                const exclusionSection = document.getElementById('exclusionCriteriaSection');
+                const summary = document.getElementById('eligibilitySummary');
                 Utils.clearElement(list);
+                list.style.display = 'none';
+
+                const inclusionText = (trial.inclusionCriteria || '').trim();
+                const exclusionText = (trial.exclusionCriteria || '').trim();
+
+                if (inclusionText) {
+                    inclusionSection.style.display = 'block';
+                    document.getElementById('inclusionCriteriaText').textContent = inclusionText;
+                } else {
+                    inclusionSection.style.display = 'none';
+                }
+
+                if (exclusionText) {
+                    exclusionSection.style.display = 'block';
+                    document.getElementById('exclusionCriteriaText').textContent = exclusionText;
+                } else {
+                    exclusionSection.style.display = 'none';
+                }
+
+                if (inclusionText || exclusionText) {
+                    summary.textContent = 'Parsed directly from the ClinicalTrials.gov eligibility section for this trial.';
+                    return;
+                }
+
+                const criteria = trial.eligibilityCriteria || [];
+                summary.textContent = '';
+                if (criteria.length > 0) {
+                    list.style.display = 'block';
+                }
 
                 criteria.forEach(criterion => {
                     const li = document.createElement('li');
@@ -345,6 +441,27 @@
                 if (criteria.length === 0) {
                     list.innerHTML = '<li style="color: var(--text-secondary); font-style: italic;">No specific criteria listed</li>';
                 }
+            }
+
+            displaySites(sites) {
+                const container = document.getElementById('availableSites');
+                Utils.clearElement(container);
+
+                if (!Array.isArray(sites) || sites.length === 0) {
+                    container.textContent = 'No site details listed';
+                    return;
+                }
+
+                sites.forEach(site => {
+                    const block = document.createElement('div');
+                    block.style.marginBottom = '0.75rem';
+                    block.innerHTML = `
+                        <div style="font-weight: 600; color: var(--text-primary);">${Utils.sanitizeHTML(site.institution || 'Unknown site')}</div>
+                        <div>${Utils.sanitizeHTML([site.city, site.state].filter(Boolean).join(', ') || 'Location not specified')}</div>
+                        <div>PI: ${Utils.sanitizeHTML(site.piName || 'Not specified')}</div>
+                    `;
+                    container.appendChild(block);
+                });
             }
 
             displaySecondaryObjectives(objectives) {
@@ -370,20 +487,22 @@
             bindEventListeners() {
                 // Contact button
                 document.getElementById('contactBtn').addEventListener('click', () => {
-                    if (!this.currentTrial.contactEmail) {
+                    const primaryEmail = Utils.getPrimaryContactEmail(this.currentTrial);
+                    if (!primaryEmail) {
                         Utils.showErrorMessage('No contact email provided for this trial');
                         return;
                     }
-                    window.location.href = `mailto:${this.currentTrial.contactEmail}?subject=Inquiry about ${this.currentTrial.title}`;
+                    window.location.href = `mailto:${primaryEmail}?subject=Inquiry about ${this.currentTrial.title}`;
                 });
 
                 // Copy email button
                 document.getElementById('copyEmailBtn').addEventListener('click', async () => {
-                    if (!this.currentTrial.contactEmail) {
+                    const primaryEmail = Utils.getPrimaryContactEmail(this.currentTrial);
+                    if (!primaryEmail) {
                         Utils.showErrorMessage('No contact email provided for this trial');
                         return;
                     }
-                    const success = await Utils.copyToClipboard(this.currentTrial.contactEmail);
+                    const success = await Utils.copyToClipboard(primaryEmail);
                     if (success) {
                         Utils.showSuccessMessage('Email address copied to clipboard');
                     } else {

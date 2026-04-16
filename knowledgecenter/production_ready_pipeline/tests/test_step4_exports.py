@@ -3,12 +3,14 @@ from __future__ import annotations
 
 import sys
 import tempfile
+import json
 from pathlib import Path
 
 PACKAGE = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PACKAGE.parent))
 
 from production_ready_pipeline.excel_export import build_cancer_type_excel, build_updates_excel, save_flat_csv
+from production_ready_pipeline.website_export import write_website_catalog
 
 
 PASS = "\033[92mPASS\033[0m"
@@ -96,6 +98,7 @@ def test_exports() -> None:
         csv_path = tmpdir_path / "all_trials_2026-04-16.csv"
         workbook_path = tmpdir_path / "prostate_trials_2026-04-16.xlsx"
         updates_path = tmpdir_path / "updates_2026-04-16.xlsx"
+        website_catalog_path = tmpdir_path / "website_trials.json"
 
         save_flat_csv(study_records, csv_path)
         build_cancer_type_excel(
@@ -118,10 +121,30 @@ def test_exports() -> None:
             version="3.0.0",
             pulled_by="Test Suite",
         )
+        write_website_catalog(
+            study_records=study_records,
+            site_rows=site_rows,
+            out_path=website_catalog_path,
+            run_ts="2026-04-16_1200",
+            pipeline_version="3.0.0",
+            source_run_dir=str(tmpdir_path),
+        )
 
         check(csv_path.exists() and csv_path.stat().st_size > 0, "Flat CSV written")
         check(workbook_path.exists() and workbook_path.stat().st_size > 0, "Cancer-type workbook written")
         check(updates_path.exists() and updates_path.stat().st_size > 0, "Updates workbook written")
+        check(website_catalog_path.exists() and website_catalog_path.stat().st_size > 0, "Website catalog written")
+
+        payload = json.loads(website_catalog_path.read_text(encoding="utf-8"))
+        metadata = payload.get("metadata", {})
+        trials = payload.get("trials", [])
+        first_trial = trials[0] if trials else {}
+
+        check(metadata.get("trialCount") == 1, "Website catalog metadata includes trial count")
+        check(metadata.get("institutionCount") == 1, "Website catalog metadata includes institution count")
+        check(first_trial.get("phase") == "Phase II", "Website catalog normalizes display phase")
+        check(first_trial.get("availableInstitutions") == ["UCLA"], "Website catalog preserves institution list")
+        check(first_trial.get("sites", [{}])[0].get("email") == "jane.smith@example.org", "Website catalog preserves site contacts")
 
 
 if __name__ == "__main__":

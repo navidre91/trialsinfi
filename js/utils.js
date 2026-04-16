@@ -89,10 +89,14 @@ class Utils {
       prostate: 'Prostate',
       kidney: 'Kidney',
       renal: 'Kidney',
+      'kidney/rcc': 'Kidney',
       bladder: 'Bladder',
       urothelial: 'Bladder',
+      'bladder/urothelial': 'Bladder',
       testicular: 'Testicular',
       testis: 'Testicular',
+      'testicular/gct': 'Testicular',
+      adrenal: 'Adrenal',
       other: 'Others',
       others: 'Others'
     };
@@ -107,12 +111,13 @@ class Utils {
     if (/(kidney|renal|rcc|renal cell carcinoma)/.test(haystack)) return 'Kidney';
     if (/(bladder|urothelial|nmibc|mibc)/.test(haystack)) return 'Bladder';
     if (/(testicular|testis|germ cell|seminoma)/.test(haystack)) return 'Testicular';
+    if (/(adrenal|adrenocortical|pheochromocytoma|paraganglioma)/.test(haystack)) return 'Adrenal';
 
     return null;
   }
 
   static getTrialCancerType(trial) {
-    const explicitType = Utils.normalizeCancerType(trial?.type || trial?.cancerType);
+    const explicitType = Utils.normalizeCancerType(trial?.type || trial?.cancerType || trial?.cancerTypes?.[0]);
     if (explicitType) {
       return explicitType;
     }
@@ -125,8 +130,30 @@ class Utils {
       trial?.title,
       trial?.description,
       trial?.qualification,
+      trial?.diseaseSettingPrimary,
       eligibilityText
     ].filter(Boolean).join(' '));
+  }
+
+  static normalizePhaseValue(phase) {
+    const normalized = (phase || '').toString().trim().toUpperCase();
+    const aliases = {
+      EARLY_PHASE1: 'Early Phase I',
+      PHASE1: 'Phase I',
+      'PHASE1 | PHASE2': 'Phase I/II',
+      PHASE2: 'Phase II',
+      'PHASE2 | PHASE3': 'Phase II/III',
+      PHASE3: 'Phase III',
+      PHASE4: 'Phase IV',
+      'N/A': 'Not specified',
+      '': 'Not specified'
+    };
+
+    return aliases[normalized] || phase || 'Not specified';
+  }
+
+  static getDisplayPhase(trial) {
+    return Utils.normalizePhaseValue(trial?.phaseRaw || trial?.phase);
   }
 
   /**
@@ -396,11 +423,78 @@ class Utils {
   }
 
   static getDisplayWebsiteUpdate(trial) {
-    return (trial?.lastWebsiteUpdate || trial?.lastUpdated || '').toString().trim();
+    return (trial?.lastWebsiteUpdate || trial?.lastSyncAt || trial?.lastUpdated || '').toString().trim();
   }
 
   static getDisplayInstituteId(trial) {
-    return (trial?.instituteId || trial?.id || '').toString().trim();
+    return (trial?.instituteId || Utils.getPrimarySite(trial)?.institution || trial?.id || '').toString().trim();
+  }
+
+  static getTrialInstitutions(trial) {
+    const institutions = [];
+    if (Array.isArray(trial?.availableInstitutions)) {
+      institutions.push(...trial.availableInstitutions);
+    }
+    if (Array.isArray(trial?.sites)) {
+      trial.sites.forEach(site => {
+        if (site?.institution) {
+          institutions.push(site.institution);
+        }
+      });
+    }
+    if (trial?.location?.hospital) {
+      institutions.push(trial.location.hospital);
+    }
+
+    return Array.from(new Set(
+      institutions
+        .map(value => (value || '').toString().trim())
+        .filter(Boolean)
+    )).sort();
+  }
+
+  static getPrimarySite(trial) {
+    if (Array.isArray(trial?.sites) && trial.sites.length > 0) {
+      return trial.sites[0];
+    }
+
+    return {
+      institution: (trial?.location?.hospital || '').toString().trim(),
+      city: (trial?.location?.city || '').toString().trim(),
+      state: (trial?.location?.state || '').toString().trim(),
+      address: (trial?.location?.address || '').toString().trim(),
+      email: (trial?.contactEmail || '').toString().trim(),
+      piName: (trial?.piName || '').toString().trim(),
+      phone: '',
+      affiliation: ''
+    };
+  }
+
+  static getPrimaryContactEmail(trial) {
+    return (trial?.contactEmail || Utils.getPrimarySite(trial)?.email || '').toString().trim();
+  }
+
+  static getPrimaryPiName(trial) {
+    return (trial?.piName || Utils.getPrimarySite(trial)?.piName || '').toString().trim();
+  }
+
+  static getDiseaseSettingLabel(trial) {
+    if (trial?.diseaseSettingPrimary) {
+      return trial.diseaseSettingPrimary;
+    }
+
+    if (Array.isArray(trial?.diseaseSettingAll) && trial.diseaseSettingAll.length > 0) {
+      return trial.diseaseSettingAll[0];
+    }
+
+    return (trial?.qualification || '').toString().trim();
+  }
+
+  static getDisplayCancerTypes(trial) {
+    const cancerTypes = Array.isArray(trial?.cancerTypes) && trial.cancerTypes.length > 0
+      ? trial.cancerTypes
+      : [Utils.getTrialCancerType(trial)].filter(Boolean);
+    return cancerTypes.join(', ') || 'Not specified';
   }
 
   static getTrialCsvHeaders() {
@@ -415,9 +509,26 @@ class Utils {
       'startDate',
       'studyType',
       'phase',
+      'phaseRaw',
       'cancerType',
+      'cancerTypes',
       'type',
       'sponsor',
+      'diseaseSettingPrimary',
+      'diseaseSettingAll',
+      'classificationConfidence',
+      'treatmentModality',
+      'delivery',
+      'nccnTaxonomyVersion',
+      'ctGovUrl',
+      'availableInstitutions',
+      'inclusionCriteria',
+      'exclusionCriteria',
+      'primaryOutcomes',
+      'secondaryOutcomes',
+      'lastSyncAt',
+      'pipelineVersion',
+      'sourceRun',
       'primaryObjective',
       'secondaryObjectives',
       'eligibilityCriteria',
@@ -541,6 +652,40 @@ class Utils {
   static normalizeTrialForSave(trial) {
     const normalizedStatus = Utils.normalizeStatus(trial?.status);
     const normalizedCancerType = Utils.getTrialCancerType(trial);
+    const normalizedCancerTypes = Array.isArray(trial?.cancerTypes)
+      ? Array.from(new Set(
+        trial.cancerTypes
+          .map(item => Utils.normalizeCancerType(item))
+          .filter(Boolean)
+      ))
+      : [normalizedCancerType].filter(Boolean);
+    const institutions = Utils.getTrialInstitutions(trial);
+    const primarySite = Utils.getPrimarySite(trial);
+    const normalizedSites = Array.isArray(trial?.sites)
+      ? trial.sites
+        .filter(site => site && typeof site === 'object')
+        .map(site => ({
+          siteId: (site.siteId || '').toString().trim(),
+          institution: (site.institution || '').toString().trim(),
+          city: (site.city || '').toString().trim(),
+          state: (site.state || '').toString().trim(),
+          address: (site.address || '').toString().trim(),
+          piName: (site.piName || '').toString().trim(),
+          email: (site.email || '').toString().trim(),
+          phone: (site.phone || '').toString().trim(),
+          affiliation: (site.affiliation || '').toString().trim()
+        }))
+      : [];
+    const normalizedDiseaseSettingAll = Array.isArray(trial?.diseaseSettingAll)
+      ? trial.diseaseSettingAll
+        .map(item => (item === null || item === undefined ? '' : String(item).trim()))
+        .filter(Boolean)
+      : [];
+    const normalizeStringList = values => Array.isArray(values)
+      ? values
+        .map(item => (item === null || item === undefined ? '' : String(item).trim()))
+        .filter(Boolean)
+      : [];
 
     return {
       id: (trial?.id || '').toString().trim(),
@@ -548,25 +693,27 @@ class Utils {
       title: (trial?.title || '').toString().trim(),
       status: normalizedStatus || 'not_specified',
       description: (trial?.description || '').toString().trim(),
-      qualification: (trial?.qualification || '').toString().trim(),
+      qualification: (trial?.qualification || Utils.getDiseaseSettingLabel(trial) || '').toString().trim(),
       location: {
-        hospital: (trial?.location?.hospital || '').toString().trim(),
-        city: (trial?.location?.city || '').toString().trim(),
-        state: (trial?.location?.state || '').toString().trim(),
+        hospital: (trial?.location?.hospital || primarySite.institution || '').toString().trim(),
+        city: (trial?.location?.city || primarySite.city || '').toString().trim(),
+        state: (trial?.location?.state || primarySite.state || '').toString().trim(),
         zipCode: (trial?.location?.zipCode || '').toString().trim(),
-        address: (trial?.location?.address || '').toString().trim()
+        address: (trial?.location?.address || primarySite.address || '').toString().trim()
       },
-      contactEmail: (trial?.contactEmail || '').toString().trim(),
+      contactEmail: Utils.getPrimaryContactEmail(trial),
       startDate: (trial?.startDate || '').toString().trim(),
       endDate: (trial?.endDate || '').toString().trim(),
       estimatedDuration: (trial?.estimatedDuration || '').toString().trim(),
       studyType: (trial?.studyType || '').toString().trim(),
-      phase: (trial?.phase || '').toString().trim(),
+      phase: Utils.getDisplayPhase(trial),
+      phaseRaw: (trial?.phaseRaw || trial?.phase || '').toString().trim(),
       cancerType: normalizedCancerType || '',
+      cancerTypes: normalizedCancerTypes,
       sponsor: (trial?.sponsor || '').toString().trim(),
-      lastWebsiteUpdate: (trial?.lastWebsiteUpdate || '').toString().trim(),
+      lastWebsiteUpdate: (trial?.lastWebsiteUpdate || trial?.lastSyncAt || '').toString().trim(),
       instituteId: (trial?.instituteId || '').toString().trim(),
-      piName: (trial?.piName || '').toString().trim(),
+      piName: Utils.getPrimaryPiName(trial),
       primaryObjective: (trial?.primaryObjective || '').toString().trim(),
       secondaryObjectives: Array.isArray(trial?.secondaryObjectives)
         ? trial.secondaryObjectives
@@ -578,7 +725,26 @@ class Utils {
           .map(item => (item === null || item === undefined ? '' : String(item).trim()))
           .filter(Boolean)
         : [],
-      lastUpdated: (trial?.lastUpdated || '').toString().trim()
+      lastUpdated: (trial?.lastUpdated || '').toString().trim(),
+      diseaseSettingPrimary: (trial?.diseaseSettingPrimary || Utils.getDiseaseSettingLabel(trial) || '').toString().trim(),
+      diseaseSettingAll: normalizedDiseaseSettingAll,
+      classificationConfidence: (trial?.classificationConfidence || '').toString().trim(),
+      treatmentModality: (trial?.treatmentModality || '').toString().trim(),
+      delivery: (trial?.delivery || '').toString().trim(),
+      nccnTaxonomyVersion: (trial?.nccnTaxonomyVersion || '').toString().trim(),
+      ctGovUrl: (trial?.ctGovUrl || '').toString().trim(),
+      conditions: normalizeStringList(trial?.conditions),
+      interventions: normalizeStringList(trial?.interventions),
+      availableInstitutions: institutions,
+      siteCount: Number(trial?.siteCount || normalizedSites.length || institutions.length || 0),
+      sites: normalizedSites,
+      inclusionCriteria: (trial?.inclusionCriteria || '').toString().trim(),
+      exclusionCriteria: (trial?.exclusionCriteria || '').toString().trim(),
+      primaryOutcomes: normalizeStringList(trial?.primaryOutcomes),
+      secondaryOutcomes: normalizeStringList(trial?.secondaryOutcomes),
+      lastSyncAt: (trial?.lastSyncAt || '').toString().trim(),
+      pipelineVersion: (trial?.pipelineVersion || '').toString().trim(),
+      sourceRun: (trial?.sourceRun || '').toString().trim()
     };
   }
 
@@ -595,9 +761,26 @@ class Utils {
       startDate: normalizedTrial.startDate,
       studyType: normalizedTrial.studyType,
       phase: normalizedTrial.phase,
+      phaseRaw: normalizedTrial.phaseRaw,
       cancerType: normalizedTrial.cancerType,
+      cancerTypes: Utils.formatPipeSeparatedList(normalizedTrial.cancerTypes),
       type: normalizedTrial.cancerType,
       sponsor: normalizedTrial.sponsor,
+      diseaseSettingPrimary: normalizedTrial.diseaseSettingPrimary,
+      diseaseSettingAll: Utils.formatPipeSeparatedList(normalizedTrial.diseaseSettingAll),
+      classificationConfidence: normalizedTrial.classificationConfidence,
+      treatmentModality: normalizedTrial.treatmentModality,
+      delivery: normalizedTrial.delivery,
+      nccnTaxonomyVersion: normalizedTrial.nccnTaxonomyVersion,
+      ctGovUrl: normalizedTrial.ctGovUrl,
+      availableInstitutions: Utils.formatPipeSeparatedList(normalizedTrial.availableInstitutions),
+      inclusionCriteria: normalizedTrial.inclusionCriteria,
+      exclusionCriteria: normalizedTrial.exclusionCriteria,
+      primaryOutcomes: Utils.formatPipeSeparatedList(normalizedTrial.primaryOutcomes),
+      secondaryOutcomes: Utils.formatPipeSeparatedList(normalizedTrial.secondaryOutcomes),
+      lastSyncAt: normalizedTrial.lastSyncAt,
+      pipelineVersion: normalizedTrial.pipelineVersion,
+      sourceRun: normalizedTrial.sourceRun,
       primaryObjective: normalizedTrial.primaryObjective,
       secondaryObjectives: Utils.formatPipeSeparatedList(normalizedTrial.secondaryObjectives),
       eligibilityCriteria: Utils.formatPipeSeparatedList(normalizedTrial.eligibilityCriteria),
@@ -628,8 +811,25 @@ class Utils {
       estimatedDuration: row?.estimatedDuration,
       studyType: row?.studyType,
       phase: row?.phase,
+      phaseRaw: row?.phaseRaw,
       cancerType: row?.type ?? row?.Type ?? row?.cancerType,
+      cancerTypes: Utils.parsePipeSeparatedList(row?.cancerTypes),
       sponsor: row?.sponsor,
+      diseaseSettingPrimary: row?.diseaseSettingPrimary,
+      diseaseSettingAll: Utils.parsePipeSeparatedList(row?.diseaseSettingAll),
+      classificationConfidence: row?.classificationConfidence,
+      treatmentModality: row?.treatmentModality,
+      delivery: row?.delivery,
+      nccnTaxonomyVersion: row?.nccnTaxonomyVersion,
+      ctGovUrl: row?.ctGovUrl,
+      availableInstitutions: Utils.parsePipeSeparatedList(row?.availableInstitutions),
+      inclusionCriteria: row?.inclusionCriteria,
+      exclusionCriteria: row?.exclusionCriteria,
+      primaryOutcomes: Utils.parsePipeSeparatedList(row?.primaryOutcomes),
+      secondaryOutcomes: Utils.parsePipeSeparatedList(row?.secondaryOutcomes),
+      lastSyncAt: row?.lastSyncAt,
+      pipelineVersion: row?.pipelineVersion,
+      sourceRun: row?.sourceRun,
       lastWebsiteUpdate: row?.LastWebsiteUpdate ?? row?.lastWebsiteUpdate ?? row?.lastUpdated,
       instituteId: row?.InstituteID ?? row?.instituteId ?? row?.id,
       piName: row?.['PI Name'] ?? row?.piName,

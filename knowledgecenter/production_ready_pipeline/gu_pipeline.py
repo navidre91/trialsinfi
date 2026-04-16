@@ -24,6 +24,7 @@ from production_ready_pipeline.excel_export import (
 from production_ready_pipeline.nccn_classifier import classify_trial
 from production_ready_pipeline.site_normalization import SiteNormalizer
 from production_ready_pipeline.study_parser import parse_study_extended
+from production_ready_pipeline.website_export import write_website_catalog
 
 
 VERSION = "3.0.0"
@@ -95,6 +96,7 @@ def run_pipeline(
     max_conditions: int | None = None,
     skip_excel: bool = False,
     skip_updates: bool = False,
+    website_catalog_out: Path | None = None,
 ) -> dict:
     config = load_pipeline_config(root)
     api_config = replace(config.api, page_size=page_size or config.api.page_size)
@@ -143,6 +145,15 @@ def run_pipeline(
 
     csv_path = run_output_dir / f"all_trials_{run_date}.csv"
     save_flat_csv(study_records, csv_path)
+    website_catalog_path = website_catalog_out or (run_output_dir / "website_trials.json")
+    write_website_catalog(
+        study_records=study_records,
+        site_rows=site_rows,
+        out_path=website_catalog_path,
+        run_ts=run_ts,
+        pipeline_version=VERSION,
+        source_run_dir=str(run_output_dir),
+    )
 
     if not skip_excel:
         for filename_prefix, cancer_type, filters in CANCER_TYPE_DEFS:
@@ -180,6 +191,7 @@ def run_pipeline(
         "site_row_count": len(site_rows),
         "institution_count": len({row["Institution"] for row in site_rows}),
         "csv_path": str(csv_path),
+        "website_catalog_path": str(website_catalog_path),
     }
 
 
@@ -191,6 +203,7 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--max-conditions", type=int, help="Limit the number of configured search terms for a smoke run.")
     parser.add_argument("--skip-excel", action="store_true", help="Skip cancer-type Excel generation.")
     parser.add_argument("--skip-updates", action="store_true", help="Skip updates workbook generation.")
+    parser.add_argument("--website-catalog-out", type=Path, help="Optional website-ready JSON output path.")
     return parser.parse_args()
 
 
@@ -203,10 +216,12 @@ def main() -> None:
         max_conditions=args.max_conditions,
         skip_excel=args.skip_excel,
         skip_updates=args.skip_updates,
+        website_catalog_out=args.website_catalog_out,
     )
     print(
         f"Run {result['run_ts']} complete: {result['study_count']} trials, "
-        f"{result['site_row_count']} site rows, output={result['run_output_dir']}"
+        f"{result['site_row_count']} site rows, output={result['run_output_dir']}, "
+        f"website_catalog={result['website_catalog_path']}"
     )
 
 

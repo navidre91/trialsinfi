@@ -12,6 +12,7 @@ class TrialManager {
     this.apiUrl = 'api/trials.php';
     this.authUrl = 'api/auth.php';
     this.csrfToken = '';
+    this.catalogMetadata = {};
   }
 
   setCsrfToken(csrfToken) {
@@ -53,7 +54,11 @@ class TrialManager {
   }
 
   getLocationLabel(trial) {
-    return trial.location?.hospital || trial.location?.city || Utils.getDisplayInstituteId(trial) || 'Not specified';
+    const institutions = Utils.getTrialInstitutions(trial);
+    if (institutions.length > 1) {
+      return `${institutions[0]} +${institutions.length - 1} more`;
+    }
+    return institutions[0] || trial.location?.city || Utils.getDisplayInstituteId(trial) || 'Not specified';
   }
 
   async loadTrials() {
@@ -64,6 +69,7 @@ class TrialManager {
       });
 
       this.trials = (data.trials || []).map(trial => this.normalizeTrialRecord(trial));
+      this.catalogMetadata = data.metadata || {};
       this.filteredTrials = [...this.trials];
       this.dataLoaded = true;
       return this.trials;
@@ -78,6 +84,7 @@ class TrialManager {
         if (fallbackResponse.ok) {
           const fallbackData = await fallbackResponse.json();
           this.trials = (fallbackData.trials || []).map(trial => this.normalizeTrialRecord(trial));
+          this.catalogMetadata = fallbackData.metadata || {};
           this.filteredTrials = [...this.trials];
           this.dataLoaded = true;
           return this.trials;
@@ -152,14 +159,16 @@ class TrialManager {
       }
 
       if (selectedLocations.length > 0) {
-        const locationLabel = this.getLocationLabel(trial).toLowerCase();
-        const matched = selectedLocations.some(location => locationLabel.includes(location.toLowerCase()));
+        const institutions = Utils.getTrialInstitutions(trial).map(location => location.toLowerCase());
+        const matched = selectedLocations.some(location =>
+          institutions.some(institution => institution.includes(location.toLowerCase()))
+        );
         if (!matched) {
           return false;
         }
       }
 
-      if (phaseFilter !== 'all' && !this.matchesPhaseFilter(trial.phase, phaseFilter)) {
+      if (phaseFilter !== 'all' && !this.matchesPhaseFilter(Utils.getDisplayPhase(trial), phaseFilter)) {
         return false;
       }
 
@@ -175,11 +184,17 @@ class TrialManager {
           trial.qualification,
           trial.location?.hospital || '',
           trial.location?.city || '',
-          trial.piName || '',
+          Utils.getPrimaryPiName(trial),
           Utils.getDisplayInstituteId(trial),
           trial.primaryObjective,
+          trial.diseaseSettingPrimary || '',
+          ...(Array.isArray(trial.diseaseSettingAll) ? trial.diseaseSettingAll : []),
+          trial.treatmentModality || '',
+          ...(Array.isArray(trial.availableInstitutions) ? trial.availableInstitutions : []),
+          ...(Array.isArray(trial.conditions) ? trial.conditions : []),
           trial.sponsor,
-          trial.cancerType || ''
+          trial.cancerType || '',
+          ...(Array.isArray(trial.cancerTypes) ? trial.cancerTypes : [])
         ].join(' ').toLowerCase();
 
         if (!searchableFields.includes(query)) {
@@ -198,14 +213,14 @@ class TrialManager {
   }
 
   matchesPhaseFilter(trialPhase, selectedPhase) {
-    const phase = (trialPhase || '').trim();
+    const phase = Utils.normalizePhaseValue(trialPhase);
 
-    if (!phase || phase === 'N/A') {
+    if (!phase || phase === 'Not specified') {
       return false;
     }
 
     if (selectedPhase === 'Phase I') {
-      return phase === 'Phase I' || phase === 'Phase I/II';
+      return phase === 'Phase I' || phase === 'Phase I/II' || phase === 'Early Phase I';
     }
 
     if (selectedPhase === 'Phase II') {
@@ -231,7 +246,8 @@ class TrialManager {
         case 'startDate':
           return new Date(b.startDate) - new Date(a.startDate);
         case 'location':
-          return this.getLocationLabel(a).localeCompare(this.getLocationLabel(b));
+          return (Utils.getTrialInstitutions(a)[0] || this.getLocationLabel(a))
+            .localeCompare(Utils.getTrialInstitutions(b)[0] || this.getLocationLabel(b));
         default:
           return 0;
       }
@@ -251,12 +267,18 @@ class TrialManager {
         trial.qualification,
         trial.location?.hospital || '',
         trial.location?.city || '',
-        trial.piName || '',
+        Utils.getPrimaryPiName(trial),
         Utils.getDisplayInstituteId(trial),
         trial.primaryObjective,
+        trial.diseaseSettingPrimary || '',
+        ...(Array.isArray(trial.diseaseSettingAll) ? trial.diseaseSettingAll : []),
+        trial.treatmentModality || '',
+        ...(Array.isArray(trial.availableInstitutions) ? trial.availableInstitutions : []),
+        ...(Array.isArray(trial.conditions) ? trial.conditions : []),
         trial.sponsor,
         ...(Array.isArray(trial.eligibilityCriteria) ? trial.eligibilityCriteria : []),
-        ...(Array.isArray(trial.secondaryObjectives) ? trial.secondaryObjectives : [])
+        ...(Array.isArray(trial.secondaryObjectives) ? trial.secondaryObjectives : []),
+        ...(Array.isArray(trial.secondaryOutcomes) ? trial.secondaryOutcomes : [])
       ].join(' ').toLowerCase();
 
       return searchTerms.every(term => searchableContent.includes(term));
@@ -275,10 +297,7 @@ class TrialManager {
   getUniqueLocations() {
     const locations = new Set();
     this.trials.forEach(trial => {
-      const locationLabel = this.getLocationLabel(trial);
-      if (locationLabel) {
-        locations.add(locationLabel);
-      }
+      Utils.getTrialInstitutions(trial).forEach(location => locations.add(location));
     });
     return Array.from(locations).sort();
   }
@@ -342,6 +361,7 @@ class TrialManager {
       body: JSON.stringify(payload)
     });
 
+    this.catalogMetadata = data.metadata || this.catalogMetadata;
     this.trials.unshift(this.normalizeTrialRecord(data.trial));
     this.filteredTrials = [...this.trials];
     return true;
@@ -359,6 +379,7 @@ class TrialManager {
       body: JSON.stringify(payload)
     });
 
+    this.catalogMetadata = data.metadata || this.catalogMetadata;
     const trialIndex = this.trials.findIndex(trial => trial.id === trialId);
     if (trialIndex !== -1) {
       this.trials[trialIndex] = this.normalizeTrialRecord(data.trial);
@@ -369,12 +390,13 @@ class TrialManager {
   }
 
   async deleteTrial(trialId) {
-    await this.requestJson(this.apiUrl, {
+    const data = await this.requestJson(this.apiUrl, {
       method: 'DELETE',
       headers: this.buildMutationHeaders(),
       body: JSON.stringify({ id: trialId })
     });
 
+    this.catalogMetadata = data.metadata || this.catalogMetadata;
     const trialIndex = this.trials.findIndex(trial => trial.id === trialId);
     if (trialIndex !== -1) {
       this.trials.splice(trialIndex, 1);
@@ -395,6 +417,7 @@ class TrialManager {
       })
     });
 
+    this.catalogMetadata = data.metadata || this.catalogMetadata;
     this.trials = (data.trials || []).map(trial => this.normalizeTrialRecord(trial));
     this.filteredTrials = [...this.trials];
     return data;

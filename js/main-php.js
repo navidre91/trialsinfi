@@ -116,16 +116,20 @@ class ClinicalTrialsApp {
    */
   createTrialCard(trial) {
     const statusConfig = Utils.getStatusConfig(trial.status);
-    const hospital = trial.location?.hospital || 'Not specified';
-    const instituteId = Utils.getDisplayInstituteId(trial) || 'Not specified';
-    const piName = trial.piName || 'Not specified';
+    const institutions = Utils.getTrialInstitutions(trial);
+    const primaryInstitution = institutions[0] || trial.location?.hospital || 'Not specified';
+    const siteCount = Number(trial.siteCount || institutions.length || 0);
+    const institutionLabel = siteCount > 1
+      ? `${primaryInstitution} + ${siteCount - 1} more`
+      : primaryInstitution;
+    const piName = Utils.getPrimaryPiName(trial) || 'Not specified';
     const websiteUpdate = Utils.getDisplayWebsiteUpdate(trial);
-    const contactEmail = trial.contactEmail || '';
-    const contactMarkup = contactEmail
-      ? `<a href="mailto:${Utils.sanitizeHTML(contactEmail)}" class="trial-contact trial-detail-value">
-                ${Utils.sanitizeHTML(contactEmail)}
-              </a>`
-      : '<span class="trial-detail-value">Not specified</span>';
+    const contactEmail = Utils.getPrimaryContactEmail(trial);
+    const diseaseSetting = Utils.getDiseaseSettingLabel(trial) || 'Not specified';
+    const treatmentModality = trial.treatmentModality || 'Not specified';
+    const classificationConfidence = trial.classificationConfidence || 'Not specified';
+    const phaseLabel = Utils.getDisplayPhase(trial);
+    const cancerTypes = Utils.getDisplayCancerTypes(trial);
     
     const cardHTML = `
       <div class="trial-card" data-trial-id="${trial.id}" onclick="window.clinicalTrialsApp.viewTrialDetail('${trial.id}')">
@@ -142,19 +146,19 @@ class ClinicalTrialsApp {
           <div class="trial-detail-item">
             <span class="trial-detail-icon">🏥</span>
             <div class="trial-detail-content">
-              <span class="trial-detail-label">Institution</span>
+              <span class="trial-detail-label">Sites</span>
               <div class="trial-detail-value trial-location">
-                ${Utils.sanitizeHTML(hospital)}<br>
-                <small>Institute ID: ${Utils.sanitizeHTML(instituteId)}</small>
+                ${Utils.sanitizeHTML(institutionLabel)}<br>
+                <small>${Utils.sanitizeHTML(cancerTypes)}</small>
               </div>
             </div>
           </div>
           
           <div class="trial-detail-item">
-            <span class="trial-detail-icon">📧</span>
+            <span class="trial-detail-icon">🧭</span>
             <div class="trial-detail-content">
-              <span class="trial-detail-label">Contact</span>
-              ${contactMarkup}
+              <span class="trial-detail-label">Disease Setting</span>
+              <div class="trial-detail-value">${Utils.sanitizeHTML(diseaseSetting)}</div>
             </div>
           </div>
           
@@ -169,20 +173,24 @@ class ClinicalTrialsApp {
           <div class="trial-detail-item">
             <span class="trial-detail-icon">🔬</span>
             <div class="trial-detail-content">
-              <span class="trial-detail-label">Study Type</span>
-              <div class="trial-detail-value">${Utils.sanitizeHTML(trial.studyType || 'Not specified')}</div>
+              <span class="trial-detail-label">Treatment / Confidence</span>
+              <div class="trial-detail-value">${Utils.sanitizeHTML(treatmentModality)}<br><small>${Utils.sanitizeHTML(classificationConfidence)}</small></div>
             </div>
           </div>
         </div>
         
         <div class="trial-card-footer">
           <div class="trial-dates">
-            <strong>Start:</strong> ${Utils.formatDate(trial.startDate)} | 
-            <strong>Website Update:</strong> ${Utils.formatDate(websiteUpdate)}
+            <strong>Phase:</strong> ${Utils.sanitizeHTML(phaseLabel)} | 
+            <strong>Synced:</strong> ${Utils.formatDate(websiteUpdate)}
           </div>
-          <a href="trial-detail-php.html?id=${trial.id}" class="trial-view-btn" onclick="event.stopPropagation();">
-            View Details
-          </a>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            ${contactEmail ? `<a href="mailto:${Utils.sanitizeHTML(contactEmail)}" class="trial-view-btn" style="background: transparent; color: var(--primary-color); border: 1px solid var(--border-color);" onclick="event.stopPropagation();">Email PI</a>` : ''}
+            ${trial.ctGovUrl ? `<a href="${Utils.sanitizeHTML(trial.ctGovUrl)}" target="_blank" rel="noopener noreferrer" class="trial-view-btn" style="background: transparent; color: var(--primary-color); border: 1px solid var(--border-color);" onclick="event.stopPropagation();">CT.gov</a>` : ''}
+            <a href="trial-detail-php.html?id=${trial.id}" class="trial-view-btn" onclick="event.stopPropagation();">
+              View Details
+            </a>
+          </div>
         </div>
       </div>
     `;

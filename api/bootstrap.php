@@ -687,10 +687,14 @@ function cts_normalize_cancer_type_value($cancerType): ?string
         'prostate' => 'Prostate',
         'kidney' => 'Kidney',
         'renal' => 'Kidney',
+        'kidney/rcc' => 'Kidney',
         'bladder' => 'Bladder',
         'urothelial' => 'Bladder',
+        'bladder/urothelial' => 'Bladder',
         'testicular' => 'Testicular',
         'testis' => 'Testicular',
+        'testicular/gct' => 'Testicular',
+        'adrenal' => 'Adrenal',
         'other' => 'Others',
         'others' => 'Others'
     ];
@@ -719,6 +723,10 @@ function cts_infer_cancer_type_from_text($text): ?string
 
     if (preg_match('/\b(testicular|testis|germ cell|seminoma)\b/', $haystack)) {
         return 'Testicular';
+    }
+
+    if (preg_match('/\b(adrenal|adrenocortical|pheochromocytoma|paraganglioma)\b/', $haystack)) {
+        return 'Adrenal';
     }
 
     return null;
@@ -763,6 +771,64 @@ function cts_normalize_list_field($value): array
     return $trimmed === '' ? [] : [$trimmed];
 }
 
+function cts_normalize_sites_field($value): array
+{
+    if (!is_array($value)) {
+        return [];
+    }
+
+    $normalized = [];
+    foreach ($value as $site) {
+        if (!is_array($site)) {
+            continue;
+        }
+
+        $siteRecord = [
+            'siteId' => trim((string)($site['siteId'] ?? '')),
+            'institution' => trim((string)($site['institution'] ?? '')),
+            'city' => trim((string)($site['city'] ?? '')),
+            'state' => trim((string)($site['state'] ?? '')),
+            'address' => trim((string)($site['address'] ?? '')),
+            'piName' => trim((string)($site['piName'] ?? '')),
+            'email' => trim((string)($site['email'] ?? '')),
+            'phone' => trim((string)($site['phone'] ?? '')),
+            'affiliation' => trim((string)($site['affiliation'] ?? ''))
+        ];
+
+        $hasContent = false;
+        foreach ($siteRecord as $fieldValue) {
+            if ($fieldValue !== '') {
+                $hasContent = true;
+                break;
+            }
+        }
+
+        if ($hasContent) {
+            $normalized[] = $siteRecord;
+        }
+    }
+
+    return $normalized;
+}
+
+function cts_normalize_catalog_metadata($metadata): array
+{
+    if (!is_array($metadata)) {
+        return [];
+    }
+
+    return [
+        'exportType' => trim((string)($metadata['exportType'] ?? '')),
+        'exportedAt' => trim((string)($metadata['exportedAt'] ?? '')),
+        'lastSyncAt' => trim((string)($metadata['lastSyncAt'] ?? '')),
+        'pipelineVersion' => trim((string)($metadata['pipelineVersion'] ?? '')),
+        'sourceRun' => trim((string)($metadata['sourceRun'] ?? '')),
+        'sourceRunDir' => trim((string)($metadata['sourceRunDir'] ?? '')),
+        'trialCount' => (int)($metadata['trialCount'] ?? 0),
+        'institutionCount' => (int)($metadata['institutionCount'] ?? 0)
+    ];
+}
+
 function cts_normalize_trial_shape($trial): array
 {
     if (!is_array($trial)) {
@@ -772,6 +838,48 @@ function cts_normalize_trial_shape($trial): array
     $location = isset($trial['location']) && is_array($trial['location']) ? $trial['location'] : [];
     $normalizedStatus = cts_normalize_status_value($trial['status'] ?? '');
     $normalizedCancerType = cts_resolve_trial_cancer_type($trial);
+    $sites = cts_normalize_sites_field($trial['sites'] ?? []);
+    $availableInstitutions = cts_normalize_list_field($trial['availableInstitutions'] ?? []);
+    $cancerTypes = cts_normalize_list_field($trial['cancerTypes'] ?? []);
+    $diseaseSettingAll = cts_normalize_list_field($trial['diseaseSettingAll'] ?? []);
+    $conditions = cts_normalize_list_field($trial['conditions'] ?? []);
+    $interventions = cts_normalize_list_field($trial['interventions'] ?? []);
+    $primaryOutcomes = cts_normalize_list_field($trial['primaryOutcomes'] ?? []);
+    $secondaryOutcomes = cts_normalize_list_field($trial['secondaryOutcomes'] ?? []);
+    $classificationEvidence = cts_normalize_list_field($trial['classificationEvidence'] ?? []);
+
+    if (empty($availableInstitutions) && !empty($sites)) {
+        foreach ($sites as $site) {
+            if (($site['institution'] ?? '') !== '') {
+                $availableInstitutions[] = $site['institution'];
+            }
+        }
+        $availableInstitutions = array_values(array_unique($availableInstitutions));
+    }
+
+    if (empty($cancerTypes) && $normalizedCancerType !== null) {
+        $cancerTypes[] = $normalizedCancerType;
+    } else {
+        $normalizedCancerTypes = [];
+        foreach ($cancerTypes as $cancerType) {
+            $mappedCancerType = cts_normalize_cancer_type_value($cancerType);
+            if ($mappedCancerType !== null && !in_array($mappedCancerType, $normalizedCancerTypes, true)) {
+                $normalizedCancerTypes[] = $mappedCancerType;
+            }
+        }
+        $cancerTypes = $normalizedCancerTypes;
+    }
+
+    if (empty($location) && !empty($sites)) {
+        $primarySite = $sites[0];
+        $location = [
+            'hospital' => $primarySite['institution'] ?? '',
+            'city' => $primarySite['city'] ?? '',
+            'state' => $primarySite['state'] ?? '',
+            'zipCode' => '',
+            'address' => $primarySite['address'] ?? ''
+        ];
+    }
 
     return [
         'id' => trim((string)($trial['id'] ?? '')),
@@ -793,7 +901,9 @@ function cts_normalize_trial_shape($trial): array
         'estimatedDuration' => trim((string)($trial['estimatedDuration'] ?? '')),
         'studyType' => trim((string)($trial['studyType'] ?? '')),
         'phase' => trim((string)($trial['phase'] ?? '')),
+        'phaseRaw' => trim((string)($trial['phaseRaw'] ?? '')),
         'cancerType' => $normalizedCancerType ?? '',
+        'cancerTypes' => $cancerTypes,
         'sponsor' => trim((string)($trial['sponsor'] ?? '')),
         'lastWebsiteUpdate' => trim((string)($trial['lastWebsiteUpdate'] ?? '')),
         'instituteId' => trim((string)($trial['instituteId'] ?? '')),
@@ -801,30 +911,78 @@ function cts_normalize_trial_shape($trial): array
         'primaryObjective' => trim((string)($trial['primaryObjective'] ?? '')),
         'secondaryObjectives' => cts_normalize_list_field($trial['secondaryObjectives'] ?? []),
         'eligibilityCriteria' => cts_normalize_list_field($trial['eligibilityCriteria'] ?? []),
-        'lastUpdated' => trim((string)($trial['lastUpdated'] ?? ''))
+        'lastUpdated' => trim((string)($trial['lastUpdated'] ?? '')),
+        'diseaseSettingPrimary' => trim((string)($trial['diseaseSettingPrimary'] ?? '')),
+        'diseaseSettingAll' => $diseaseSettingAll,
+        'classificationConfidence' => trim((string)($trial['classificationConfidence'] ?? '')),
+        'classificationEvidence' => $classificationEvidence,
+        'treatmentModality' => trim((string)($trial['treatmentModality'] ?? '')),
+        'delivery' => trim((string)($trial['delivery'] ?? '')),
+        'nccnTaxonomyVersion' => trim((string)($trial['nccnTaxonomyVersion'] ?? '')),
+        'ctGovUrl' => trim((string)($trial['ctGovUrl'] ?? '')),
+        'conditions' => $conditions,
+        'interventions' => $interventions,
+        'availableInstitutions' => $availableInstitutions,
+        'siteCount' => (int)($trial['siteCount'] ?? count($sites)),
+        'sites' => $sites,
+        'inclusionCriteria' => trim((string)($trial['inclusionCriteria'] ?? '')),
+        'exclusionCriteria' => trim((string)($trial['exclusionCriteria'] ?? '')),
+        'primaryOutcomes' => $primaryOutcomes,
+        'secondaryOutcomes' => $secondaryOutcomes,
+        'studyFirstPosted' => trim((string)($trial['studyFirstPosted'] ?? '')),
+        'lastUpdatePosted' => trim((string)($trial['lastUpdatePosted'] ?? '')),
+        'lastSyncAt' => trim((string)($trial['lastSyncAt'] ?? '')),
+        'pipelineVersion' => trim((string)($trial['pipelineVersion'] ?? '')),
+        'sourceRun' => trim((string)($trial['sourceRun'] ?? '')),
+        'sourceRunDir' => trim((string)($trial['sourceRunDir'] ?? ''))
     ];
 }
 
-function cts_load_trials_catalog(): array
+function cts_load_trials_payload(): array
 {
     $dataFile = CTS_DATA_ROOT . '/trials.json';
     if (!file_exists($dataFile)) {
-        return [];
+        return [
+            'metadata' => [],
+            'trials' => []
+        ];
     }
 
     $decoded = json_decode((string)file_get_contents($dataFile), true);
     if (!is_array($decoded)) {
-        return [];
+        return [
+            'metadata' => [],
+            'trials' => []
+        ];
     }
 
-    $trials = isset($decoded['trials']) && is_array($decoded['trials']) ? $decoded['trials'] : [];
+    $isList = empty($decoded)
+        || (function_exists('array_is_list') ? array_is_list($decoded) : array_keys($decoded) === range(0, count($decoded) - 1));
+    $trials = $isList
+        ? $decoded
+        : (isset($decoded['trials']) && is_array($decoded['trials']) ? $decoded['trials'] : []);
     $normalizedTrials = [];
 
     foreach ($trials as $trial) {
         $normalizedTrials[] = cts_normalize_trial_shape($trial);
     }
 
-    return $normalizedTrials;
+    return [
+        'metadata' => $isList ? [] : cts_normalize_catalog_metadata($decoded['metadata'] ?? []),
+        'trials' => $normalizedTrials
+    ];
+}
+
+function cts_load_trials_catalog(): array
+{
+    $payload = cts_load_trials_payload();
+    return $payload['trials'] ?? [];
+}
+
+function cts_load_trials_metadata(): array
+{
+    $payload = cts_load_trials_payload();
+    return $payload['metadata'] ?? [];
 }
 
 function cts_find_trial(array $trials, string $trialId): ?array
@@ -856,12 +1014,30 @@ function cts_validate_trial_payload($trial): ?string
     }
 
     $cancerType = trim((string)($trial['cancerType'] ?? ''));
-    $validCancerTypes = ['Prostate', 'Kidney', 'Bladder', 'Testicular', 'Others'];
+    $validCancerTypes = ['Prostate', 'Kidney', 'Bladder', 'Testicular', 'Adrenal', 'Others'];
     if ($cancerType !== '' && !in_array($cancerType, $validCancerTypes, true)) {
         return 'Invalid cancer type.';
     }
 
-    $dateFields = ['startDate', 'endDate', 'lastWebsiteUpdate'];
+    $cancerTypes = $trial['cancerTypes'] ?? [];
+    if (is_array($cancerTypes)) {
+        foreach ($cancerTypes as $item) {
+            $normalizedCancerType = cts_normalize_cancer_type_value($item);
+            if ($normalizedCancerType === null) {
+                return 'Invalid cancer type list.';
+            }
+        }
+    }
+
+    $dateFields = [
+        'startDate',
+        'endDate',
+        'lastWebsiteUpdate',
+        'studyFirstPosted',
+        'lastUpdatePosted',
+        'lastSyncAt',
+        'lastUpdated'
+    ];
     foreach ($dateFields as $dateField) {
         $value = trim((string)($trial[$dateField] ?? ''));
         if ($value !== '' && strtotime($value) === false) {
@@ -878,7 +1054,7 @@ function cts_validate_trial_payload($trial): ?string
     return null;
 }
 
-function cts_write_trials_catalog(array $trials): void
+function cts_write_trials_catalog(array $trials, array $metadata = []): void
 {
     if (!is_dir(CTS_DATA_ROOT) && !@mkdir(CTS_DATA_ROOT, 0755, true) && !is_dir(CTS_DATA_ROOT)) {
         throw new RuntimeException('Unable to create data directory.');
@@ -890,6 +1066,7 @@ function cts_write_trials_catalog(array $trials): void
     }
 
     $payload = [
+        'metadata' => cts_normalize_catalog_metadata($metadata),
         'trials' => array_values($trials)
     ];
 
