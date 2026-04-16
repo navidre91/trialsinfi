@@ -1,0 +1,11 @@
+{
+    "migration": {
+        "legacy_admin_imported": true,
+        "imported_username": "admin",
+        "migrated_at": "2026-03-09T23:20:45+00:00"
+    },
+    "security": {
+        "password_min_length": 12,
+        "require_special_chars": true
+    }
+}

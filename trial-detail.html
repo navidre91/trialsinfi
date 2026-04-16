@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinical Trial Details - Clinical Trials SoCal</title>
+    <meta name="description" content="Detailed information about clinical trial">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">
+                    <a href="index.html">Clinical Trials SoCal</a>
+                </h1>
+                <nav class="nav">
+                    <ul class="nav-list">
+                        <li><a href="index.html" class="nav-link">Browse Trials</a></li>
+                        <li><a href="admin-login.html" class="nav-link">Admin Login</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <!-- Breadcrumb Navigation -->
+            <nav class="breadcrumb" style="margin-bottom: 2rem; color: var(--text-secondary); font-size: 0.875rem;">
+                <a href="index.html" style="color: var(--primary-color); text-decoration: none;">Browse Trials</a>
+                <span style="margin: 0 0.5rem;"> › </span>
+                <span id="breadcrumbTitle">Trial Details</span>
+            </nav>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="loading-spinner">
+                <div class="spinner"></div>
+                <p>Loading trial details...</p>
+            </div>
+
+            <!-- Error State -->
+            <div id="errorState" class="no-results" style="display: none;">
+                <div class="no-results-content">
+                    <h3>Trial Not Found</h3>
+                    <p>The requested clinical trial could not be found or may have been removed.</p>
+                    <a href="index.html" class="btn btn-primary">Browse All Trials</a>
+                </div>
+            </div>
+
+            <!-- Trial Detail Content -->
+            <div id="trialDetailContent" style="display: none;">
+                <!-- Trial Header -->
+                <section class="trial-header" style="background: var(--card-background); border-radius: var(--border-radius); padding: 2rem; margin-bottom: 2rem; box-shadow: var(--shadow-sm);">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 2rem; margin-bottom: 1.5rem;">
+                        <div style="flex: 1;">
+                            <h1 id="trialTitle" class="trial-title" style="font-size: 2rem; margin-bottom: 1rem; line-height: 1.3;"></h1>
+                            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                                <span id="trialStatus" class="trial-status"></span>
+                                <span id="trialPhase" style="padding: 0.25rem 0.75rem; background: #f1f5f9; color: var(--text-secondary); border-radius: 20px; font-size: 0.75rem; font-weight: 600;"></span>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <button id="contactBtn" class="btn btn-primary" style="margin-bottom: 0.5rem; min-width: 150px;">Contact Study Team</button>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary);">
+                                Website updated: <span id="lastUpdated"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p id="trialDescription" style="font-size: 1.125rem; line-height: 1.6; color: var(--text-secondary); margin: 0;"></p>
+                </section>
+
+                <!-- Main Content Grid -->
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; align-items: start;">
+                    <!-- Left Column - Main Information -->
+                    <div class="trial-main-info">
+                        <!-- Eligibility Criteria -->
+                        <section class="trial-section" style="background: var(--card-background); border-radius: var(--border-radius); padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-sm);">
+                            <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-primary);">Eligibility Criteria</h2>
+                            <ul id="eligibilityCriteria" class="eligibility-list" style="list-style: none; padding: 0; margin: 0;">
+                                <!-- Criteria items will be populated here -->
+                            </ul>
+                        </section>
+
+                        <!-- Study Objectives -->
+                        <section class="trial-section" style="background: var(--card-background); border-radius: var(--border-radius); padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-sm);">
+                            <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-primary);">Study Objectives</h2>
+                            
+                            <div style="margin-bottom: 1.5rem;">
+                                <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">Primary Objective</h3>
+                                <p id="primaryObjective" style="color: var(--text-secondary); line-height: 1.6; margin: 0;"></p>
+                            </div>
+                            
+                            <div id="secondaryObjectivesSection" style="display: none;">
+                                <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--text-primary);">Secondary Objectives</h3>
+                                <ul id="secondaryObjectives" style="color: var(--text-secondary); line-height: 1.6; margin: 0; padding-left: 1.25rem;">
+                                    <!-- Secondary objectives will be populated here -->
+                                </ul>
+                            </div>
+                        </section>
+
+                        <!-- Study Timeline -->
+                        <section class="trial-section" style="background: var(--card-background); border-radius: var(--border-radius); padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-sm);">
+                            <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-primary);">Study Timeline</h2>
+                            <div class="timeline-info" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                                <div>
+                                    <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.025em; margin-bottom: 0.25rem;">Start Date</div>
+                                    <div id="startDate" style="font-weight: 500; color: var(--text-primary);"></div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.025em; margin-bottom: 0.25rem;">Last Website Update</div>
+                                    <div id="lastWebsiteUpdate" style="font-weight: 500; color: var(--text-primary);"></div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.025em; margin-bottom: 0.25rem;">Institute ID</div>
+                                    <div id="instituteId" style="font-weight: 500; color: var(--text-primary); word-break: break-word;"></div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- Right Column - Sidebar Information -->
+                    <aside class="trial-sidebar">
+                        <!-- Contact Information -->
+                        <section class="sidebar-section" style="background: var(--card-background); border-radius: var(--border-radius); padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-sm);">
+                            <h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-primary);">Contact Information</h3>
+                            
+                            <div style="margin-bottom: 1rem;">
+                                <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.025em; margin-bottom: 0.25rem;">Study Team Email</div>
+                                <a id="contactEmail" href="#" style="color: var(--primary-color); text-decoration: none; font-weight: 500; word-break: break-word;"></a>
+                            </div>
+
+                            <div style="margin-bottom: 1rem;">
+                                <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.025em; margin-bottom: 0.25rem;">PI Name</div>
+                                <div id="piName" style="color: var(--text-primary); font-weight: 500;"></div>
+                            </div>
+                            
+                            <button id="copyEmailBtn" class="btn btn-outline" style="width: 100%; margin-bottom: 0.75rem;">Copy Email Address</button>
+                            
+                            <div style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">
+                                <strong>Note:</strong> Please mention this specific trial when contacting the study team.
+                            </div>
+                        </section>
+
+                        <!-- Institution Information -->
+                        <section class="sidebar-section" style="background: var(--card-background); border-radius: var(--border-radius); padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-sm);">
+                            <h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-primary);">Institution</h3>
+                            
+                            <div id="locationInfo">
+                                <div id="hospitalName" style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;"></div>
+                                <div id="institutionMeta" style="color: var(--text-secondary); line-height: 1.4;"></div>
+                            </div>
+                        </section>
+
+                        <!-- Study Details -->
+                        <section class="sidebar-section" style="background: var(--card-background); border-radius: var(--border-radius); padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-sm);">
+                            <h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-primary);">Study Details</h3>
+                            
+                            <div class="detail-grid" style="display: grid; gap: 0.75rem;">
+                                <div>
+                                    <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.025em; margin-bottom: 0.25rem;">Study Type</div>
+                                    <div id="studyType" style="color: var(--text-primary);"></div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.025em; margin-bottom: 0.25rem;">Phase</div>
+                                    <div id="studyPhase" style="color: var(--text-primary);"></div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.025em; margin-bottom: 0.25rem;">Sponsor</div>
+                                    <div id="sponsor" style="color: var(--text-primary); word-break: break-word;"></div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.025em; margin-bottom: 0.25rem;">NCTID</div>
+                                    <div id="nctId" style="color: var(--text-primary); word-break: break-word;"></div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Quick Actions -->
+                        <section class="sidebar-section" style="background: var(--card-background); border-radius: var(--border-radius); padding: 1.5rem; box-shadow: var(--shadow-sm);">
+                            <h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-primary);">Quick Actions</h3>
+                            
+                            <div style="display: grid; gap: 0.75rem;">
+                                <button id="printBtn" class="btn btn-outline">Print Trial Info</button>
+                                <button id="shareBtn" class="btn btn-outline">Share Trial</button>
+                                <a href="index.html" class="btn btn-secondary" style="text-align: center; text-decoration: none;">Back to Browse</a>
+                            </div>
+                        </section>
+                    </aside>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p class="footer-text">
+                    &copy; 2024 Clinical Trials SoCal. 
+                    For educational and informational purposes only.
+                </p>
+                <p class="footer-disclaimer">
+                    Always consult with healthcare professionals before participating in clinical trials.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/utils.js"></script>
+    <script src="js/trial-manager.js"></script>
+    <script>
+        // Trial Detail Page specific functionality
+        class TrialDetailPage {
+            constructor() {
+                this.trialManager = new TrialManager();
+                this.currentTrial = null;
+            }
+
+            async init() {
+                try {
+                    // Load trials data
+                    const hasStoredData = this.trialManager.loadTrialsFromStorage();
+                    if (!hasStoredData) {
+                        await this.trialManager.loadTrials();
+                    }
+
+                    // Get trial ID from URL
+                    const urlParams = Utils.getUrlParams();
+                    const trialId = urlParams.get('id');
+
+                    if (!trialId) {
+                        this.showError('No trial ID specified');
+                        return;
+                    }
+
+                    // Get trial data
+                    this.currentTrial = this.trialManager.getTrialById(trialId);
+                    
+                    if (!this.currentTrial) {
+                        this.showError('Trial not found');
+                        return;
+                    }
+
+                    // Display trial details
+                    this.displayTrial();
+                    this.bindEventListeners();
+
+                } catch (error) {
+                    console.error('Error loading trial details:', error);
+                    this.showError('Failed to load trial details');
+                }
+            }
+
+            showError(message) {
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('errorState').style.display = 'block';
+                document.getElementById('trialDetailContent').style.display = 'none';
+                
+                const errorContent = document.querySelector('#errorState .no-results-content p');
+                if (errorContent) {
+                    errorContent.textContent = message;
+                }
+            }
+
+            displayTrial() {
+                const trial = this.currentTrial;
+                const statusConfig = Utils.getStatusConfig(trial.status);
+
+                // Hide loading, show content
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('trialDetailContent').style.display = 'block';
+
+                // Update page title and breadcrumb
+                document.title = `${trial.title} - Clinical Trials SoCal`;
+                document.getElementById('breadcrumbTitle').textContent = Utils.truncateText(trial.title, 50);
+
+                // Header information
+                document.getElementById('trialTitle').textContent = trial.title;
+                document.getElementById('trialStatus').className = `trial-status ${statusConfig.className}`;
+                document.getElementById('trialStatus').textContent = statusConfig.label;
+                document.getElementById('trialPhase').textContent = trial.phase || 'Not specified';
+                document.getElementById('trialDescription').textContent = trial.description;
+                document.getElementById('lastUpdated').textContent = Utils.formatDate(Utils.getDisplayWebsiteUpdate(trial));
+
+                // Eligibility
+                this.displayEligibilityCriteria(trial.eligibilityCriteria || []);
+
+                // Objectives
+                document.getElementById('primaryObjective').textContent = trial.primaryObjective;
+                this.displaySecondaryObjectives(trial.secondaryObjectives || []);
+
+                // Timeline
+                document.getElementById('startDate').textContent = Utils.formatDate(trial.startDate);
+                document.getElementById('lastWebsiteUpdate').textContent = Utils.formatDate(Utils.getDisplayWebsiteUpdate(trial));
+                document.getElementById('instituteId').textContent = Utils.getDisplayInstituteId(trial) || 'Not specified';
+
+                // Contact information
+                const contactEmail = document.getElementById('contactEmail');
+                if (trial.contactEmail) {
+                    contactEmail.href = `mailto:${trial.contactEmail}?subject=Inquiry about ${trial.title}`;
+                    contactEmail.textContent = trial.contactEmail;
+                } else {
+                    contactEmail.href = '#';
+                    contactEmail.textContent = 'Not specified';
+                }
+                document.getElementById('piName').textContent = trial.piName || 'Not specified';
+
+                // Institution information
+                document.getElementById('hospitalName').textContent = trial.location.hospital || 'Not specified';
+                document.getElementById('institutionMeta').textContent = `Institute ID: ${Utils.getDisplayInstituteId(trial) || 'Not specified'}`;
+
+                // Study details
+                document.getElementById('studyType').textContent = trial.studyType || 'Not specified';
+                document.getElementById('studyPhase').textContent = trial.phase || 'Not specified';
+                document.getElementById('sponsor').textContent = trial.sponsor || 'Not specified';
+                document.getElementById('nctId').textContent = trial.nctId || 'Not specified';
+            }
+
+            displayEligibilityCriteria(criteria) {
+                const list = document.getElementById('eligibilityCriteria');
+                Utils.clearElement(list);
+
+                criteria.forEach(criterion => {
+                    const li = document.createElement('li');
+                    li.style.cssText = `
+                        padding: 0.5rem 0;
+                        border-bottom: 1px solid var(--border-color);
+                        display: flex;
+                        align-items: flex-start;
+                        gap: 0.5rem;
+                    `;
+                    li.innerHTML = `
+                        <span style="color: var(--success-color); font-weight: bold; flex-shrink: 0; margin-top: 0.125rem;">✓</span>
+                        <span style="color: var(--text-secondary); line-height: 1.5;">${Utils.sanitizeHTML(criterion)}</span>
+                    `;
+                    list.appendChild(li);
+                });
+
+                if (criteria.length === 0) {
+                    list.innerHTML = '<li style="color: var(--text-secondary); font-style: italic;">No specific criteria listed</li>';
+                }
+            }
+
+            displaySecondaryObjectives(objectives) {
+                const section = document.getElementById('secondaryObjectivesSection');
+                const list = document.getElementById('secondaryObjectives');
+
+                if (objectives.length === 0) {
+                    section.style.display = 'none';
+                    return;
+                }
+
+                section.style.display = 'block';
+                Utils.clearElement(list);
+
+                objectives.forEach(objective => {
+                    const li = document.createElement('li');
+                    li.textContent = objective;
+                    li.style.marginBottom = '0.25rem';
+                    list.appendChild(li);
+                });
+            }
+
+            bindEventListeners() {
+                // Contact button
+                document.getElementById('contactBtn').addEventListener('click', () => {
+                    if (!this.currentTrial.contactEmail) {
+                        Utils.showErrorMessage('No contact email provided for this trial');
+                        return;
+                    }
+                    window.location.href = `mailto:${this.currentTrial.contactEmail}?subject=Inquiry about ${this.currentTrial.title}`;
+                });
+
+                // Copy email button
+                document.getElementById('copyEmailBtn').addEventListener('click', async () => {
+                    if (!this.currentTrial.contactEmail) {
+                        Utils.showErrorMessage('No contact email provided for this trial');
+                        return;
+                    }
+                    const success = await Utils.copyToClipboard(this.currentTrial.contactEmail);
+                    if (success) {
+                        Utils.showSuccessMessage('Email address copied to clipboard');
+                    } else {
+                        Utils.showErrorMessage('Failed to copy email address');
+                    }
+                });
+
+                // Print button
+                document.getElementById('printBtn').addEventListener('click', () => {
+                    window.print();
+                });
+
+                // Share button
+                document.getElementById('shareBtn').addEventListener('click', async () => {
+                    if (navigator.share) {
+                        try {
+                            await navigator.share({
+                                title: this.currentTrial.title,
+                                text: `Check out this clinical trial: ${this.currentTrial.title}`,
+                                url: window.location.href
+                            });
+                        } catch (error) {
+                            this.fallbackShare();
+                        }
+                    } else {
+                        this.fallbackShare();
+                    }
+                });
+            }
+
+            fallbackShare() {
+                const success = Utils.copyToClipboard(window.location.href);
+                if (success) {
+                    Utils.showSuccessMessage('Trial URL copied to clipboard');
+                } else {
+                    Utils.showErrorMessage('Failed to copy URL');
+                }
+            }
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            const page = new TrialDetailPage();
+            page.init();
+        });
+    </script>
+
+    <style>
+        /* Print styles */
+        @media print {
+            .header, .footer, .breadcrumb, #contactBtn, #copyEmailBtn, #getDirectionsBtn, #printBtn, #shareBtn {
+                display: none !important;
+            }
+            
+            body {
+                background: white !important;
+            }
+            
+            .trial-section, .sidebar-section {
+                box-shadow: none !important;
+                border: 1px solid #ddd !important;
+                break-inside: avoid;
+                margin-bottom: 1rem !important;
+            }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 968px) {
+            .container > div[style*="grid-template-columns"] {
+                grid-template-columns: 1fr !important;
+                gap: 1rem !important;
+            }
+            
+            .trial-sidebar {
+                order: -1;
+            }
+            
+            .trial-header div[style*="flex"] {
+                flex-direction: column !important;
+                gap: 1rem !important;
+            }
+            
+            .trial-header div[style*="text-align: right"] {
+                text-align: left !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .timeline-info {
+                grid-template-columns: 1fr !important;
+            }
+            
+            .trial-header {
+                padding: 1.5rem !important;
+            }
+            
+            .trial-section, .sidebar-section {
+                padding: 1.25rem !important;
+            }
+        }
+    </style>
+</body>
+</html>

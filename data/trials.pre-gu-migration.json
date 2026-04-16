@@ -1,0 +1,176 @@
+{
+  "trials": [
+    {
+      "title": "Testing the Effect of M1774 on Hard-to-Treat Refractory SPOP-mutant Prostate Cancer",
+      "status": "past",
+      "description": "-",
+      "qualification": "Prostate Cancer",
+      "location": {
+        "hospital": "UC Irvine",
+        "city": "Irvine",
+        "state": "CA",
+        "zipCode": "92617",
+        "address": "UC Irvine"
+      },
+      "contactEmail": "arez@uci.edu",
+      "startDate": "2023-10-16",
+      "endDate": "2025-04-25",
+      "estimatedDuration": "",
+      "studyType": "Interventional",
+      "phase": "",
+      "sponsor": "UC Irvine",
+      "primaryObjective": "-",
+      "secondaryObjectives": [
+        "-"
+      ],
+      "eligibilityCriteria": [
+        "-"
+      ],
+      "id": "trial_68a8c2aeba32a6.05805601",
+      "lastUpdated": "2025-08-22T19:19:10+00:00"
+    },
+    {
+      "title": "Study of MRx0518 and Avelumab in Patients With Urothelial Carcinoma",
+      "status": "past",
+      "description": "-",
+      "qualification": "Urothelial Carcinoma",
+      "location": {
+        "hospital": "UC Irvine",
+        "city": "Irvine",
+        "state": "CA",
+        "zipCode": "92617",
+        "address": "UC Irvine"
+      },
+      "contactEmail": "arez@uci.edu",
+      "startDate": "2022-03-01",
+      "endDate": "2023-04-01",
+      "estimatedDuration": "",
+      "studyType": "Interventional",
+      "phase": "",
+      "sponsor": "UC Irvine",
+      "primaryObjective": "-",
+      "secondaryObjectives": [],
+      "eligibilityCriteria": [
+        "-"
+      ],
+      "id": "trial_68a8c24a609cd9.14190556",
+      "lastUpdated": "2025-08-22T19:17:30+00:00"
+    },
+    {
+      "title": "Treatment Combination of Durvalumab, Tremelimumab and Enfortumab Vedotin or Durvalumab and Enfortumab Vedotin in Patients With Muscle Invasive Bladder Cancer Ineligible to Cisplatin or Who Refuse Cisplatin",
+      "status": "ongoing",
+      "description": "-",
+      "qualification": "Muscle Invasive Bladder Cancer",
+      "location": {
+        "hospital": "UC Irvine",
+        "city": "Irvine",
+        "state": "CA",
+        "zipCode": "92617",
+        "address": "UC Irvine"
+      },
+      "contactEmail": "arez@uci.edu",
+      "startDate": "2021-08-05",
+      "endDate": "2028-09-08",
+      "estimatedDuration": "",
+      "studyType": "Interventional",
+      "phase": "",
+      "sponsor": "UC Irvine",
+      "primaryObjective": "-",
+      "secondaryObjectives": [
+        "-"
+      ],
+      "eligibilityCriteria": [
+        "-"
+      ],
+      "id": "trial_68a8c1d2307581.63150636",
+      "lastUpdated": "2025-08-22T19:15:30+00:00"
+    },
+    {
+      "title": "Safety and Efficacy of Therapies for Metastatic Castration-resistant Prostate Cancer (mCRPC)",
+      "status": "past",
+      "description": "-",
+      "qualification": "Metastatic Castration-resistant Prostate Cancer",
+      "location": {
+        "hospital": "UC Irvine",
+        "city": "Irvine",
+        "state": "CA",
+        "zipCode": "92617",
+        "address": "UC Irvine"
+      },
+      "contactEmail": "arez@uci.edu",
+      "startDate": "2021-01-15",
+      "endDate": "2023-10-23",
+      "estimatedDuration": "",
+      "studyType": "Interventional",
+      "phase": "",
+      "sponsor": "UC Irvine",
+      "primaryObjective": "-",
+      "secondaryObjectives": [
+        "-"
+      ],
+      "eligibilityCriteria": [
+        "-"
+      ],
+      "id": "trial_68a8c16fd05db6.70230265",
+      "lastUpdated": "2025-08-22T19:13:51+00:00"
+    },
+    {
+      "title": "A Study of miRNA 371 in Patients With Germ Cell Tumors",
+      "status": "ongoing",
+      "description": "-",
+      "qualification": "Germ Cell Tumor, Malignant Neoplasm, Seminoma, Testicular Cancer, Neoplasms",
+      "location": {
+        "hospital": "UC Irvine",
+        "city": "Irvine",
+        "state": "CA",
+        "zipCode": "92617",
+        "address": "UC Irvine"
+      },
+      "contactEmail": "arez@uci.edu",
+      "startDate": "2020-07-28",
+      "endDate": "2026-10-01",
+      "estimatedDuration": "",
+      "studyType": "Interventional",
+      "phase": "",
+      "sponsor": "UC Irvine",
+      "primaryObjective": "-",
+      "secondaryObjectives": [
+        "-"
+      ],
+      "eligibilityCriteria": [
+        "-"
+      ],
+      "id": "trial_68a8c1052187a7.60455628",
+      "lastUpdated": "2025-08-22T19:12:05+00:00"
+    },
+    {
+      "title": "Testing Olaparib in Patients With Advanced or Metastatic (Cancer That Has Spread) Bladder Cancer and Other Genitourinary Tumors With DNA-Repair Genetic Changes",
+      "status": "past",
+      "description": "-",
+      "qualification": "Advanced Bladder Carcinoma, Advanced Genitourinary System Carcinoma, Metastatic Bladder Carcinoma, Metastatic Genitourinary System Carcinoma, Stage III Bladder Cancer AJCC v8, Stage IV Bladder Cancer AJCC v8",
+      "location": {
+        "hospital": "UC Irvine",
+        "city": "Irvine",
+        "state": "CA",
+        "zipCode": "92617",
+        "address": "UC Irvine"
+      },
+      "contactEmail": "arez@uci.edu",
+      "startDate": "2020-11-03",
+      "endDate": "2024-08-21",
+      "estimatedDuration": "",
+      "studyType": "Observational",
+      "phase": "",
+      "sponsor": "UC Irvine",
+      "primaryObjective": "-",
+      "secondaryObjectives": [],
+      "eligibilityCriteria": [
+        "-"
+      ],
+      "id": "trial_68a8c028e65bb3.34124680",
+      "lastUpdated": "2025-08-22T19:08:24+00:00"
+    }
+  ],
+  "exportDate": "2026-02-09T06:18:38.241Z",
+  "totalTrials": 6
+}

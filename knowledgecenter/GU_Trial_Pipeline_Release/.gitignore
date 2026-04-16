@@ -1,0 +1,26 @@
+# Generated output — never commit
+output/
+!output/.gitkeep
+
+# NCCN source PDFs — large files, share separately
+nccn_input/pdfs/
+!nccn_input/pdfs/.gitkeep
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+venv/
+.venv/
+
+# macOS
+.DS_Store
+
+# Excel temp files
+~$*.xlsx
+~$*.docx
+
+# IDE
+.vscode/
+.idea/

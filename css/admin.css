@@ -1,0 +1,575 @@
+/* Admin Panel Specific Styles */
+
+/* Admin Table Styles */
+.admin-table {
+  font-size: 0.875rem;
+}
+
+.admin-table th {
+  white-space: nowrap;
+  user-select: none;
+}
+
+.admin-table td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+}
+
+.admin-table tr:hover {
+  background-color: #f8fafc;
+}
+
+.admin-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Status badges in table */
+.table-status {
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.table-status.recruiting,
+.table-status.ongoing {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.table-status.active-not-recruiting,
+.table-status.upcoming {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.table-status.completed,
+.table-status.past {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.table-status.not-specified {
+  background-color: #f1f5f9;
+  color: #334155;
+}
+
+/* Action buttons */
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  padding: 0.375rem 0.75rem;
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.action-btn:hover {
+  transform: translateY(-1px);
+}
+
+.action-btn-view {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.action-btn-view:hover {
+  background-color: var(--primary-hover);
+}
+
+.action-btn-edit {
+  background-color: var(--warning-color);
+  color: white;
+}
+
+.action-btn-edit:hover {
+  background-color: #d97706;
+}
+
+.action-btn-delete {
+  background-color: var(--error-color);
+  color: white;
+}
+
+.action-btn-delete:hover {
+  background-color: #dc2626;
+}
+
+/* Modal Styles */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.modal.active {
+  display: flex;
+  opacity: 1;
+}
+
+.modal-content {
+  background-color: var(--card-background);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-lg);
+  transform: scale(0.9);
+  transition: transform 0.3s ease;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal.active .modal-content {
+  transform: scale(1);
+}
+
+.modal-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  padding: 0.25rem;
+  border-radius: var(--border-radius);
+  transition: all 0.2s ease;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-close:hover {
+  background-color: #f1f5f9;
+  color: var(--text-primary);
+}
+
+/* Form in modal */
+.modal form {
+  padding: 1.5rem;
+}
+
+/* Dashboard specific styles */
+.stats-grid {
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Table responsive wrapper */
+.table-container {
+  position: relative;
+}
+
+.table-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 20px;
+  background: linear-gradient(to left, var(--card-background), transparent);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.table-container.scrollable::after {
+  opacity: 1;
+}
+
+/* Loading states */
+.table-loading {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-secondary);
+}
+
+.table-loading .spinner {
+  width: 32px;
+  height: 32px;
+  margin: 0 auto 1rem;
+}
+
+/* Empty state */
+.table-empty {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-secondary);
+}
+
+.table-empty h4 {
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+/* Form validation styles */
+.form-input.invalid,
+.form-textarea.invalid,
+.form-select.invalid {
+  border-color: var(--error-color);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.form-input.valid,
+.form-textarea.valid,
+.form-select.valid {
+  border-color: var(--success-color);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* Export/Import styles */
+.export-section {
+  background: var(--card-background);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  margin-bottom: 1.5rem;
+}
+
+.export-section h4 {
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+.export-buttons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Notification styles */
+.admin-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1001;
+  min-width: 300px;
+  max-width: 500px;
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-lg);
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+}
+
+.admin-notification.show {
+  transform: translateX(0);
+}
+
+.admin-notification.success {
+  border-left: 4px solid var(--success-color);
+}
+
+.admin-notification.error {
+  border-left: 4px solid var(--error-color);
+}
+
+.admin-notification.warning {
+  border-left: 4px solid var(--warning-color);
+}
+
+.notification-content {
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.notification-icon {
+  flex-shrink: 0;
+  font-size: 1.25rem;
+  margin-top: 0.125rem;
+}
+
+.notification-text {
+  flex: 1;
+}
+
+.notification-title {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.notification-message {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.notification-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  padding: 0.25rem;
+  border-radius: var(--border-radius);
+  transition: color 0.2s ease;
+}
+
+.notification-close:hover {
+  color: var(--text-primary);
+}
+
+/* Breadcrumb styles */
+.admin-breadcrumb {
+  background: var(--card-background);
+  padding: 1rem 1.5rem;
+  border-radius: var(--border-radius);
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+}
+
+.admin-breadcrumb a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+.admin-breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .dashboard-header > div {
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 1rem;
+  }
+
+  .dashboard-header .btn {
+    margin: 0;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .table-header > div {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .table-header input,
+  .table-header select {
+    min-width: auto;
+    width: 100%;
+  }
+
+  .admin-table {
+    font-size: 0.75rem;
+  }
+
+  .admin-table th,
+  .admin-table td {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .action-btn {
+    justify-content: center;
+    min-width: 80px;
+  }
+
+  /* Modal responsive */
+  .modal-content {
+    margin: 1rem;
+    max-width: none;
+    width: calc(100% - 2rem);
+  }
+
+  .modal form {
+    padding: 1rem;
+  }
+
+  .modal form > div[style*="grid-template-columns"] {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-card {
+    padding: 1rem;
+  }
+
+  .admin-table th,
+  .admin-table td {
+    padding: 0.5rem 0.25rem;
+  }
+
+  .table-header {
+    padding: 1rem;
+  }
+
+  .modal-header {
+    padding: 1rem;
+  }
+
+  .modal form {
+    padding: 0.75rem;
+  }
+
+  .admin-notification {
+    min-width: auto;
+    max-width: calc(100vw - 2rem);
+    margin: 0 1rem;
+  }
+}
+
+/* Print styles for admin pages */
+@media print {
+  .header,
+  .footer,
+  .modal,
+  .action-btn-edit,
+  .action-btn-delete,
+  #addTrialBtn,
+  #exportDataBtn,
+  #logoutBtn {
+    display: none !important;
+  }
+
+  .main {
+    padding: 0 !important;
+  }
+
+  .admin-table {
+    font-size: 0.7rem;
+  }
+
+  .admin-table th,
+  .admin-table td {
+    padding: 0.5rem 0.25rem;
+  }
+
+  .stat-card,
+  .table-header,
+  .table-container {
+    box-shadow: none !important;
+    border: 1px solid #ddd !important;
+  }
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stat-card {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+.stat-card:nth-child(1) { animation-delay: 0.1s; }
+.stat-card:nth-child(2) { animation-delay: 0.2s; }
+.stat-card:nth-child(3) { animation-delay: 0.3s; }
+.stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+/* Accessibility improvements */
+.action-btn:focus,
+.modal-close:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.admin-table tr:focus-within {
+  background-color: #f1f5f9;
+  outline: 2px solid var(--primary-color);
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .stat-card,
+  .table-container {
+    border: 2px solid var(--text-primary);
+  }
+
+  .table-status {
+    border: 1px solid currentColor;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .modal,
+  .modal-content,
+  .stat-card,
+  .action-btn,
+  .admin-notification {
+    transition: none;
+  }
+
+  .stat-card {
+    animation: none;
+  }
+}

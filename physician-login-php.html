@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physician Sign In - Clinical Trials SoCal</title>
+    <meta name="description" content="Physician sign in for private discussion forum access">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="icon" type="image/x-icon" href="assets/favicon/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/apple-touch-icon.png">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">
+                    <a href="index-php.html">Clinical Trials SoCal</a>
+                </h1>
+                <nav class="nav">
+                    <ul class="nav-list">
+                        <li><a href="index-php.html" class="nav-link">Browse Trials</a></li>
+                        <li><a href="about-php.html" class="nav-link">About</a></li>
+                        <li><a href="physician-community-php.html" class="nav-link">Physician Community</a></li>
+                        <li><a href="physician-login-php.html" class="nav-link active">Physician Sign In</a></li>
+                        <li><a href="admin-login-php.html" class="nav-link">Admin Login</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main" style="display: flex; align-items: center; justify-content: center; min-height: 70vh;">
+        <div class="container">
+            <div style="max-width: 460px; margin: 0 auto;">
+                <div class="login-card" style="background: var(--card-background); border-radius: var(--border-radius); padding: 2rem; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color);">
+                    <div style="text-align: center; margin-bottom: 2rem;">
+                        <h2 style="font-size: 1.75rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.5rem;">Physician Sign In</h2>
+                        <p style="color: var(--text-secondary); font-size: 0.875rem;">Private forum access is limited to admin-approved physicians using their assigned real-name account.</p>
+                    </div>
+
+                    <div id="loginError" class="alert alert-error" style="display: none; margin-bottom: 1.5rem;">
+                        <span id="loginErrorMessage">Invalid credentials.</span>
+                    </div>
+
+                    <div id="loginSuccess" class="alert alert-success" style="display: none; margin-bottom: 1.5rem;">
+                        <span>Sign-in successful. Redirecting to the physician forum...</span>
+                    </div>
+
+                    <form id="physicianLoginForm">
+                        <div class="form-group">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" id="username" name="username" class="form-input" required autocomplete="username" placeholder="Enter your assigned username">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" id="password" name="password" class="form-input" required autocomplete="current-password" placeholder="Enter your password">
+                        </div>
+
+                        <button type="submit" id="loginBtn" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">
+                            <span id="loginBtnText">Sign In</span>
+                            <div id="loginSpinner" style="display: none;">
+                                <div class="spinner" style="width: 16px; height: 16px; margin: 0 auto;"></div>
+                            </div>
+                        </button>
+                    </form>
+
+                    <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 1rem; margin-top: 1rem;">
+                        <p style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--text-secondary);">Forum rules:</p>
+                        <ul style="margin: 0; padding-left: 1rem; font-size: 0.75rem; color: var(--text-secondary); line-height: 1.5;">
+                            <li>Real physician accounts only.</li>
+                            <li>De-identified discussion only. Do not post PHI.</li>
+                            <li>You will be prompted to change any temporary password on first sign-in.</li>
+                        </ul>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                        <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Need access? Contact the site administrator.</p>
+                        <p style="margin: 0 0 0.75rem;">
+                            <a href="admin-login-php.html" style="color: var(--primary-color); text-decoration: none; font-size: 0.875rem; font-weight: 500;">Admin? Go to Admin Login</a>
+                        </p>
+                        <a href="index-php.html" style="color: var(--primary-color); text-decoration: none; font-size: 0.875rem; font-weight: 500;">&larr; Back to Browse Trials</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <img src="assets/favicon/apple-touch-icon.png" alt="" class="footer-icon" aria-hidden="true">
+                <p class="footer-text">&copy; 2026 Genitourinary Cancer Clinical Trials in Southern California</p>
+                <p class="footer-disclaimer">
+                    Always discuss clinical trial options with your healthcare provider to understand which study may be right for you.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/utils.js"></script>
+    <script src="js/physician-login-php.js"></script>
+</body>
+</html>

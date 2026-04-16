@@ -1,0 +1,1054 @@
+{
+  "trials": [
+    {
+      "id": "ucla-001",
+      "title": "Novel Immunotherapy for Advanced Melanoma",
+      "description": "A Phase II clinical trial evaluating a new immunotherapy combination for patients with advanced melanoma who have not responded to standard treatments. This study aims to assess the efficacy and safety of combining two promising immunotherapy agents.",
+      "qualification": "Adults 18+ with advanced melanoma, ECOG performance status 0-1, adequate organ function, no prior immunotherapy",
+      "status": "ongoing",
+      "location": {
+        "hospital": "UCLA Medical Center",
+        "city": "Los Angeles",
+        "state": "CA",
+        "zipCode": "90095",
+        "address": "757 Westwood Plaza, Los Angeles, CA 90095"
+      },
+      "contactEmail": "oncology.trials@ucla.edu",
+      "startDate": "2024-01-15",
+      "endDate": "2025-12-31",
+      "estimatedDuration": "24 months",
+      "eligibilityCriteria": [
+        "Age 18 years or older",
+        "Histologically confirmed advanced melanoma",
+        "ECOG performance status 0-1",
+        "Adequate bone marrow, liver, and kidney function",
+        "No prior immunotherapy treatment"
+      ],
+      "primaryObjective": "Assess overall response rate to combination immunotherapy",
+      "secondaryObjectives": [
+        "Evaluate progression-free survival",
+        "Assess safety and tolerability",
+        "Analyze biomarkers predictive of response"
+      ],
+      "studyType": "Interventional",
+      "phase": "Phase II",
+      "sponsor": "UCLA Jonsson Comprehensive Cancer Center",
+      "lastUpdated": "2024-01-10T10:00:00Z"
+    },
+    {
+      "id": "cedars-002",
+      "title": "Heart Failure Prevention in High-Risk Diabetics",
+      "description": "A large-scale observational study tracking cardiovascular outcomes in diabetic patients at high risk for heart failure. Participants will be monitored for 5 years to identify early intervention strategies.",
+      "qualification": "Type 2 diabetes for 5+ years, age 45-75, elevated cardiovascular risk markers, stable medication regimen",
+      "status": "ongoing",
+      "location": {
+        "hospital": "Cedars-Sinai Medical Center",
+        "city": "Los Angeles",
+        "state": "CA",
+        "zipCode": "90048",
+        "address": "8700 Beverly Blvd, Los Angeles, CA 90048"
+      },
+      "contactEmail": "cardio.research@cshs.org",
+      "startDate": "2023-06-01",
+      "endDate": "2028-06-01",
+      "estimatedDuration": "60 months",
+      "eligibilityCriteria": [
+        "Type 2 diabetes for at least 5 years",
+        "Age 45-75 years",
+        "Elevated HbA1c or cardiovascular risk markers",
+        "Stable diabetes medication for 3+ months",
+        "Ability to attend regular follow-up visits"
+      ],
+      "primaryObjective": "Identify predictors of heart failure development in diabetic patients",
+      "secondaryObjectives": [
+        "Evaluate biomarkers for early detection",
+        "Assess quality of life measures",
+        "Analyze cost-effectiveness of monitoring strategies"
+      ],
+      "studyType": "Observational",
+      "phase": "N/A",
+      "sponsor": "Cedars-Sinai Heart Institute",
+      "lastUpdated": "2023-12-15T14:30:00Z"
+    },
+    {
+      "id": "usc-003",
+      "title": "Innovative Stroke Recovery Therapy",
+      "description": "Testing a novel combination of neurorehabilitation techniques including virtual reality therapy and targeted brain stimulation to improve recovery outcomes in stroke patients.",
+      "qualification": "Stroke within past 6 months, age 18-80, moderate to severe functional deficits, medically stable",
+      "status": "upcoming",
+      "location": {
+        "hospital": "USC Keck Medicine",
+        "city": "Los Angeles",
+        "state": "CA",
+        "zipCode": "90033",
+        "address": "1500 San Pablo St, Los Angeles, CA 90033"
+      },
+      "contactEmail": "neuro.trials@med.usc.edu",
+      "startDate": "2024-03-01",
+      "endDate": "2026-03-01",
+      "estimatedDuration": "24 months",
+      "eligibilityCriteria": [
+        "Ischemic or hemorrhagic stroke within 6 months",
+        "Age 18-80 years",
+        "Modified Rankin Scale score 2-4",
+        "Medically stable with no acute complications",
+        "Able to participate in rehabilitation activities"
+      ],
+      "primaryObjective": "Evaluate efficacy of combined VR and brain stimulation therapy",
+      "secondaryObjectives": [
+        "Assess functional improvement scores",
+        "Monitor safety and adverse events",
+        "Analyze patient satisfaction and compliance"
+      ],
+      "studyType": "Interventional",
+      "phase": "Phase II",
+      "sponsor": "USC Stevens Neuroimaging and Informatics Institute",
+      "lastUpdated": "2024-01-05T09:15:00Z"
+    },
+    {
+      "id": "kaiser-004",
+      "title": "Digital Mental Health Platform for Depression",
+      "description": "Comparing the effectiveness of a new AI-powered digital therapy platform versus traditional therapy for treating moderate to severe depression in adults.",
+      "qualification": "Adults 21-65 with major depression, PHQ-9 score 10+, smartphone access, English fluency",
+      "status": "ongoing",
+      "location": {
+        "hospital": "Kaiser Permanente Los Angeles",
+        "city": "Los Angeles",
+        "state": "CA",
+        "zipCode": "90027",
+        "address": "4867 Sunset Blvd, Los Angeles, CA 90027"
+      },
+      "contactEmail": "mental.health.research@kp.org",
+      "startDate": "2023-09-15",
+      "endDate": "2025-03-15",
+      "estimatedDuration": "18 months",
+      "eligibilityCriteria": [
+        "Age 21-65 years",
+        "Major depressive disorder diagnosis",
+        "PHQ-9 score of 10 or higher",
+        "Access to smartphone or tablet",
+        "English language fluency"
+      ],
+      "primaryObjective": "Compare depression scores between digital and traditional therapy",
+      "secondaryObjectives": [
+        "Evaluate treatment adherence rates",
+        "Assess cost-effectiveness",
+        "Monitor safety and crisis management"
+      ],
+      "studyType": "Interventional",
+      "phase": "Phase III",
+      "sponsor": "Kaiser Permanente Research Division",
+      "lastUpdated": "2023-11-20T16:45:00Z"
+    },
+    {
+      "id": "scripps-005",
+      "title": "Precision Medicine for Breast Cancer Treatment",
+      "description": "Using genetic testing to personalize chemotherapy selection for early-stage breast cancer patients, aiming to improve outcomes while reducing unnecessary side effects.",
+      "qualification": "Early-stage breast cancer, HER2-negative, candidates for chemotherapy, willing for genetic testing",
+      "status": "ongoing",
+      "location": {
+        "hospital": "Scripps Health",
+        "city": "San Diego",
+        "state": "CA",
+        "zipCode": "92037",
+        "address": "9888 Genesee Ave, San Diego, CA 92037"
+      },
+      "contactEmail": "cancer.research@scripps.edu",
+      "startDate": "2023-11-01",
+      "endDate": "2026-11-01",
+      "estimatedDuration": "36 months",
+      "eligibilityCriteria": [
+        "Early-stage breast cancer (Stage I-III)",
+        "HER2-negative tumor",
+        "Candidate for adjuvant chemotherapy",
+        "Willing to undergo tumor genetic testing",
+        "Age 18 years or older"
+      ],
+      "primaryObjective": "Improve treatment selection through genetic profiling",
+      "secondaryObjectives": [
+        "Reduce chemotherapy-related side effects",
+        "Assess long-term survival outcomes",
+        "Evaluate patient quality of life"
+      ],
+      "studyType": "Interventional",
+      "phase": "Phase III",
+      "sponsor": "Scripps Translational Science Institute",
+      "lastUpdated": "2023-12-01T11:20:00Z"
+    },
+    {
+      "id": "sharp-006",
+      "title": "Robotic Surgery Recovery Enhancement",
+      "description": "Evaluating enhanced recovery protocols following robotic colorectal surgery to reduce hospital stays and improve patient outcomes through optimized pain management and early mobilization.",
+      "qualification": "Scheduled for robotic colorectal surgery, age 18-85, ASA score I-III, ability to follow protocol",
+      "status": "ongoing",
+      "location": {
+        "hospital": "Sharp HealthCare",
+        "city": "San Diego",
+        "state": "CA",
+        "zipCode": "92123",
+        "address": "7901 Frost St, San Diego, CA 92123"
+      },
+      "contactEmail": "surgery.research@sharp.com",
+      "startDate": "2023-08-01",
+      "endDate": "2025-02-01",
+      "estimatedDuration": "18 months",
+      "eligibilityCriteria": [
+        "Scheduled for elective robotic colorectal surgery",
+        "Age 18-85 years",
+        "ASA physical status I-III",
+        "Ability to understand and follow study protocol",
+        "Informed consent provided"
+      ],
+      "primaryObjective": "Reduce length of hospital stay with enhanced recovery protocol",
+      "secondaryObjectives": [
+        "Decrease post-operative complications",
+        "Improve patient satisfaction scores",
+        "Assess cost-effectiveness of protocol"
+      ],
+      "studyType": "Interventional",
+      "phase": "Phase IV",
+      "sponsor": "Sharp Memorial Hospital",
+      "lastUpdated": "2023-10-15T13:30:00Z"
+    },
+    {
+      "id": "ucsd-007",
+      "title": "Alzheimer's Disease Prevention Trial",
+      "description": "Testing a multi-modal intervention including cognitive training, physical exercise, and nutritional supplements to prevent cognitive decline in individuals at high risk for Alzheimer's disease.",
+      "qualification": "Age 65-80, family history of dementia, mild cognitive concerns, physically able to exercise",
+      "status": "upcoming",
+      "location": {
+        "hospital": "UC San Diego Health",
+        "city": "San Diego",
+        "state": "CA",
+        "zipCode": "92103",
+        "address": "200 W Arbor Dr, San Diego, CA 92103"
+      },
+      "contactEmail": "alzheimers.prevention@ucsd.edu",
+      "startDate": "2024-04-01",
+      "endDate": "2027-04-01",
+      "estimatedDuration": "36 months",
+      "eligibilityCriteria": [
+        "Age 65-80 years",
+        "Family history of dementia or Alzheimer's",
+        "Mild cognitive concerns but not dementia",
+        "Physically able to participate in exercise program",
+        "Committed to 3-year participation"
+      ],
+      "primaryObjective": "Prevent or delay cognitive decline through multi-modal intervention",
+      "secondaryObjectives": [
+        "Assess individual intervention components",
+        "Monitor brain imaging changes",
+        "Evaluate biomarker changes"
+      ],
+      "studyType": "Interventional",
+      "phase": "Phase III",
+      "sponsor": "UC San Diego Alzheimer's Disease Cooperative Study",
+      "lastUpdated": "2024-01-08T08:45:00Z"
+    },
+    {
+      "id": "hoag-008",
+      "title": "Advanced Prostate Cancer Imaging Study",
+      "description": "Comparing advanced MRI techniques with traditional imaging for detecting and staging prostate cancer, potentially reducing the need for invasive biopsies.",
+      "qualification": "Suspected prostate cancer, elevated PSA, age 45-80, scheduled for biopsy, no prior prostate treatment",
+      "status": "ongoing",
+      "location": {
+        "hospital": "Hoag Memorial Hospital",
+        "city": "Newport Beach",
+        "state": "CA",
+        "zipCode": "92663",
+        "address": "1 Hoag Dr, Newport Beach, CA 92663"
+      },
+      "contactEmail": "urology.research@hoag.org",
+      "startDate": "2023-10-01",
+      "endDate": "2025-10-01",
+      "estimatedDuration": "24 months",
+      "eligibilityCriteria": [
+        "Suspected prostate cancer based on clinical findings",
+        "Elevated PSA levels",
+        "Age 45-80 years",
+        "Scheduled for prostate biopsy",
+        "No prior prostate cancer treatment"
+      ],
+      "primaryObjective": "Compare accuracy of advanced MRI versus standard imaging",
+      "secondaryObjectives": [
+        "Reduce unnecessary biopsies",
+        "Improve cancer staging accuracy",
+        "Assess patient comfort and preferences"
+      ],
+      "studyType": "Observational",
+      "phase": "N/A",
+      "sponsor": "Hoag Family Cancer Institute",
+      "lastUpdated": "2023-12-10T15:20:00Z"
+    },
+    {
+      "id": "cityofhope-009",
+      "title": "CAR-T Cell Therapy for Lymphoma",
+      "description": "Advanced cellular immunotherapy trial using genetically modified T-cells to treat patients with relapsed or refractory B-cell lymphomas that have not responded to standard treatments.",
+      "qualification": "Relapsed/refractory B-cell lymphoma, age 18+, adequate organ function, failed 2+ prior therapies",
+      "status": "ongoing",
+      "location": {
+        "hospital": "City of Hope",
+        "city": "Duarte",
+        "state": "CA",
+        "zipCode": "91010",
+        "address": "1500 E Duarte Rd, Duarte, CA 91010"
+      },
+      "contactEmail": "cart.trials@coh.org",
+      "startDate": "2023-05-01",
+      "endDate": "2026-05-01",
+      "estimatedDuration": "36 months",
+      "eligibilityCriteria": [
+        "Relapsed or refractory B-cell lymphoma",
+        "Age 18 years or older",
+        "Failed at least 2 prior treatment regimens",
+        "Adequate organ function",
+        "ECOG performance status 0-1"
+      ],
+      "primaryObjective": "Evaluate safety and efficacy of CAR-T cell therapy",
+      "secondaryObjectives": [
+        "Assess duration of response",
+        "Monitor for cytokine release syndrome",
+        "Analyze T-cell persistence and function"
+      ],
+      "studyType": "Interventional",
+      "phase": "Phase I/II",
+      "sponsor": "City of Hope Comprehensive Cancer Center",
+      "lastUpdated": "2023-11-25T12:10:00Z"
+    },
+    {
+      "id": "chla-010",
+      "title": "Pediatric Asthma Digital Monitoring",
+      "description": "Using wearable devices and smartphone apps to monitor asthma symptoms and medication adherence in children, aiming to prevent severe asthma attacks through early intervention.",
+      "qualification": "Children 8-17 with persistent asthma, smartphone access, parental consent, stable on controller medication",
+      "status": "ongoing",
+      "location": {
+        "hospital": "Children's Hospital Los Angeles",
+        "city": "Los Angeles",
+        "state": "CA",
+        "zipCode": "90027",
+        "address": "4650 Sunset Blvd, Los Angeles, CA 90027"
+      },
+      "contactEmail": "pediatric.pulmonology@chla.usc.edu",
+      "startDate": "2023-07-01",
+      "endDate": "2025-07-01",
+      "estimatedDuration": "24 months",
+      "eligibilityCriteria": [
+        "Age 8-17 years",
+        "Persistent asthma diagnosis",
+        "Access to smartphone or tablet",
+        "Parental/guardian consent",
+        "Stable on controller asthma medication"
+      ],
+      "primaryObjective": "Reduce asthma exacerbations through digital monitoring",
+      "secondaryObjectives": [
+        "Improve medication adherence",
+        "Enhance quality of life scores",
+        "Reduce emergency department visits"
+      ],
+      "studyType": "Interventional",
+      "phase": "Phase IV",
+      "sponsor": "CHLA Saban Research Institute",
+      "lastUpdated": "2023-12-05T10:30:00Z"
+    },
+    {
+      "id": "ucla-011",
+      "title": "COVID-19 Long-Term Effects Study",
+      "description": "Comprehensive longitudinal study tracking the long-term effects of COVID-19 infection, including neurological, cardiovascular, and pulmonary complications in recovered patients.",
+      "qualification": "Prior COVID-19 infection confirmed by testing, age 18+, symptoms lasting 3+ months post-infection",
+      "status": "past",
+      "location": {
+        "hospital": "UCLA Medical Center",
+        "city": "Los Angeles",
+        "state": "CA",
+        "zipCode": "90095",
+        "address": "757 Westwood Plaza, Los Angeles, CA 90095"
+      },
+      "contactEmail": "covid.longterm@ucla.edu",
+      "startDate": "2021-03-01",
+      "endDate": "2023-12-31",
+      "estimatedDuration": "33 months",
+      "eligibilityCriteria": [
+        "Laboratory-confirmed COVID-19 infection",
+        "Age 18 years or older",
+        "Persistent symptoms for 3+ months post-infection",
+        "Ability to attend follow-up visits",
+        "Informed consent provided"
+      ],
+      "primaryObjective": "Characterize long-term effects of COVID-19 infection",
+      "secondaryObjectives": [
+        "Identify risk factors for long COVID",
+        "Develop treatment strategies",
+        "Assess quality of life impacts"
+      ],
+      "studyType": "Observational",
+      "phase": "N/A",
+      "sponsor": "UCLA David Geffen School of Medicine",
+      "lastUpdated": "2023-12-31T23:59:00Z"
+    },
+    {
+      "id": "cedars-012",
+      "title": "Minimally Invasive Heart Valve Repair",
+      "description": "Evaluating a new transcatheter approach for mitral valve repair that reduces recovery time and improves outcomes compared to traditional open-heart surgery.",
+      "qualification": "Severe mitral regurgitation, high surgical risk, age 65+, heart team approval for procedure",
+      "status": "upcoming",
+      "location": {
+        "hospital": "Cedars-Sinai Medical Center",
+        "city": "Los Angeles",
+        "state": "CA",
+        "zipCode": "90048",
+        "address": "8700 Beverly Blvd, Los Angeles, CA 90048"
+      },
+      "contactEmail": "cardiac.surgery.trials@cshs.org",
+      "startDate": "2024-05-01",
+      "endDate": "2027-05-01",
+      "estimatedDuration": "36 months",
+      "eligibilityCriteria": [
+        "Severe mitral valve regurgitation",
+        "High or prohibitive surgical risk",
+        "Age 65 years or older",
+        "Heart team recommendation for transcatheter therapy",
+        "Life expectancy greater than 12 months"
+      ],
+      "primaryObjective": "Evaluate safety and efficacy of transcatheter mitral valve repair",
+      "secondaryObjectives": [
+        "Compare outcomes to surgical repair",
+        "Assess quality of life improvements",
+        "Monitor long-term device performance"
+      ],
+      "studyType": "Interventional",
+      "phase": "Phase III",
+      "sponsor": "Cedars-Sinai Smidt Heart Institute",
+      "lastUpdated": "2024-01-12T14:15:00Z"
+    },
+    {
+      "id": "usc-013",
+      "title": "Personalized Cancer Vaccine Development",
+      "description": "Creating individualized vaccines based on each patient's unique tumor genetics to stimulate immune responses against their specific cancer type.",
+      "qualification": "Solid tumor malignancy, adequate tissue for analysis, completed standard treatment, stable disease",
+      "status": "ongoing",
+      "location": {
+        "hospital": "USC Keck Medicine",
+        "city": "Los Angeles",
+        "state": "CA",
+        "zipCode": "90033",
+        "address": "1500 San Pablo St, Los Angeles, CA 90033"
+      },
+      "contactEmail": "personalized.vaccines@med.usc.edu",
+      "startDate": "2023-12-01",
+      "endDate": "2026-12-01",
+      "estimatedDuration": "36 months",
+      "eligibilityCriteria": [
+        "Solid tumor malignancy with adequate tissue",
+        "Completed standard treatment regimen",
+        "Stable or responding disease status",
+        "Adequate immune function",
+        "Life expectancy greater than 6 months"
+      ],
+      "primaryObjective": "Assess immune response to personalized cancer vaccines",
+      "secondaryObjectives": [
+        "Monitor disease progression",
+        "Evaluate vaccine safety profile",
+        "Analyze biomarkers of response"
+      ],
+      "studyType": "Interventional",
+      "phase": "Phase I/II",
+      "sponsor": "USC Norris Comprehensive Cancer Center",
+      "lastUpdated": "2023-12-20T09:00:00Z"
+    },
+    {
+      "id": "kaiser-014",
+      "title": "Diabetes Prevention Through Lifestyle Coaching",
+      "description": "Large-scale intervention study using digital health coaching and remote monitoring to prevent type 2 diabetes in high-risk individuals through sustained lifestyle changes.",
+      "qualification": "Pre-diabetes diagnosis, BMI 25+, age 35-70, smartphone access, motivation for lifestyle change",
+      "status": "ongoing",
+      "location": {
+        "hospital": "Kaiser Permanente Los Angeles",
+        "city": "Los Angeles",
+        "state": "CA",
+        "zipCode": "90027",
+        "address": "4867 Sunset Blvd, Los Angeles, CA 90027"
+      },
+      "contactEmail": "diabetes.prevention@kp.org",
+      "startDate": "2023-04-01",
+      "endDate": "2026-04-01",
+      "estimatedDuration": "36 months",
+      "eligibilityCriteria": [
+        "Pre-diabetes confirmed by glucose testing",
+        "BMI 25 kg/m² or higher",
+        "Age 35-70 years",
+        "Access to smartphone or computer",
+        "Motivated to make lifestyle changes"
+      ],
+      "primaryObjective": "Prevent progression to type 2 diabetes",
+      "secondaryObjectives": [
+        "Achieve sustained weight loss",
+        "Improve cardiovascular risk factors",
+        "Assess program cost-effectiveness"
+      ],
+      "studyType": "Interventional",
+      "phase": "Phase III",
+      "sponsor": "Kaiser Permanente Prevention Research Program",
+      "lastUpdated": "2023-10-30T11:45:00Z"
+    },
+    {
+      "id": "scripps-015",
+      "title": "Novel Arthritis Pain Management",
+      "description": "Testing a new non-opioid pain management approach combining targeted physical therapy, mindfulness techniques, and innovative topical treatments for rheumatoid arthritis.",
+      "qualification": "Rheumatoid arthritis diagnosis, moderate to severe pain, age 21-75, stable on DMARDs, willing to reduce pain medications",
+      "status": "upcoming",
+      "location": {
+        "hospital": "Scripps Health",
+        "city": "San Diego",
+        "state": "CA",
+        "zipCode": "92037",
+        "address": "9888 Genesee Ave, San Diego, CA 92037"
+      },
+      "contactEmail": "rheumatology.research@scripps.edu",
+      "startDate": "2024-06-01",
+      "endDate": "2026-06-01",
+      "estimatedDuration": "24 months",
+      "eligibilityCriteria": [
+        "Rheumatoid arthritis diagnosis for 6+ months",
+        "Moderate to severe joint pain (VAS score 4+)",
+        "Age 21-75 years",
+        "Stable on disease-modifying drugs",
+        "Willing to participate in mindfulness training"
+      ],
+      "primaryObjective": "Reduce pain scores through multimodal non-opioid approach",
+      "secondaryObjectives": [
+        "Improve functional outcomes",
+        "Reduce reliance on pain medications",
+        "Enhance quality of life measures"
+      ],
+      "studyType": "Interventional",
+      "phase": "Phase II",
+      "sponsor": "Scripps Clinic Rheumatology Research",
+      "lastUpdated": "2024-01-15T16:20:00Z"
+    },
+    {
+      "id": "sharp-016",
+      "title": "Emergency Department AI Diagnostic Tool",
+      "description": "Implementing and evaluating an artificial intelligence system to assist emergency physicians in diagnosing acute conditions, aiming to improve accuracy and reduce diagnostic delays.",
+      "qualification": "Emergency department patients presenting with chest pain, abdominal pain, or shortness of breath",
+      "status": "ongoing",
+      "location": {
+        "hospital": "Sharp HealthCare",
+        "city": "San Diego",
+        "state": "CA",
+        "zipCode": "92123",
+        "address": "7901 Frost St, San Diego, CA 92123"
+      },
+      "contactEmail": "emergency.research@sharp.com",
+      "startDate": "2023-09-01",
+      "endDate": "2025-09-01",
+      "estimatedDuration": "24 months",
+      "eligibilityCriteria": [
+        "Emergency department presentation",
+        "Chief complaint of chest pain, abdominal pain, or dyspnea",
+        "Age 18 years or older",
+        "Ability to provide informed consent",
+        "English or Spanish speaking"
+      ],
+      "primaryObjective": "Improve diagnostic accuracy with AI assistance",
+      "secondaryObjectives": [
+        "Reduce time to diagnosis",
+        "Decrease diagnostic errors",
+        "Assess physician acceptance of AI recommendations"
+      ],
+      "studyType": "Observational",
+      "phase": "N/A",
+      "sponsor": "Sharp Memorial Hospital Emergency Medicine Research",
+      "lastUpdated": "2023-11-15T14:50:00Z"
+    },
+    {
+      "id": "ucsd-017",
+      "title": "Gene Therapy for Inherited Blindness",
+      "description": "Groundbreaking gene therapy trial for patients with Leber congenital amaurosis, using AAV vectors to deliver functional copies of genes to restore vision.",
+      "qualification": "Leber congenital amaurosis diagnosis, specific gene mutation, age 3+, some remaining retinal function",
+      "status": "ongoing",
+      "location": {
+        "hospital": "UC San Diego Health",
+        "city": "San Diego",
+        "state": "CA",
+        "zipCode": "92103",
+        "address": "200 W Arbor Dr, San Diego, CA 92103"
+      },
+      "contactEmail": "gene.therapy@ucsd.edu",
+      "startDate": "2023-06-15",
+      "endDate": "2028-06-15",
+      "estimatedDuration": "60 months",
+      "eligibilityCriteria": [
+        "Confirmed diagnosis of Leber congenital amaurosis",
+        "Specific gene mutation identified",
+        "Age 3 years or older",
+        "Some measurable retinal function",
+        "Adequate general health for surgery"
+      ],
+      "primaryObjective": "Restore or improve vision through gene replacement",
+      "secondaryObjectives": [
+        "Assess long-term safety of gene therapy",
+        "Monitor immune responses",
+        "Evaluate quality of life improvements"
+      ],
+      "studyType": "Interventional",
+      "phase": "Phase I/II",
+      "sponsor": "UC San Diego Shiley Eye Institute",
+      "lastUpdated": "2023-12-08T10:25:00Z"
+    },
+    {
+      "id": "hoag-018",
+      "title": "Precision Oncology Biomarker Discovery",
+      "description": "Large-scale genomic analysis study to identify new biomarkers that predict response to targeted cancer therapies, potentially revolutionizing personalized cancer treatment.",
+      "qualification": "Any solid tumor malignancy, planned for targeted therapy, adequate tissue available, willing for genomic testing",
+      "status": "past",
+      "location": {
+        "hospital": "Hoag Memorial Hospital",
+        "city": "Newport Beach",
+        "state": "CA",
+        "zipCode": "92663",
+        "address": "1 Hoag Dr, Newport Beach, CA 92663"
+      },
+      "contactEmail": "precision.oncology@hoag.org",
+      "startDate": "2020-01-01",
+      "endDate": "2023-12-31",
+      "estimatedDuration": "48 months",
+      "eligibilityCriteria": [
+        "Any solid tumor malignancy",
+        "Candidate for targeted therapy",
+        "Adequate tumor tissue for genomic analysis",
+        "Willing to undergo comprehensive genomic testing",
+        "Life expectancy greater than 3 months"
+      ],
+      "primaryObjective": "Identify predictive biomarkers for targeted therapy response",
+      "secondaryObjectives": [
+        "Develop personalized treatment algorithms",
+        "Improve overall survival outcomes",
+        "Reduce unnecessary treatment toxicity"
+      ],
+      "studyType": "Observational",
+      "phase": "N/A",
+      "sponsor": "Hoag Family Cancer Institute",
+      "lastUpdated": "2023-12-31T23:59:00Z"
+    },
+    {
+      "id": "cityofhope-019",
+      "title": "Advanced Pancreatic Cancer Treatment",
+      "description": "Combination trial testing a novel drug combination with immunotherapy for patients with advanced pancreatic cancer, one of the most challenging cancers to treat.",
+      "qualification": "Metastatic pancreatic adenocarcinoma, ECOG 0-1, adequate organ function, no more than 1 prior therapy",
+      "status": "upcoming",
+      "location": {
+        "hospital": "City of Hope",
+        "city": "Duarte",
+        "state": "CA",
+        "zipCode": "91010",
+        "address": "1500 E Duarte Rd, Duarte, CA 91010"
+      },
+      "contactEmail": "pancreatic.trials@coh.org",
+      "startDate": "2024-07-01",
+      "endDate": "2027-07-01",
+      "estimatedDuration": "36 months",
+      "eligibilityCriteria": [
+        "Metastatic pancreatic adenocarcinoma",
+        "ECOG performance status 0-1",
+        "Adequate liver, kidney, and bone marrow function",
+        "No more than 1 prior systemic therapy",
+        "Measurable disease by imaging"
+      ],
+      "primaryObjective": "Evaluate efficacy of novel combination therapy",
+      "secondaryObjectives": [
+        "Assess overall survival",
+        "Monitor treatment safety",
+        "Analyze biomarkers of response"
+      ],
+      "studyType": "Interventional",
+      "phase": "Phase II",
+      "sponsor": "City of Hope Comprehensive Cancer Center",
+      "lastUpdated": "2024-01-18T13:40:00Z"
+    },
+    {
+      "id": "chla-020",
+      "title": "Pediatric Rare Disease Gene Therapy",
+      "description": "Innovative gene therapy for children with spinal muscular atrophy, using advanced viral vectors to deliver therapeutic genes directly to motor neurons.",
+      "qualification": "Spinal muscular atrophy diagnosis, age 2-18, specific genetic confirmation, adequate respiratory function",
+      "status": "ongoing",
+      "location": {
+        "hospital": "Children's Hospital Los Angeles",
+        "city": "Los Angeles",
+        "state": "CA",
+        "zipCode": "90027",
+        "address": "4650 Sunset Blvd, Los Angeles, CA 90027"
+      },
+      "contactEmail": "gene.therapy@chla.usc.edu",
+      "startDate": "2023-03-01",
+      "endDate": "2028-03-01",
+      "estimatedDuration": "60 months",
+      "eligibilityCriteria": [
+        "Confirmed spinal muscular atrophy diagnosis",
+        "Age 2-18 years",
+        "Genetic testing confirming SMA type",
+        "Adequate respiratory function",
+        "Parental consent for gene therapy"
+      ],
+      "primaryObjective": "Improve motor function through gene replacement",
+      "secondaryObjectives": [
+        "Assess long-term safety",
+        "Monitor developmental milestones",
+        "Evaluate quality of life measures"
+      ],
+      "studyType": "Interventional",
+      "phase": "Phase II",
+      "sponsor": "CHLA Center for Personalized Medicine",
+      "lastUpdated": "2023-11-30T15:15:00Z"
+    },
+    {
+      "id": "ucla-021",
+      "title": "Brain-Computer Interface for Paralysis",
+      "description": "Revolutionary study testing brain-computer interface technology to restore communication and control abilities in patients with severe paralysis from spinal cord injury or ALS.",
+      "qualification": "Severe paralysis from spinal cord injury or ALS, age 18-65, stable medical condition, strong motivation",
+      "status": "upcoming",
+      "location": {
+        "hospital": "UCLA Medical Center",
+        "city": "Los Angeles",
+        "state": "CA",
+        "zipCode": "90095",
+        "address": "757 Westwood Plaza, Los Angeles, CA 90095"
+      },
+      "contactEmail": "bci.study@ucla.edu",
+      "startDate": "2024-08-01",
+      "endDate": "2029-08-01",
+      "estimatedDuration": "60 months",
+      "eligibilityCriteria": [
+        "Severe paralysis from spinal cord injury or ALS",
+        "Age 18-65 years",
+        "Medically stable condition",
+        "Strong motivation and family support",
+        "Ability to undergo surgical implantation"
+      ],
+      "primaryObjective": "Restore communication abilities through brain-computer interface",
+      "secondaryObjectives": [
+        "Enable computer control through thought",
+        "Assess device safety and durability",
+        "Improve quality of life measures"
+      ],
+      "studyType": "Interventional",
+      "phase": "Phase I",
+      "sponsor": "UCLA Center for Neural Engineering",
+      "lastUpdated": "2024-01-22T12:30:00Z"
+    },
+    {
+      "id": "cedars-022",
+      "title": "Advanced Kidney Disease Treatment",
+      "description": "Testing a novel therapeutic approach to slow progression of chronic kidney disease and potentially avoid the need for dialysis in patients with advanced kidney disease.",
+      "qualification": "Chronic kidney disease stage 3-4, proteinuria, age 21-80, stable on ACE inhibitors/ARBs, eGFR 15-60",
+      "status": "ongoing",
+      "location": {
+        "hospital": "Cedars-Sinai Medical Center",
+        "city": "Los Angeles",
+        "state": "CA",
+        "zipCode": "90048",
+        "address": "8700 Beverly Blvd, Los Angeles, CA 90048"
+      },
+      "contactEmail": "nephrology.research@cshs.org",
+      "startDate": "2023-05-15",
+      "endDate": "2026-05-15",
+      "estimatedDuration": "36 months",
+      "eligibilityCriteria": [
+        "Chronic kidney disease stage 3-4",
+        "Proteinuria (>300mg/day)",
+        "Age 21-80 years",
+        "Stable on ACE inhibitors or ARBs",
+        "eGFR between 15-60 mL/min/1.73m²"
+      ],
+      "primaryObjective": "Slow progression of chronic kidney disease",
+      "secondaryObjectives": [
+        "Reduce proteinuria levels",
+        "Delay need for dialysis",
+        "Improve cardiovascular outcomes"
+      ],
+      "studyType": "Interventional",
+      "phase": "Phase III",
+      "sponsor": "Cedars-Sinai Department of Nephrology",
+      "lastUpdated": "2023-12-12T09:55:00Z"
+    },
+    {
+      "id": "usc-023",
+      "title": "Virtual Reality Therapy for PTSD",
+      "description": "Innovative treatment combining virtual reality exposure therapy with biofeedback to treat post-traumatic stress disorder in veterans and civilian trauma survivors.",
+      "qualification": "PTSD diagnosis, age 18-65, trauma history, no active substance abuse, able to use VR equipment",
+      "status": "past",
+      "location": {
+        "hospital": "USC Keck Medicine",
+        "city": "Los Angeles",
+        "state": "CA",
+        "zipCode": "90033",
+        "address": "1500 San Pablo St, Los Angeles, CA 90033"
+      },
+      "contactEmail": "ptsd.research@med.usc.edu",
+      "startDate": "2021-01-01",
+      "endDate": "2023-06-30",
+      "estimatedDuration": "30 months",
+      "eligibilityCriteria": [
+        "PTSD diagnosis confirmed by clinical assessment",
+        "Age 18-65 years",
+        "History of traumatic event",
+        "No active substance abuse disorder",
+        "Physically able to use VR equipment"
+      ],
+      "primaryObjective": "Reduce PTSD symptoms through VR exposure therapy",
+      "secondaryObjectives": [
+        "Improve quality of life scores",
+        "Reduce avoidance behaviors",
+        "Assess treatment acceptability"
+      ],
+      "studyType": "Interventional",
+      "phase": "Phase II",
+      "sponsor": "USC Institute for Creative Technologies",
+      "lastUpdated": "2023-06-30T23:59:00Z"
+    },
+    {
+      "id": "kaiser-024",
+      "title": "Artificial Pancreas for Type 1 Diabetes",
+      "description": "Testing an advanced automated insulin delivery system (artificial pancreas) that continuously monitors blood glucose and automatically adjusts insulin delivery in real-time.",
+      "qualification": "Type 1 diabetes for 2+ years, age 14-65, C-peptide negative, on insulin pump therapy, HbA1c 6-10%",
+      "status": "ongoing",
+      "location": {
+        "hospital": "Kaiser Permanente Los Angeles",
+        "city": "Los Angeles",
+        "state": "CA",
+        "zipCode": "90027",
+        "address": "4867 Sunset Blvd, Los Angeles, CA 90027"
+      },
+      "contactEmail": "artificial.pancreas@kp.org",
+      "startDate": "2023-08-15",
+      "endDate": "2025-08-15",
+      "estimatedDuration": "24 months",
+      "eligibilityCriteria": [
+        "Type 1 diabetes for at least 2 years",
+        "Age 14-65 years",
+        "C-peptide negative",
+        "Currently using insulin pump therapy",
+        "HbA1c between 6-10%"
+      ],
+      "primaryObjective": "Improve glucose control with automated insulin delivery",
+      "secondaryObjectives": [
+        "Reduce hypoglycemic episodes",
+        "Improve time in target range",
+        "Enhance quality of life"
+      ],
+      "studyType": "Interventional",
+      "phase": "Phase III",
+      "sponsor": "Kaiser Permanente Endocrinology Research",
+      "lastUpdated": "2023-12-01T14:20:00Z"
+    },
+    {
+      "id": "scripps-025",
+      "title": "Liquid Biopsy for Early Cancer Detection",
+      "description": "Developing a blood test that can detect multiple types of cancer in their earliest stages by analyzing circulating tumor DNA and other biomarkers in blood samples.",
+      "qualification": "High cancer risk (family history, genetic predisposition), age 50+, no current cancer diagnosis, willing for blood draws",
+      "status": "upcoming",
+      "location": {
+        "hospital": "Scripps Health",
+        "city": "San Diego",
+        "state": "CA",
+        "zipCode": "92037",
+        "address": "9888 Genesee Ave, San Diego, CA 92037"
+      },
+      "contactEmail": "liquid.biopsy@scripps.edu",
+      "startDate": "2024-09-01",
+      "endDate": "2029-09-01",
+      "estimatedDuration": "60 months",
+      "eligibilityCriteria": [
+        "High cancer risk based on family history or genetics",
+        "Age 50 years or older",
+        "No current cancer diagnosis",
+        "Willing to undergo regular blood sampling",
+        "Ability to attend follow-up visits"
+      ],
+      "primaryObjective": "Develop accurate blood-based cancer screening test",
+      "secondaryObjectives": [
+        "Identify optimal biomarker panels",
+        "Assess test sensitivity and specificity",
+        "Evaluate clinical utility and cost-effectiveness"
+      ],
+      "studyType": "Observational",
+      "phase": "N/A",
+      "sponsor": "Scripps Translational Science Institute",
+      "lastUpdated": "2024-01-25T11:10:00Z"
+    },
+    {
+      "id": "sharp-026",
+      "title": "Robotic Spine Surgery Outcomes",
+      "description": "Comparing outcomes of robotic-assisted spine surgery versus traditional techniques for complex spinal conditions, focusing on precision, recovery time, and long-term results.",
+      "qualification": "Complex spinal condition requiring surgery, age 18-75, candidate for robotic approach, no prior spinal surgery at target level",
+      "status": "ongoing",
+      "location": {
+        "hospital": "Sharp HealthCare",
+        "city": "San Diego",
+        "state": "CA",
+        "zipCode": "92123",
+        "address": "7901 Frost St, San Diego, CA 92123"
+      },
+      "contactEmail": "spine.robotics@sharp.com",
+      "startDate": "2023-10-01",
+      "endDate": "2026-10-01",
+      "estimatedDuration": "36 months",
+      "eligibilityCriteria": [
+        "Complex spinal condition requiring surgical intervention",
+        "Age 18-75 years",
+        "Candidate for robotic-assisted approach",
+        "No prior surgery at target spinal level",
+        "Adequate bone quality for instrumentation"
+      ],
+      "primaryObjective": "Compare surgical precision between robotic and traditional techniques",
+      "secondaryObjectives": [
+        "Assess recovery time and pain scores",
+        "Evaluate long-term functional outcomes",
+        "Monitor complication rates"
+      ],
+      "studyType": "Interventional",
+      "phase": "Phase IV",
+      "sponsor": "Sharp Memorial Hospital Spine Center",
+      "lastUpdated": "2023-12-15T16:45:00Z"
+    },
+    {
+      "id": "ucsd-027",
+      "title": "Regenerative Medicine for Heart Failure",
+      "description": "Groundbreaking trial using stem cell therapy to regenerate damaged heart muscle in patients with heart failure, potentially reversing heart damage thought to be permanent.",
+      "qualification": "Heart failure with reduced ejection fraction, optimal medical therapy, age 21-75, ejection fraction <40%",
+      "status": "upcoming",
+      "location": {
+        "hospital": "UC San Diego Health",
+        "city": "San Diego",
+        "state": "CA",
+        "zipCode": "92103",
+        "address": "200 W Arbor Dr, San Diego, CA 92103"
+      },
+      "contactEmail": "stem.cell.cardio@ucsd.edu",
+      "startDate": "2024-10-01",
+      "endDate": "2029-10-01",
+      "estimatedDuration": "60 months",
+      "eligibilityCriteria": [
+        "Heart failure with reduced ejection fraction",
+        "On optimal medical therapy for 3+ months",
+        "Age 21-75 years",
+        "Left ventricular ejection fraction <40%",
+        "Life expectancy >12 months"
+      ],
+      "primaryObjective": "Improve cardiac function through stem cell regeneration",
+      "secondaryObjectives": [
+        "Assess safety of stem cell therapy",
+        "Monitor quality of life improvements",
+        "Evaluate exercise capacity changes"
+      ],
+      "studyType": "Interventional",
+      "phase": "Phase I/II",
+      "sponsor": "UC San Diego Cardiovascular Institute",
+      "lastUpdated": "2024-01-28T10:05:00Z"
+    },
+    {
+      "id": "hoag-028",
+      "title": "Precision Radiotherapy for Lung Cancer",
+      "description": "Advanced radiation therapy technique using real-time imaging and adaptive planning to precisely target lung tumors while minimizing damage to healthy tissue.",
+      "qualification": "Early-stage lung cancer, medically inoperable or declining surgery, age 18+, adequate pulmonary function",
+      "status": "ongoing",
+      "location": {
+        "hospital": "Hoag Memorial Hospital",
+        "city": "Newport Beach",
+        "state": "CA",
+        "zipCode": "92663",
+        "address": "1 Hoag Dr, Newport Beach, CA 92663"
+      },
+      "contactEmail": "radiation.oncology@hoag.org",
+      "startDate": "2023-07-01",
+      "endDate": "2026-07-01",
+      "estimatedDuration": "36 months",
+      "eligibilityCriteria": [
+        "Early-stage non-small cell lung cancer",
+        "Medically inoperable or declining surgery",
+        "Age 18 years or older",
+        "Adequate pulmonary function tests",
+        "ECOG performance status 0-2"
+      ],
+      "primaryObjective": "Achieve local tumor control with adaptive radiotherapy",
+      "secondaryObjectives": [
+        "Minimize radiation-induced side effects",
+        "Assess overall survival",
+        "Evaluate treatment tolerability"
+      ],
+      "studyType": "Interventional",
+      "phase": "Phase II",
+      "sponsor": "Hoag Family Cancer Institute",
+      "lastUpdated": "2023-11-20T13:25:00Z"
+    },
+    {
+      "id": "cityofhope-029",
+      "title": "Microbiome Therapy for Cancer Treatment",
+      "description": "Investigating how modifying the gut microbiome can enhance the effectiveness of cancer immunotherapy and reduce treatment-related side effects.",
+      "qualification": "Solid tumor malignancy, starting immunotherapy, willing for stool sampling, no recent antibiotics",
+      "status": "ongoing",
+      "location": {
+        "hospital": "City of Hope",
+        "city": "Duarte",
+        "state": "CA",
+        "zipCode": "91010",
+        "address": "1500 E Duarte Rd, Duarte, CA 91010"
+      },
+      "contactEmail": "microbiome.cancer@coh.org",
+      "startDate": "2023-04-01",
+      "endDate": "2026-04-01",
+      "estimatedDuration": "36 months",
+      "eligibilityCriteria": [
+        "Solid tumor malignancy",
+        "Starting or continuing immunotherapy",
+        "Willing to provide stool samples",
+        "No antibiotics in past 30 days",
+        "Age 18 years or older"
+      ],
+      "primaryObjective": "Enhance immunotherapy response through microbiome modulation",
+      "secondaryObjectives": [
+        "Reduce immune-related adverse events",
+        "Identify beneficial bacterial strains",
+        "Develop personalized microbiome interventions"
+      ],
+      "studyType": "Interventional",
+      "phase": "Phase II",
+      "sponsor": "City of Hope Comprehensive Cancer Center",
+      "lastUpdated": "2023-12-18T15:30:00Z"
+    },
+    {
+      "id": "chla-030",
+      "title": "Pediatric Mental Health Digital Intervention",
+      "description": "Comprehensive digital mental health platform specifically designed for children and adolescents, combining therapy apps, family involvement, and AI-powered mood monitoring.",
+      "qualification": "Children/adolescents 8-17 with anxiety or depression, parental consent, access to smartphone/tablet, English fluency",
+      "status": "past",
+      "location": {
+        "hospital": "Children's Hospital Los Angeles",
+        "city": "Los Angeles",
+        "state": "CA",
+        "zipCode": "90027",
+        "address": "4650 Sunset Blvd, Los Angeles, CA 90027"
+      },
+      "contactEmail": "pediatric.mentalhealth@chla.usc.edu",
+      "startDate": "2022-01-01",
+      "endDate": "2023-12-31",
+      "estimatedDuration": "24 months",
+      "eligibilityCriteria": [
+        "Age 8-17 years",
+        "Diagnosis of anxiety or depression",
+        "Parental or guardian consent",
+        "Access to smartphone or tablet device",
+        "English language fluency"
+      ],
+      "primaryObjective": "Improve mental health outcomes through digital intervention",
+      "secondaryObjectives": [
+        "Increase therapy engagement and adherence",
+        "Reduce symptoms of anxiety and depression",
+        "Improve family understanding and support"
+      ],
+      "studyType": "Interventional",
+      "phase": "Phase III",
+      "sponsor": "CHLA Department of Psychiatry",
+      "lastUpdated": "2023-12-31T23:59:00Z"
+    }
+  ]
+}

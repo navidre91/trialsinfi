@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Clinical Trials SoCal</title>
+    <meta name="description" content="Admin login for clinical trials management">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">
+                    <a href="index.html">Clinical Trials SoCal</a>
+                </h1>
+                <nav class="nav">
+                    <ul class="nav-list">
+                        <li><a href="index.html" class="nav-link">Browse Trials</a></li>
+                        <li><a href="admin-login.html" class="nav-link active">Admin Login</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main" style="display: flex; align-items: center; justify-content: center; min-height: 70vh;">
+        <div class="container">
+            <div style="max-width: 400px; margin: 0 auto;">
+                <!-- Login Form Card -->
+                <div class="login-card" style="background: var(--card-background); border-radius: var(--border-radius); padding: 2rem; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color);">
+                    <div style="text-align: center; margin-bottom: 2rem;">
+                        <h2 style="font-size: 1.75rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.5rem;">Admin Login</h2>
+                        <p style="color: var(--text-secondary); font-size: 0.875rem;">Sign in to manage clinical trials</p>
+                    </div>
+
+                    <!-- Error Alert -->
+                    <div id="loginError" class="alert alert-error" style="display: none; margin-bottom: 1.5rem;">
+                        <span id="loginErrorMessage">Invalid credentials. Please try again.</span>
+                    </div>
+
+                    <!-- Success Alert -->
+                    <div id="loginSuccess" class="alert alert-success" style="display: none; margin-bottom: 1.5rem;">
+                        <span>Login successful! Redirecting to admin panel...</span>
+                    </div>
+
+                    <!-- Login Form -->
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="username" class="form-label">Username</label>
+                            <input 
+                                type="text" 
+                                id="username" 
+                                name="username" 
+                                class="form-input" 
+                                required 
+                                autocomplete="username"
+                                placeholder="Enter your username"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password" class="form-label">Password</label>
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                class="form-input" 
+                                required 
+                                autocomplete="current-password"
+                                placeholder="Enter your password"
+                            >
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 1.5rem;">
+                            <label class="checkbox-label" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                <input type="checkbox" id="rememberMe" name="rememberMe" style="margin: 0;">
+                                <span style="font-size: 0.875rem; color: var(--text-secondary);">Remember me for 7 days</span>
+                            </label>
+                        </div>
+
+                        <button type="submit" id="loginBtn" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">
+                            <span id="loginBtnText">Sign In</span>
+                            <div id="loginSpinner" style="display: none;">
+                                <div class="spinner" style="width: 16px; height: 16px; margin: 0 auto;"></div>
+                            </div>
+                        </button>
+                    </form>
+
+                    <!-- Demo Credentials Info -->
+                    <div style="background: #f8fafc; border-radius: var(--border-radius); padding: 1rem; margin-top: 1.5rem; border: 1px solid var(--border-color);">
+                        <h4 style="font-size: 0.875rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;">Demo Credentials</h4>
+                        <div style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.5;">
+                            <div><strong>Username:</strong> admin</div>
+                            <div><strong>Password:</strong> clinicaltrials2024</div>
+                        </div>
+                    </div>
+
+                    <!-- Help Links -->
+                    <div style="text-align: center; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                        <p style="font-size: 0.75rem; color: var(--text-secondary);">
+                            Need help? Contact the system administrator
+                        </p>
+                        <a href="index.html" style="color: var(--primary-color); text-decoration: none; font-size: 0.875rem; font-weight: 500;">
+                            ← Back to Browse Trials
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p class="footer-text">
+                    &copy; 2024 Clinical Trials SoCal. 
+                    For educational and informational purposes only.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/utils.js"></script>
+    <script>
+        /**
+         * Admin Authentication Manager
+         */
+        class AdminAuth {
+            constructor() {
+                this.credentials = {
+                    username: 'admin',
+                    password: 'clinicaltrials2024'
+                };
+                this.sessionKey = 'adminSession';
+                this.rememberKey = 'adminRemember';
+            }
+
+            /**
+             * Initialize authentication
+             */
+            init() {
+                // Check if already logged in
+                if (this.isLoggedIn()) {
+                    this.redirectToAdminPanel();
+                    return;
+                }
+
+                this.bindEventListeners();
+                this.setupFormValidation();
+                
+                // Focus username field
+                document.getElementById('username').focus();
+            }
+
+            /**
+             * Bind event listeners
+             */
+            bindEventListeners() {
+                const loginForm = document.getElementById('loginForm');
+                const usernameField = document.getElementById('username');
+                const passwordField = document.getElementById('password');
+
+                loginForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handleLogin();
+                });
+
+                // Clear error on input
+                [usernameField, passwordField].forEach(field => {
+                    field.addEventListener('input', () => {
+                        this.hideError();
+                    });
+                });
+
+                // Enter key handling
+                [usernameField, passwordField].forEach(field => {
+                    field.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') {
+                            this.handleLogin();
+                        }
+                    });
+                });
+            }
+
+            /**
+             * Setup form validation
+             */
+            setupFormValidation() {
+                const usernameField = document.getElementById('username');
+                const passwordField = document.getElementById('password');
+
+                usernameField.addEventListener('blur', () => {
+                    if (!usernameField.value.trim()) {
+                        this.showFieldError(usernameField, 'Username is required');
+                    }
+                });
+
+                passwordField.addEventListener('blur', () => {
+                    if (!passwordField.value) {
+                        this.showFieldError(passwordField, 'Password is required');
+                    }
+                });
+            }
+
+            /**
+             * Handle login attempt
+             */
+            async handleLogin() {
+                const username = document.getElementById('username').value.trim();
+                const password = document.getElementById('password').value;
+                const rememberMe = document.getElementById('rememberMe').checked;
+
+                // Validate fields
+                if (!username || !password) {
+                    this.showError('Please enter both username and password');
+                    return;
+                }
+
+                // Show loading state
+                this.showLoading();
+
+                // Simulate API call delay
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                // Validate credentials
+                if (this.validateCredentials(username, password)) {
+                    this.handleLoginSuccess(rememberMe);
+                } else {
+                    this.handleLoginFailure();
+                }
+            }
+
+            /**
+             * Validate credentials
+             */
+            validateCredentials(username, password) {
+                return username === this.credentials.username && 
+                       password === this.credentials.password;
+            }
+
+            /**
+             * Handle successful login
+             */
+            handleLoginSuccess(rememberMe) {
+                // Create session
+                const sessionData = {
+                    authenticated: true,
+                    loginTime: Date.now(),
+                    username: this.credentials.username,
+                    expiresAt: Date.now() + (rememberMe ? 7 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000) // 7 days or 24 hours
+                };
+
+                localStorage.setItem(this.sessionKey, JSON.stringify(sessionData));
+
+                if (rememberMe) {
+                    localStorage.setItem(this.rememberKey, 'true');
+                } else {
+                    localStorage.removeItem(this.rememberKey);
+                }
+
+                // Show success
+                this.showSuccess();
+
+                // Redirect after delay
+                setTimeout(() => {
+                    this.redirectToAdminPanel();
+                }, 1500);
+            }
+
+            /**
+             * Handle failed login
+             */
+            handleLoginFailure() {
+                this.hideLoading();
+                this.showError('Invalid username or password. Please try again.');
+                
+                // Clear password field
+                document.getElementById('password').value = '';
+                document.getElementById('password').focus();
+            }
+
+            /**
+             * Check if user is logged in
+             */
+            isLoggedIn() {
+                try {
+                    const sessionData = localStorage.getItem(this.sessionKey);
+                    if (!sessionData) return false;
+
+                    const session = JSON.parse(sessionData);
+                    if (!session.authenticated || !session.expiresAt) return false;
+
+                    // Check if session expired
+                    if (Date.now() > session.expiresAt) {
+                        this.logout();
+                        return false;
+                    }
+
+                    return true;
+                } catch (error) {
+                    console.error('Error checking login status:', error);
+                    return false;
+                }
+            }
+
+            /**
+             * Logout user
+             */
+            logout() {
+                localStorage.removeItem(this.sessionKey);
+                localStorage.removeItem(this.rememberKey);
+            }
+
+            /**
+             * Redirect to admin panel
+             */
+            redirectToAdminPanel() {
+                window.location.href = 'admin-panel.html';
+            }
+
+            /**
+             * Show loading state
+             */
+            showLoading() {
+                const btn = document.getElementById('loginBtn');
+                const btnText = document.getElementById('loginBtnText');
+                const spinner = document.getElementById('loginSpinner');
+
+                btn.disabled = true;
+                btnText.style.display = 'none';
+                spinner.style.display = 'block';
+
+                this.hideError();
+            }
+
+            /**
+             * Hide loading state
+             */
+            hideLoading() {
+                const btn = document.getElementById('loginBtn');
+                const btnText = document.getElementById('loginBtnText');
+                const spinner = document.getElementById('loginSpinner');
+
+                btn.disabled = false;
+                btnText.style.display = 'block';
+                spinner.style.display = 'none';
+            }
+
+            /**
+             * Show error message
+             */
+            showError(message) {
+                const errorDiv = document.getElementById('loginError');
+                const errorMessage = document.getElementById('loginErrorMessage');
+                
+                errorMessage.textContent = message;
+                errorDiv.style.display = 'block';
+
+                // Hide success if visible
+                document.getElementById('loginSuccess').style.display = 'none';
+            }
+
+            /**
+             * Hide error message
+             */
+            hideError() {
+                document.getElementById('loginError').style.display = 'none';
+            }
+
+            /**
+             * Show success message
+             */
+            showSuccess() {
+                this.hideLoading();
+                document.getElementById('loginSuccess').style.display = 'block';
+                document.getElementById('loginError').style.display = 'none';
+            }
+
+            /**
+             * Show field error
+             */
+            showFieldError(field, message) {
+                // Remove existing error
+                const existingError = field.parentNode.querySelector('.form-error');
+                if (existingError) {
+                    existingError.remove();
+                }
+
+                // Add error message
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'form-error';
+                errorDiv.textContent = message;
+                field.parentNode.appendChild(errorDiv);
+
+                // Add error styling
+                field.style.borderColor = 'var(--error-color)';
+
+                // Remove error on focus
+                field.addEventListener('focus', () => {
+                    field.style.borderColor = '';
+                    if (errorDiv.parentNode) {
+                        errorDiv.remove();
+                    }
+                }, { once: true });
+            }
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            const auth = new AdminAuth();
+            auth.init();
+        });
+    </script>
+
+    <style>
+        /* Additional styles for login page */
+        .checkbox-label input[type="checkbox"] {
+            accent-color: var(--primary-color);
+        }
+
+        .login-card {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .main {
+                padding: 1rem 0 !important;
+            }
+            
+            .login-card {
+                margin: 0 1rem;
+                padding: 1.5rem !important;
+            }
+        }
+    </style>
+</body>
+</html>

@@ -1,0 +1,583 @@
+{
+  "disease": "prostate",
+  "nccn_version": "5.2026",
+  "nccn_date": "2026-01-23",
+  "guidelines_title": "NCCN Clinical Practice Guidelines in Oncology: Prostate Cancer",
+  "created_date": "2026-04-01",
+  "updated_date": "2026-04-02",
+  "created_by": "GU Oncology SoCal Pipeline v2.0",
+  "changelog": [
+    {
+      "date": "2026-04-02",
+      "version": "1.1",
+      "changes": [
+        "Split localized_unfavorable_ir_high_risk into two separate categories: localized_unfavorable_ir and localized_high_very_high_risk. Validated by GUIDANCE trial — unfavorable IR and high risk have distinct SOC backbones and separate Phase III trial populations.",
+        "Added genomic_classifier clinical axis (Decipher, Oncotype GPS, Prolaris) — validated by GUIDANCE trial design.",
+        "Strengthened bcr_post_rp include_patterns for PET-guided salvage RT trials (INDICATE pattern). Added PSMA-PET + BCR post-RP signal patterns.",
+        "Added INDICATE and GUIDANCE to known_trial_anchors as real-world validation cases."
+      ]
+    }
+  ],
+  "pathway_namespace": "PROS",
+  "classification_philosophy": "Inclusive — when ambiguous, include in adjacent categories. Better to over-tag than miss a trial. Multi-label: one trial may appear under localized, BCR, and/or metastatic if eligibility criteria span states.",
+  "sections_order": ["Localized", "BCR", "mCSPC", "CRPC"],
+  "section_colors": {
+    "Localized": "1B5E3B",
+    "BCR": "8B6914",
+    "mCSPC": "1B3A6B",
+    "CRPC": "8B3A2F"
+  },
+  "categories": [
+    {
+      "id": "localized_low_favorable_ir",
+      "label": "Localized — Low / Favorable Intermediate Risk",
+      "short": "Low / Favorable IR",
+      "section": "Localized",
+      "nccn_page": "PROS-1/PROS-2",
+      "order": 1,
+      "color_hex": "2E9E60",
+      "confidence_base": "HIGH",
+      "include_patterns": [
+        "low.risk.*prostate","prostate.*low.risk",
+        "very.low.risk.*prostate","prostate.*very.low.risk",
+        "favorable.intermediate.*prostate","prostate.*favorable.intermediate",
+        "favorable.IR.*prostate","prostate.*favorable.IR",
+        "low.grade.*prostate","Gleason.*6.*prostate","Gleason.*3.\\+3.*prostate",
+        "PSA.*10.*ng.*localized.*prostate","localized.*prostate.*PSA.*<.*10",
+        "cT1.*prostate","cT2a.*prostate",
+        "active.surveillance.*prostate","watchful.waiting.*prostate",
+        "clinically.localized.*prostate.*low"
+      ],
+      "exclude_patterns": [
+        "high.risk.*prostate","unfavorable.intermediate",
+        "metastatic.*prostate","castration.resistant",
+        "biochemical.recurrence","BCR","nmCRPC","mCRPC","mCSPC"
+      ],
+      "description": "Very low / Low / Favorable IR prostate cancer — cT1-cT2a, Gleason ≤6 or Gleason 3+4, PSA <10-20, no high-risk features"
+    },
+    {
+      "id": "localized_unfavorable_ir",
+      "label": "Localized — Unfavorable Intermediate Risk",
+      "short": "Unfavorable IR",
+      "section": "Localized",
+      "nccn_page": "PROS-3",
+      "order": 2,
+      "color_hex": "1B7A4E",
+      "confidence_base": "HIGH",
+      "include_patterns": [
+        "unfavorable.intermediate.*prostate","prostate.*unfavorable.intermediate",
+        "unfavorable.intermediate.risk","unfavorable.IR.*prostate","prostate.*unfavorable.IR",
+        "Gleason.*4.\\+3.*prostate","Gleason.*4.\\+3.*localized","ISUP.*grade.*3.*prostate",
+        "grade.group.3.*prostate","prostate.*grade.group.3",
+        "cT2b.*prostate","cT2c.*prostate",
+        "PSA.*10.*20.*prostate","PSA.*between.*10.*20.*prostate",
+        "intermediate.risk.*prostate.*unfavorable",
+        "50.*percent.*cores.*positive.*prostate","majority.*biopsy.*cores.*prostate",
+        "short.course.*ADT.*radiation.*prostate","6.*month.*ADT.*radiation.*prostate",
+        "GUIDANCE.*trial","de.intensif.*prostate.*intermediate","intensif.*prostate.*intermediate"
+      ],
+      "exclude_patterns": [
+        "Gleason.*\\b[89]\\b.*prostate","Gleason.*\\b10\\b.*prostate",
+        "Gleason.*4.\\+4.*prostate","Gleason.*\\b5\\b.*prostate",
+        "ISUP.*grade.*\\b[45]\\b.*prostate",
+        "grade.group.[45].*prostate",
+        "PSA.*>.*20.*prostate","cT3.*prostate","cT4.*prostate",
+        "metastatic.*prostate","castration.resistant",
+        "biochemical.recurrence","\\bBCR\\b","nmCRPC","mCRPC","mCSPC",
+        "regional.*lymph.node","\\bfavorable.intermediate","low.risk"
+      ],
+      "description": "Unfavorable IR only — Gleason 4+3, PSA 10-20, cT2b-c, or ≥50% cores positive, WITHOUT high-risk features. SOC: EBRT + short-course ADT (4-6 mo). Key trial: GUIDANCE (de-intensification vs intensification by genomic risk)."
+    },
+    {
+      "id": "localized_high_very_high_risk",
+      "label": "Localized — High / Very High Risk",
+      "short": "High / Very High Risk",
+      "section": "Localized",
+      "nccn_page": "PROS-4/PROS-5",
+      "order": 3,
+      "color_hex": "1B5E3B",
+      "confidence_base": "HIGH",
+      "include_patterns": [
+        "high.risk.*prostate","prostate.*high.risk",
+        "very.high.risk.*prostate","prostate.*very.high.risk",
+        "high.grade.*prostate","Gleason.*8.*prostate","Gleason.*9.*prostate","Gleason.*10.*prostate",
+        "Gleason.*4.\\+4.*prostate","Gleason.*5.*prostate",
+        "ISUP.*grade.*4.*prostate","ISUP.*grade.*5.*prostate",
+        "grade.group.4.*prostate","grade.group.5.*prostate",
+        "cT3.*prostate","cT4.*prostate","pT3.*prostate",
+        "PSA.*>.*20.*prostate","prostate.*PSA.*>.*20",
+        "locally.advanced.*prostate",
+        "neoadjuvant.*prostate","neoadjuvant.*hormone.*prostate",
+        "neoadjuvant.*ADT.*prostate","ADT.*plus.*radiation.*prostate",
+        "radiation.*plus.*ADT.*prostate","long.term.*ADT.*prostate",
+        "18.*month.*ADT.*prostate","24.*month.*ADT.*prostate","36.*month.*ADT.*prostate",
+        "radical.prostatectomy.*high.risk","high.risk.*radical.prostatectomy",
+        "combined.modality.*prostate"
+      ],
+      "exclude_patterns": [
+        "low.risk.*prostate","favorable.intermediate","unfavorable.intermediate",
+        "metastatic.*prostate","castration.resistant",
+        "biochemical.recurrence","BCR","nmCRPC","mCRPC","mCSPC",
+        "regional.*lymph.node"
+      ],
+      "description": "High / Very High Risk — Gleason ≥8, cT3-T4, PSA >20, or ≥2 high-risk features. SOC: EBRT + long-term ADT (18-36 mo) ± abiraterone (STAMPEDE/TITAN). RP + PLND for selected patients."
+    },
+    {
+      "id": "localized_regional_n1",
+      "label": "Localized — Regional (N1) Disease",
+      "short": "Regional N1",
+      "section": "Localized",
+      "nccn_page": "PROS-6/PROS-7",
+      "order": 4,
+      "color_hex": "0F5C36",
+      "confidence_base": "HIGH",
+      "include_patterns": [
+        "node.positive.*prostate","prostate.*node.positive",
+        "lymph.node.positive.*prostate","prostate.*lymph.node.positive",
+        "N1.*prostate","prostate.*N1",
+        "pN1.*prostate","prostate.*pN1",
+        "regional.*lymph.node.*prostate","prostate.*regional.*lymph.node",
+        "pelvic.lymph.node.*prostate.*positive",
+        "hormone.*therapy.*prostate.*node",
+        "ADT.*radiation.*prostate.*node"
+      ],
+      "exclude_patterns": [
+        "M1.*prostate","metastatic.*prostate","castration.resistant",
+        "biochemical.recurrence","mCRPC","mCSPC"
+      ],
+      "description": "Prostate cancer with pelvic lymph node involvement (N1/pN1) — still regional; treated with ADT ± RT or RP + PLND"
+    },
+    {
+      "id": "localized_general",
+      "label": "Localized — General / Unspecified Risk",
+      "short": "Localized (unspecified risk)",
+      "section": "Localized",
+      "nccn_page": "PROS-1/PROS-8",
+      "order": 5,
+      "color_hex": "4BB87A",
+      "confidence_base": "MEDIUM",
+      "include_patterns": [
+        "localized.*prostate.*cancer","prostate.*cancer.*localized",
+        "clinically.localized.*prostate","non.metastatic.*prostate",
+        "prostatectomy.*trial","radiation.*prostate.*cancer.*trial",
+        "prostate.*cancer.*surgery","EBRT.*prostate","brachytherapy.*prostate",
+        "SBRT.*prostate","stereotactic.*prostate"
+      ],
+      "exclude_patterns": [
+        "metastatic.*prostate","castration.resistant","\\bmCRPC\\b","\\bmCSPC\\b",
+        "biochemical.recurrence","BCR","nmCRPC","M1","N1.*positive"
+      ],
+      "description": "Localized prostate cancer without sufficient detail to assign risk group"
+    },
+    {
+      "id": "bcr_post_rp",
+      "label": "BCR — Biochemical Recurrence After RP",
+      "short": "BCR post-RP",
+      "section": "BCR",
+      "nccn_page": "PROS-9/PROS-10",
+      "order": 6,
+      "color_hex": "C9A84C",
+      "confidence_base": "HIGH",
+      "include_patterns": [
+        "biochemical.recurrence.*prostatectomy","biochemical.recurrence.*RP",
+        "PSA.recurrence.*prostatectomy","PSA.failure.*prostatectomy",
+        "PSA.relapse.*prostatectomy","rising.PSA.*prostatectomy",
+        "post.prostatectomy.*biochemical","salvage.*radiation.*prostatectomy",
+        "salvage.*RT.*prostatectomy","salvage.radiotherapy.*prostatectomy",
+        "BCR.*after.*RP","BCR.*post.*RP","BCR.*after.*prostatectomy",
+        "adjuvant.*radiation.*prostatectomy",
+        "post.prostatectomy.*PSMA.PET","PSMA.PET.*post.prostatectomy",
+        "PET.guided.*salvage.*prostatectomy","PET.directed.*salvage.*prostatectomy",
+        "PET.*intensification.*prostatectomy","PET.*directed.*radiation.*prostatectomy",
+        "INDICATE.*trial","post.prostatectomy.*PET.*radiation",
+        "salvage.*radiation.*prostate.bed","prostate.bed.*radiation.*BCR",
+        "post.RP.*salvage","salvage.*pelvic.*radiation.*prostatectomy"
+      ],
+      "exclude_patterns": [
+        "castration.resistant","mCRPC","mCSPC",
+        "BCR.*after.*radiation","BCR.*after.*RT","BCR.*post.*RT",
+        "PSA.failure.*after.*radiation","rising.PSA.*after.*radiation",
+        "Phoenix.definition","nadir.\\+.2"
+      ],
+      "description": "PSA ≥0.2 ng/mL rising after RP (AUA definition) — salvage RT ± ADT ± ARPI. Includes PET-guided intensification trials (e.g. INDICATE: PSMA-PET stratified, prostate bed + pelvic RT + ADT ± systemic intensification)."
+    },
+    {
+      "id": "bcr_post_rt",
+      "label": "BCR — Biochemical Recurrence After RT",
+      "short": "BCR post-RT",
+      "section": "BCR",
+      "nccn_page": "PROS-11/PROS-12",
+      "order": 7,
+      "color_hex": "B8960A",
+      "confidence_base": "HIGH",
+      "include_patterns": [
+        "biochemical.recurrence.*radiation","biochemical.recurrence.*radiotherapy",
+        "PSA.recurrence.*radiation","PSA.failure.*radiation","PSA.relapse.*radiation",
+        "rising.PSA.*radiation","post.radiation.*biochemical",
+        "BCR.*after.*RT","BCR.*post.*RT","BCR.*after.*radiation",
+        "salvage.*prostatectomy.*radiation","salvage.*HIFU.*radiation",
+        "salvage.*cryotherapy.*radiation","salvage.*local.*therapy.*radiation",
+        "Phoenix.definition.*BCR","nadir.\\+.2.*PSA"
+      ],
+      "exclude_patterns": [
+        "metastatic.*prostate","castration.resistant","M1","mCRPC","mCSPC",
+        "BCR.*prostatectomy","BCR.*RP"
+      ],
+      "description": "PSA nadir +2 ng/mL after definitive RT (Phoenix definition) — salvage local therapy or ADT"
+    },
+    {
+      "id": "bcr_general",
+      "label": "BCR — General / Unspecified Prior Treatment",
+      "short": "BCR (general)",
+      "section": "BCR",
+      "nccn_page": "PROS-9/PROS-12",
+      "order": 8,
+      "color_hex": "D4AA30",
+      "confidence_base": "MEDIUM",
+      "include_patterns": [
+        "biochemical.recurrence.*prostate","biochemical.relapse.*prostate",
+        "PSA.recurrence.*prostate","PSA.relapse.*prostate","PSA.failure.*prostate",
+        "rising.PSA.*prostate","\\bBCR\\b.*prostate","prostate.*\\bBCR\\b",
+        "non.metastatic.*rising.PSA","hormone.sensitive.*BCR",
+        "intermittent.ADT.*prostate","androgen.deprivation.*BCR"
+      ],
+      "exclude_patterns": [
+        "metastatic.*prostate","castration.resistant","M1","mCRPC","mCSPC",
+        "nmCRPC"
+      ],
+      "description": "Biochemical recurrence after definitive local therapy — prior treatment type not specified or ambiguous"
+    },
+    {
+      "id": "cspc_oligometastatic",
+      "label": "mCSPC — Oligometastatic / Low-Volume",
+      "short": "Oligomets / Low-Vol CSPC",
+      "section": "mCSPC",
+      "nccn_page": "PROS-13/PROS-14",
+      "order": 9,
+      "color_hex": "2B5BA0",
+      "confidence_base": "HIGH",
+      "include_patterns": [
+        "oligometastatic.*prostate","prostate.*oligometastatic",
+        "oligomets.*prostate","low.volume.*metastatic.*prostate",
+        "low.volume.*castration.sensitive.*prostate",
+        "low.volume.*mCSPC","mCSPC.*low.volume",
+        "synchronous.*oligometastatic.*prostate","metachronous.*oligometastatic.*prostate",
+        "SBRT.*metastatic.*prostate","stereotactic.*metastatic.*prostate",
+        "MDT.*metastatic.*prostate","metastasis.directed.*prostate",
+        "1.to.3.*metastas.*prostate","fewer.than.*5.*metastas.*prostate",
+        "M1.*low.volume.*prostate","low.volume.*hormone.sensitive.*prostate"
+      ],
+      "exclude_patterns": [
+        "high.volume.*prostate","castration.resistant","mCRPC","nmCRPC",
+        "visceral.*metastas","liver.metastas.*prostate","lung.metastas.*prostate"
+      ],
+      "description": "Oligometastatic or low-volume mCSPC: <4 bone mets (non-axial) without visceral; includes MDT/SBRT trials"
+    },
+    {
+      "id": "cspc_high_volume",
+      "label": "mCSPC — High-Volume (CHAARTED Criteria)",
+      "short": "High-Vol CSPC (CHAARTED)",
+      "section": "mCSPC",
+      "nccn_page": "PROS-15",
+      "order": 10,
+      "color_hex": "1B3A6B",
+      "confidence_base": "HIGH",
+      "include_patterns": [
+        "high.volume.*metastatic.*prostate","high.volume.*castration.sensitive",
+        "high.volume.*mCSPC","mCSPC.*high.volume",
+        "CHAARTED.*high.volume","high.burden.*metastatic.*prostate",
+        "high.burden.*castration.sensitive",
+        "visceral.*metastas.*prostate","liver.metastas.*prostate.*hormone",
+        "lung.metastas.*prostate.*hormone",
+        "4.or.more.*bone.*metastas.*prostate","≥4.*bone.*metastas.*prostate",
+        "extensive.metastas.*prostate","widespread.metastas.*prostate"
+      ],
+      "exclude_patterns": [
+        "low.volume.*prostate","oligometastatic","castration.resistant",
+        "mCRPC","nmCRPC"
+      ],
+      "description": "High-volume mCSPC: ≥4 bone mets with ≥1 non-axial OR visceral mets (CHAARTED criteria). Docetaxel-based combinations standard."
+    },
+    {
+      "id": "cspc_general",
+      "label": "mCSPC — General / Hormone-Sensitive",
+      "short": "mCSPC / HSPC",
+      "section": "mCSPC",
+      "nccn_page": "PROS-13/PROS-15",
+      "order": 11,
+      "color_hex": "3A6DC5",
+      "confidence_base": "HIGH",
+      "include_patterns": [
+        "metastatic.*castration.sensitive.*prostate",
+        "metastatic.*hormone.sensitive.*prostate",
+        "metastatic.*castration.naive.*prostate",
+        "\\bmCSPC\\b","\\bHSPC\\b.*metastatic","\\bmHSPC\\b",
+        "castration.sensitive.*prostate.*cancer",
+        "hormone.naive.*metastatic.*prostate",
+        "newly.diagnosed.*metastatic.*prostate",
+        "de.novo.*metastatic.*prostate",
+        "androgen.sensitive.*metastatic.*prostate",
+        "ADT.naive.*metastatic.*prostate",
+        "combination.*ADT.*metastatic.*prostate"
+      ],
+      "exclude_patterns": [
+        "castration.resistant","\\bmCRPC\\b","nmCRPC",
+        "non.metastatic","biochemical.recurrence","\\bBCR\\b"
+      ],
+      "description": "Metastatic castration-sensitive / hormone-sensitive prostate cancer — general or volume not specified"
+    },
+    {
+      "id": "crpc_nonmetastatic",
+      "label": "CRPC — Non-Metastatic (nmCRPC / M0 CRPC)",
+      "short": "nmCRPC / M0 CRPC",
+      "section": "CRPC",
+      "nccn_page": "PROS-16",
+      "order": 12,
+      "color_hex": "C04040",
+      "confidence_base": "HIGH",
+      "include_patterns": [
+        "non.metastatic.*castration.resistant.*prostate",
+        "nmCRPC","M0.*CRPC","M0.*castration.resistant",
+        "castration.resistant.*non.metastatic.*prostate",
+        "\\bnmCRPC\\b",
+        "PSA.doubling.time.*castration.resistant",
+        "high.risk.*nmCRPC","M0.*castration.resistant.*prostate",
+        "enzalutamide.*nmCRPC","apalutamide.*nmCRPC","darolutamide.*nmCRPC",
+        "ARAMIS","PROSPER.*trial","SPARTAN.*trial",
+        "rising.PSA.*no.metastasis.*castration"
+      ],
+      "exclude_patterns": [
+        "\\bM1\\b.*prostate","\\bM1\\b.*castration.resistant","\\bmCRPC\\b",
+        "mCSPC","hormone.sensitive","castration.sensitive"
+      ],
+      "description": "Rising PSA under castrate testosterone with no distant metastases on conventional imaging (nmCRPC/M0 CRPC)"
+    },
+    {
+      "id": "crpc_metastatic_preARPI",
+      "label": "CRPC — Metastatic, Pre-ARPI (mCRPC 1L)",
+      "short": "mCRPC 1L (pre-ARPI)",
+      "section": "CRPC",
+      "nccn_page": "PROS-17/PROS-18",
+      "order": 13,
+      "color_hex": "8B3A2F",
+      "confidence_base": "HIGH",
+      "include_patterns": [
+        "metastatic.*castration.resistant.*prostate.*first.line",
+        "metastatic.*castration.resistant.*prostate.*1L",
+        "metastatic.*castration.resistant.*prostate.*first.*line",
+        "1L.*mCRPC","first.line.*mCRPC",
+        "chemotherapy.naive.*CRPC","chemo.naive.*CRPC",
+        "AR.*targeted.*therapy.naive.*CRPC","ARPI.naive.*CRPC",
+        "novel.hormonal.*CRPC.*first","mCRPC.*prior.*docetaxel.*no.*ARPI",
+        "enzalutamide.*mCRPC.*first","abiraterone.*mCRPC.*first",
+        "docetaxel.*mCRPC.*first.line","taxane.naive.*mCRPC",
+        "androgen.receptor.*inhibitor.*naive.*CRPC",
+        "AFFIRM.*trial","PREVAIL.*trial","COU-AA-302",
+        "mCRPC.*not.*received.*novel.*hormonal"
+      ],
+      "exclude_patterns": [
+        "nmCRPC","M0.*CRPC","hormone.sensitive","castration.sensitive",
+        "post.*enzalutamide","post.*abiraterone","prior.*ARPI.*CRPC",
+        "second.line.*mCRPC","2L.*mCRPC"
+      ],
+      "description": "mCRPC without prior ARPI or with only prior docetaxel. Standard 1L agents: enzalutamide, abiraterone, docetaxel, cabazitaxel combinations, PARP inhibitors (HRR+), PSMA-RLT (PSMA+)."
+    },
+    {
+      "id": "crpc_metastatic_postARPI",
+      "label": "CRPC — Metastatic, Post-ARPI (mCRPC 2L+)",
+      "short": "mCRPC 2L+ (post-ARPI)",
+      "section": "CRPC",
+      "nccn_page": "PROS-17/PROS-18",
+      "order": 14,
+      "color_hex": "6B1A1A",
+      "confidence_base": "HIGH",
+      "include_patterns": [
+        "post.*enzalutamide.*CRPC","post.*abiraterone.*CRPC",
+        "post.ARPI.*CRPC","ARPI.refractory.*CRPC","after.*ARPI.*CRPC",
+        "prior.*enzalutamide.*CRPC","prior.*abiraterone.*CRPC",
+        "prior.*novel.*hormonal.*CRPC","prior.*androgen.receptor.*inhibitor.*CRPC",
+        "second.line.*mCRPC","2L.*mCRPC","third.line.*mCRPC","3L.*mCRPC",
+        "post.treatment.*mCRPC","refractory.*mCRPC",
+        "cabazitaxel.*post.docetaxel","platinum.*CRPC.*post",
+        "PSMA.*lutetium.*post.ARPI","177Lu.*post.ARPI",
+        "VISION.*trial","TheraP.*trial",
+        "lutetium.*PSMA.*mCRPC","PSMA-RLT.*mCRPC",
+        "olaparib.*prior.*ARPI","rucaparib.*prior.*ARPI",
+        "BRCA.*CRPC.*post.ARPI","HRR.*CRPC.*post",
+        "pembrolizumab.*mCRPC.*post","immune.*checkpoint.*CRPC.*post"
+      ],
+      "exclude_patterns": [
+        "nmCRPC","M0.*CRPC","hormone.sensitive","castration.sensitive",
+        "ARPI.naive","chemotherapy.naive.*first.line"
+      ],
+      "description": "mCRPC after prior ARPI (enzalutamide and/or abiraterone). Second-line+ setting: cabazitaxel, PARP inhibitors (HRR+), 177Lu-PSMA-617 (PSMA+), platinum, clinical trials."
+    },
+    {
+      "id": "crpc_general",
+      "label": "CRPC — General / Unspecified Stage",
+      "short": "CRPC (general)",
+      "section": "CRPC",
+      "nccn_page": "PROS-16/PROS-18",
+      "order": 15,
+      "color_hex": "A03030",
+      "confidence_base": "MEDIUM",
+      "include_patterns": [
+        "castration.resistant.*prostate","prostate.*castration.resistant",
+        "\\bCRPC\\b","\\bmCRPC\\b.*general","hormone.refractory.*prostate",
+        "androgen.independent.*prostate","androgen.resistant.*prostate",
+        "castrate.resistant.*prostate","castrate.level.*testosterone.*prostate.*recur",
+        "CRPC.*unspecified","castration.resistant.*prostate.*cancer"
+      ],
+      "exclude_patterns": [
+        "castration.sensitive","hormone.sensitive","mCSPC","HSPC",
+        "biochemical.recurrence.*non.castrate","non.castrate"
+      ],
+      "description": "CRPC without sufficient detail to assign M0 vs M1 or treatment-line subgroup"
+    }
+  ],
+  "clinical_axes": {
+    "castration_status": {
+      "description": "Current gonadal testosterone level relative to castrate threshold (<50 ng/dL)",
+      "values": ["castration_sensitive", "castration_resistant", "unknown"],
+      "detection_rules": {
+        "castration_resistant": ["castration.resistant","CRPC","\\bCRPC\\b","hormone.refractory","androgen.independent","castrate.resistant"],
+        "castration_sensitive": ["castration.sensitive","hormone.sensitive","castration.naive","hormone.naive","CSPC","HSPC","mHSPC","mCSPC"]
+      },
+      "_ui_note": "If castration_status=unknown and trial targets a specific castration state: surface trial with flag 'Confirm castration status — is the patient hormone-sensitive (CSPC) or castration-resistant (CRPC)? This determines which trials he qualifies for.'"
+    },
+    "metastatic_status": {
+      "description": "Presence of distant metastases (M0 vs M1)",
+      "values": ["localized", "regional_n1", "nonmetastatic_crpc", "metastatic", "unknown"],
+      "detection_rules": {
+        "localized": ["\\bcT[12]\\b","\\bcT1\\b","clinically.localized","localized.*prostate"],
+        "regional_n1": ["\\bN1\\b.*prostate","node.positive.*prostate","pelvic.lymph.node.*positive"],
+        "nonmetastatic_crpc": ["\\bnmCRPC\\b","M0.*CRPC","M0.*castration.resistant"],
+        "metastatic": ["\\bM1\\b","metastatic.*prostate","\\bmCSPC\\b","\\bmCRPC\\b","bone.metastas","lymph.node.metastas.*distant"]
+      },
+      "_ui_note": "If metastatic_status=unknown: surface trials across localized and metastatic settings with flag 'Confirm staging — is there evidence of distant metastases on imaging? This is the single most important factor for narrowing the trial list.'"
+    },
+    "disease_volume": {
+      "description": "Metastatic burden (CHAARTED criteria or similar)",
+      "values": ["low_volume", "high_volume", "oligometastatic", "unknown"],
+      "detection_rules": {
+        "low_volume": ["low.volume","low.burden","oligometastatic","oligo.metastatic","fewer.*metastas","limited.*metastas"],
+        "high_volume": ["high.volume","high.burden","CHAARTED.*high","≥4.*bone","4.or.more.*bone","visceral.*metastas"],
+        "oligometastatic": ["oligometastatic","oligo.metastatic","1.*to.*3.*metastas","1.3.*bone.*lesion","SBRT.*metastas"]
+      },
+      "_ui_note": "If disease_volume=unknown and trial restricts to high-volume or oligometastatic: surface trial with flag 'Confirm disease volume — count of bone metastases and presence of visceral disease (lung, liver). High-volume = ≥4 bone mets or any visceral met.'"
+    },
+    "prior_arpi": {
+      "description": "Prior androgen receptor pathway inhibitor (enzalutamide, abiraterone, apalutamide, darolutamide)",
+      "values": ["yes", "no", "unknown"],
+      "detection_rules": {
+        "yes": ["prior.*enzalutamide","prior.*abiraterone","prior.*apalutamide","prior.*darolutamide","post.*enzalutamide","post.*abiraterone","after.*enzalutamide","after.*abiraterone","ARPI.*refractory","ARPI.*resistant","novel.*hormonal.*prior","post.ARPI"],
+        "no": ["ARPI.naive","enzalutamide.naive","abiraterone.naive","novel.hormonal.naive","prior.*no.*ARPI","no.*prior.*novel.*hormonal"]
+      },
+      "_ui_note": "If prior_arpi=unknown: surface trials for both ARPI-naive and post-ARPI settings. Add flag: 'Confirm ARPI history — has the patient received enzalutamide, abiraterone, apalutamide, or darolutamide? Many trials specify exactly one prior line of novel hormonal therapy.'"
+    },
+    "prior_docetaxel": {
+      "description": "Prior docetaxel-containing chemotherapy for prostate cancer",
+      "values": ["yes", "no", "unknown"],
+      "detection_rules": {
+        "yes": ["prior.*docetaxel","post.*docetaxel","after.*docetaxel","docetaxel.refractory","docetaxel.resistant","taxane.refractory","taxane.resistant","post.*taxane","cabazitaxel.*post.*docetaxel"],
+        "no": ["docetaxel.naive","chemotherapy.naive","taxane.naive","chemo.naive","no.*prior.*docetaxel","not.*received.*docetaxel"]
+      },
+      "_ui_note": "If prior_docetaxel=unknown: surface trials for both chemo-naive and post-docetaxel. Add flag: 'Confirm chemotherapy history — has the patient received docetaxel? Some trials exclude chemo-naive patients; others require prior docetaxel. This affects eligibility for cabazitaxel and triplet therapy trials.'"
+    },
+    "biomarker_hrr": {
+      "description": "Homologous recombination repair gene alteration (BRCA1/2, ATM, CDK12, etc.)",
+      "values": ["positive", "negative", "not_required", "unknown"],
+      "detection_rules": {
+        "positive": ["BRCA.*mutant","BRCA.*positive","BRCA.*altered","HRR.*positive","HRR.*deficient","homologous.recombination.*defici","\\bHRD\\b","BRCA1.*BRCA2","CDK12.*mutant","ATM.*mutant","HRR.*gene.*mutant"],
+        "not_required": ["all.comers","unselected","biomarker.unselected","regardless.*BRCA","regardless.*HRR"]
+      },
+      "_ui_note": "If biomarker_hrr=unknown and trial requires HRR positivity: surface trial with flag 'BRCA/HRR mutation status not confirmed — germline and somatic testing recommended before referring to PARP inhibitor trials (olaparib, rucaparib, niraparib). Most labs return results in 2–3 weeks.'"
+    },
+    "psma_status": {
+      "description": "PSMA expression status as determined by PSMA PET imaging. 'required' means the trial mandates PSMA-PET screening for eligibility; 'positive' means the trial requires confirmed PSMA positivity. Trials with 'required' should surface with a verification note when patient PSMA status is not confirmed in the query.",
+      "values": ["positive", "required", "negative", "not_required", "unknown"],
+      "detection_rules": {
+        "positive": ["PSMA.*positive","PSMA.*expressing","PSMA.PET.*positive","gallium.*PSMA.*positive","PSMA-avid","PSMA.avid"],
+        "required": ["PSMA.PET.*required","PSMA.*screening.*required","PSMA.*eligib","PSMA.*imaging.*prior","PSMA.*scan.*prior","lutetium.*PSMA","177Lu.*PSMA","PSMA.RLT","PSMA-617","Lu-PSMA","PSMA.*theranostic"],
+        "not_required": ["PSMA.unselected","all.comers","regardless.*PSMA","PSMA.status.*not.required"]
+      },
+      "_ui_note": "When psma_status=required and patient query does not confirm PSMA-PET: surface trial but add flag 'PSMA-PET confirmation required — verify before referring'. Do NOT suppress the trial."
+    },
+    "genomic_classifier": {
+      "description": "Use of a risk stratification tool beyond clinical stage — either a tissue-based genomic expression test or an AI-based digital pathology tool — to stratify or select patients. Increasingly used in localized and BCR settings to guide treatment de-intensification or intensification. Brand examples: genomic expression tests (Decipher by Veracyte, Oncotype GPS by Exact Sciences, Prolaris by Myriad Genetics); AI pathology tools (Artera AI — trained on H&E slide images).",
+      "values": ["expression_test_required", "ai_pathology_required", "classifier_required", "not_required", "unknown"],
+      "_value_notes": {
+        "expression_test_required": "Trial requires or uses an RNA/DNA-based genomic expression test (e.g., Decipher, Oncotype GPS, Prolaris). Requires tissue biopsy RNA extraction.",
+        "ai_pathology_required": "Trial requires or uses an AI-based digital pathology tool applied to H&E slides (e.g., Artera AI). No additional tissue extraction needed beyond existing slides.",
+        "classifier_required": "Trial requires some form of genomic or AI risk stratification but type is unspecified.",
+        "not_required": "Trial is biomarker-unselected for this axis — all patients eligible regardless of genomic score.",
+        "unknown": "Cannot determine from trial text whether a risk stratification tool is required."
+      },
+      "detection_rules": {
+        "expression_test_required": [
+          "Decipher","Decipher.*score","Decipher.*genomic","Decipher.*classifier",
+          "Oncotype.*GPS","Genomic.Prostate.Score","GPS.*score.*prostate",
+          "Prolaris","cell.cycle.progression.*score","CCP.*score.*prostate",
+          "RNA.*expression.*prostate","gene.*expression.*classifier.*prostate"
+        ],
+        "ai_pathology_required": [
+          "Artera","Artera.*AI","Artera.*prostate","digital.*pathology.*AI",
+          "H&E.*AI.*score","H.E.*image.*classifier","AI.*pathology.*prostate",
+          "pathology.*image.*risk.*prostate"
+        ],
+        "classifier_required": [
+          "genomic.*risk.*stratif","genomic.*classifier.*prostate","genomic.*score.*required",
+          "tissue.*genomic.*prostate","genomic.*test.*prostate","GUIDANCE.*trial",
+          "risk.*stratif.*genomic","biomarker.*stratif.*prostate"
+        ],
+        "not_required": ["genomic.*not.*required","biomarker.unselected","all.comers","regardless.*genomic"]
+      },
+      "_ui_note": "When classifier_required or expression_test_required is detected and patient query does not mention a score: surface trial but add flag 'Genomic risk classifier result needed — confirm test has been performed (e.g., Decipher, Oncotype GPS, Artera AI or equivalent)'. Do NOT suppress the trial."
+    }
+  },
+  "standard_therapies_by_state": {
+    "localized_low_favorable_ir": ["Active surveillance", "EBRT ± brachytherapy boost", "Radical prostatectomy", "Brachytherapy (LDR/HDR)"],
+    "localized_unfavorable_ir": ["EBRT + short-course ADT (4-6 mo)", "Radical prostatectomy + pelvic LND", "Brachytherapy boost + EBRT + short ADT", "Genomic de-intensification (RT alone) or intensification (ADT + ARPI)"],
+    "localized_high_very_high_risk": ["EBRT + long-term ADT (18-36 mo) ± abiraterone", "Radical prostatectomy + PLND ± adjuvant RT", "Brachytherapy boost + EBRT + long-term ADT"],
+    "localized_regional_n1": ["EBRT + long-term ADT (2-3 yr)", "RP + PLND (selected)", "ADT ± abiraterone + RT (STAMPEDE)"],
+    "bcr_post_rp": ["Salvage RT to prostate bed", "Salvage RT + short-course ADT", "Observation"],
+    "bcr_post_rt": ["ADT (intermittent or continuous)", "Salvage RP (selected)", "Salvage cryotherapy / HIFU"],
+    "cspc_oligometastatic": ["ADT + ARPI (abiraterone, enzalutamide, apalutamide, darolutamide)", "MDT/SBRT to metastases + SOC systemic therapy"],
+    "cspc_high_volume": ["ADT + docetaxel (CHAARTED)", "ADT + abiraterone (LATITUDE)", "ADT + enzalutamide (ARCHES)", "ADT + apalutamide (TITAN)", "ADT + darolutamide + docetaxel (ARANOTE)", "Triplet: ADT + ARPI + docetaxel"],
+    "crpc_nonmetastatic": ["Enzalutamide (PROSPER)", "Apalutamide (SPARTAN)", "Darolutamide (ARAMIS)"],
+    "crpc_metastatic_preARPI": ["Enzalutamide or abiraterone", "Docetaxel", "177Lu-PSMA-617 (PSMA+)", "Olaparib / rucaparib (HRR+)"],
+    "crpc_metastatic_postARPI": ["Cabazitaxel", "Olaparib (BRCA/HRR+)", "Rucaparib (BRCA+)", "177Lu-PSMA-617 (PSMA+)", "Pembrolizumab (MSI-H/TMB-H)", "Platinum (CDK12 mut)", "Clinical trial"]
+  },
+  "known_trial_anchors": {
+    "description": "Named landmark trials for cross-reference and classification validation",
+    "trials": [
+      {"name": "CHAARTED", "state": "cspc_high_volume", "intervention": "ADT + docetaxel"},
+      {"name": "LATITUDE", "state": "cspc_high_volume", "intervention": "ADT + abiraterone"},
+      {"name": "TITAN", "state": "cspc_general", "intervention": "ADT + apalutamide"},
+      {"name": "ARCHES", "state": "cspc_general", "intervention": "ADT + enzalutamide"},
+      {"name": "ARANOTE", "state": "cspc_high_volume", "intervention": "ADT + darolutamide + docetaxel"},
+      {"name": "PEACE-1", "state": "cspc_high_volume", "intervention": "ADT + docetaxel + abiraterone"},
+      {"name": "SPARTAN", "state": "crpc_nonmetastatic", "intervention": "Apalutamide"},
+      {"name": "PROSPER", "state": "crpc_nonmetastatic", "intervention": "Enzalutamide"},
+      {"name": "ARAMIS", "state": "crpc_nonmetastatic", "intervention": "Darolutamide"},
+      {"name": "VISION", "state": "crpc_metastatic_postARPI", "intervention": "177Lu-PSMA-617"},
+      {"name": "TheraP", "state": "crpc_metastatic_postARPI", "intervention": "177Lu-PSMA-617"},
+      {"name": "TRITON2", "state": "crpc_metastatic_postARPI", "intervention": "Rucaparib (BRCA+)"},
+      {"name": "PROfound", "state": "crpc_metastatic_postARPI", "intervention": "Olaparib (HRR+)"},
+      {
+        "name": "INDICATE",
+        "state": ["bcr_post_rp", "cspc_oligometastatic"],
+        "intervention": "Salvage RT + ADT ± systemic intensification, PET-guided",
+        "design_note": "Multi-state trial: BCR post-RP is entry requirement; PET-positive arms extend into oligometastatic. Validated classifier multi-label output for BCR+oligomets span.",
+        "nct": "pending"
+      },
+      {
+        "name": "GUIDANCE",
+        "state": "localized_unfavorable_ir",
+        "intervention": "Parallel Phase III: genomic de-intensification vs intensification",
+        "design_note": "Validated split of unfavorable_ir from high_risk as separate category. Introduced genomic_classifier axis (Decipher/Oncotype GPS). De-intensification arm: RT alone (no ADT) for genomic low-risk. Intensification arm: ADT + RT + ARPI for genomic high-risk.",
+        "nct": "pending"
+      }
+    ]
+  }
+}

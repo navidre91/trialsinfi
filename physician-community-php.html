@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physician Community - Clinical Trials SoCal</title>
+    <meta name="description" content="Private physician discussion forum for disease-group and trial-specific collaboration">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="icon" type="image/x-icon" href="assets/favicon/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/apple-touch-icon.png">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">
+                    <a href="index-php.html">Clinical Trials SoCal</a>
+                </h1>
+                <nav class="nav">
+                    <ul class="nav-list">
+                        <li><a href="index-php.html" class="nav-link">Browse Trials</a></li>
+                        <li><a href="about-php.html" class="nav-link">About</a></li>
+                        <li><a href="physician-community-php.html" class="nav-link active">Physician Community</a></li>
+                        <li><a href="admin-login-php.html" class="nav-link">Admin Login</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <section class="community-hero">
+                <div class="community-hero-content">
+                    <p id="communityIdentity" class="community-identity">Authenticating physician access...</p>
+                    <h2 class="hero-title">Physician Community</h2>
+                    <p class="hero-description">
+                        Private, real-name physician discussion organized by disease group and trial. All content must remain de-identified.
+                    </p>
+                </div>
+                <div class="community-disclaimer" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div>
+                        <p class="community-disclaimer-title">Forum Rules</p>
+                        <p class="community-disclaimer-text">
+                            No PHI or identifying patient information. Threads and replies are visible only to approved physician accounts.
+                        </p>
+                    </div>
+                    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                        <button id="communityChangePasswordBtn" type="button" class="btn btn-secondary">Change Password</button>
+                        <button id="communityLogoutBtn" type="button" class="btn btn-secondary">Logout</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="community-layout">
+                <section class="community-step community-panel">
+                    <div class="community-step-header">
+                        <span class="community-step-index">Step 1</span>
+                        <h3 class="community-panel-title">Select Disease Group</h3>
+                    </div>
+                    <p class="community-panel-subtitle">Choose a GU disease group to unlock the related trials and discussion threads.</p>
+                    <p id="communitySelectedGroupLabel" class="community-step-selection">No disease group selected.</p>
+                    <div id="communityGroupList" class="community-group-list">
+                        <div class="community-state-info">Loading physician discussion groups...</div>
+                    </div>
+                </section>
+
+                <section class="community-step community-panel">
+                    <div class="community-step-header">
+                        <span class="community-step-index">Step 2</span>
+                        <h3 class="community-panel-title">Select Trial</h3>
+                    </div>
+                    <p class="community-panel-subtitle">Choose a trial within the selected disease group to load live discussion threads.</p>
+                    <p id="communitySelectedTrialLabel" class="community-step-selection">No trial selected.</p>
+                    <div id="communityTrialSelectorList" class="community-trial-selector-list">
+                        <div class="community-state-info">Select a disease group to load trial options.</div>
+                    </div>
+                </section>
+
+                <section class="community-step community-panel community-feed">
+                    <div class="community-step-header">
+                        <span class="community-step-index">Step 3</span>
+                        <h3 class="community-panel-title">Case Discussions</h3>
+                    </div>
+                    <span id="communityFeedMeta" class="community-feed-meta">Select a trial to view the physician discussion forum.</span>
+
+                    <div class="community-feed-toolbar">
+                        <label class="community-toolbar-control" for="communitySortFilter">
+                            <span>Sort</span>
+                            <select id="communitySortFilter" class="community-toolbar-select" aria-label="Sort discussion threads">
+                                <option value="recent">Recent</option>
+                                <option value="most_discussed">Most Discussed</option>
+                            </select>
+                        </label>
+                        <button id="communityRefreshThreadsBtn" type="button" class="community-toolbar-btn">Refresh</button>
+                    </div>
+
+                    <div id="communityApiNotice" class="community-state-warning" hidden></div>
+                    <div id="communityEmptyState" class="community-state-info" hidden>No discussion threads are available for this trial yet.</div>
+                    <div id="communityThreadList" class="community-thread-list">
+                        <div class="community-state-info">Select a trial to load live discussion threads.</div>
+                    </div>
+
+                    <section class="community-composer" aria-labelledby="communityComposerTitle">
+                        <h4 id="communityComposerTitle" class="community-composer-title">Start a New Discussion</h4>
+                        <div class="form-group">
+                            <label for="communityComposerTitleInput" class="form-label">Thread Title</label>
+                            <input id="communityComposerTitleInput" class="form-input" type="text" placeholder="Summarize the case or referral question">
+                        </div>
+                        <div class="form-group">
+                            <label for="communityComposerInput" class="form-label">Thread Body</label>
+                            <textarea id="communityComposerInput" class="community-composer-input" rows="4" placeholder="Post only de-identified clinical discussion."></textarea>
+                        </div>
+                        <button id="communityCreateThreadBtn" type="button" class="btn btn-secondary community-composer-btn">Post Thread</button>
+                        <p class="community-composer-help">
+                            All discussion is physician-only. You may edit only your own threads and replies unless a thread is locked by the administrator.
+                        </p>
+                    </section>
+                </section>
+
+                <aside class="community-step community-panel community-trials-panel">
+                    <h3 class="community-panel-title">Selected Trial Context</h3>
+                    <p class="community-panel-subtitle">Context card for the selected trial. Use this to anchor the discussion to the correct study.</p>
+                    <div id="communityTrialList" class="community-trial-grid">
+                        <div class="community-state-info">Select a trial to view contextual trial details.</div>
+                    </div>
+
+                    <div class="community-reference-card">
+                        <h4>Posting Reminders</h4>
+                        <ul class="community-reference-list">
+                            <li>Use de-identified clinical summaries only.</li>
+                            <li>Do not include patient names, dates of birth, MRNs, or exact visit dates.</li>
+                            <li>Keep each thread tied to the correct trial and disease group.</li>
+                            <li>Escalate urgent operational issues outside the forum.</li>
+                        </ul>
+                    </div>
+                </aside>
+            </section>
+        </div>
+    </main>
+
+    <div id="communityPasswordModal" class="modal">
+        <div class="modal-content" style="max-width: 520px;">
+            <div class="modal-header">
+                <h3 id="communityPasswordModalTitle" class="modal-title">Change Password</h3>
+                <button id="communityClosePasswordModal" class="modal-close" type="button">&times;</button>
+            </div>
+            <form id="communityPasswordForm">
+                <div style="padding: 1rem 0;">
+                    <div class="form-group">
+                        <label for="communityCurrentPassword" class="form-label">Current Password</label>
+                        <input type="password" id="communityCurrentPassword" class="form-input" required autocomplete="current-password">
+                    </div>
+                    <div class="form-group">
+                        <label for="communityNewPassword" class="form-label">New Password</label>
+                        <input type="password" id="communityNewPassword" class="form-input" required autocomplete="new-password">
+                        <div class="form-help" style="margin-top: 0.5rem; font-size: 0.75rem; color: var(--text-secondary);">
+                            Password must be at least 12 characters with uppercase, lowercase, number, and symbol.
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="communityConfirmPassword" class="form-label">Confirm New Password</label>
+                        <input type="password" id="communityConfirmPassword" class="form-input" required autocomplete="new-password">
+                    </div>
+                    <div id="communityPasswordGateNotice" style="display: none; background: #fef3cd; border: 1px solid #f59e0b; border-radius: var(--border-radius); padding: 1rem; color: #92400e; font-size: 0.875rem;">
+                        Your administrator assigned a temporary password. You must change it before viewing forum content.
+                    </div>
+                </div>
+                <div style="display: flex; gap: 1rem; justify-content: flex-end; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                    <button type="button" id="communityCancelPasswordBtn" class="btn btn-secondary">Cancel</button>
+                    <button type="submit" id="communitySavePasswordBtn" class="btn btn-primary">
+                        <span id="communitySavePasswordBtnText">Update Password</span>
+                        <div id="communitySavePasswordSpinner" style="display: none;">
+                            <div class="spinner" style="width: 16px; height: 16px; margin: 0 auto;"></div>
+                        </div>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <img src="assets/favicon/apple-touch-icon.png" alt="" class="footer-icon" aria-hidden="true">
+                <p class="footer-text">&copy; 2026 Genitourinary Cancer Clinical Trials in Southern California</p>
+                <p class="footer-disclaimer">
+                    Always discuss clinical trial options with your healthcare provider to understand which study may be right for you.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/utils.js"></script>
+    <script src="js/community-prototype-php.js"></script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+.DS_Store
+.claude/
+
+# Local runtime data
+data/physician_forum.sqlite
+private/
+
+# Generated backup files
+data/*.backup.*
+config/*.backup.*
+config/*.legacy.backup.*

@@ -1,0 +1,14 @@
+DirectoryIndex index-php.html
+
+<IfModule mod_headers.c>
+    Header always set X-Frame-Options "DENY"
+    Header always set X-Content-Type-Options "nosniff"
+</IfModule>
+
+<FilesMatch "\.(sqlite|db|backup|bak)$">
+    Require all denied
+</FilesMatch>
+
+<FilesMatch "^admin_config\.json">
+    Require all denied
+</FilesMatch>

@@ -1,0 +1,646 @@
+{
+  "disease": "testicular",
+  "nccn_version": "1.2026",
+  "nccn_date": "2025-10-15",
+  "guidelines_title": "NCCN Clinical Practice Guidelines in Oncology: Testicular Cancer",
+  "created_date": "2026-04-06",
+  "updated_date": "2026-04-06",
+  "created_by": "GU Oncology SoCal Pipeline v2.0",
+  "changelog": [
+    {
+      "date": "2026-04-06",
+      "version": "1.0",
+      "changes": [
+        "Initial testicular/GCT taxonomy built from NCCN Testicular Cancer v1.2026 (95 pages). Covers SEM-1 through SEM-8 and NSEM-1 through NSEM-10.",
+        "17 disease categories spanning pure seminoma and nonseminomatous GCT (NSGCT) across stage, IGCCCG risk, and treatment-line axes.",
+        "9 clinical axes: histology, clinical_stage, igcccg_risk, primary_site, prior_chemo_lines, prior_hdct, rplnd_status, marker_status, stage1_risk_factors.",
+        "Regimen reference tables embedded: BEP, EP, TIP, VeIP, TI-CE (HD), carboplatin AUC7, gemcitabine combinations.",
+        "IGCCCG risk model (2021 Gillessen update) embedded with nomogram reference.",
+        "Extragonadal GCT category with high-volume center referral note."
+      ]
+    }
+  ],
+  "pathway_namespace": "TEST",
+  "classification_philosophy": "Inclusive — when ambiguous, include in adjacent categories. Multi-label: one trial may span stage I and advanced settings. Histology-aware: seminoma and NSGCT have separate treatment algorithms; trials restricted to one histology must not be multi-labeled to the other.",
+  "sections_order": ["Seminoma", "NSGCT", "Shared_GCT", "Extragonadal"],
+  "section_colors": {
+    "Seminoma": "1B5E3B",
+    "NSGCT": "1B3A6B",
+    "Shared_GCT": "6B3A6B",
+    "Extragonadal": "8B5E1B"
+  },
+  "categories": [
+    {
+      "id": "seminoma_stage1",
+      "label": "Seminoma — Stage I (IA/IB/IS)",
+      "short": "Seminoma Stage I",
+      "section": "Seminoma",
+      "nccn_page": "SEM-1/SEM-2",
+      "order": 1,
+      "color_hex": "2E9E60",
+      "confidence_base": "HIGH",
+      "include_patterns": [
+        "stage.I[^I].*seminoma","seminoma.*stage.I[^I]","stage.IA.*seminoma","stage.IB.*seminoma",
+        "stage.IS.*seminoma","seminoma.*stage.IA","seminoma.*stage.IB","seminoma.*stage.IS",
+        "pure.seminoma.*localized","localized.*pure.seminoma",
+        "seminoma.*pT1","seminoma.*pT2","seminoma.*pT3","pT1.*seminoma","pT2.*seminoma",
+        "adjuvant.*carboplatin.*seminoma","carboplatin.*AUC.*seminoma",
+        "adjuvant.*radiation.*seminoma","adjuvant.*RT.*seminoma",
+        "surveillance.*seminoma.*stage.I[^I]","active.surveillance.*seminoma",
+        "clinical.stage.I.*seminoma","CS.I.*seminoma"
+      ],
+      "exclude_patterns": [
+        "stage.II.*seminoma","stage.III.*seminoma","stage.IV.*seminoma",
+        "metastatic.*seminoma","advanced.*seminoma",
+        "recurrent.*seminoma","relapsed.*seminoma",
+        "nonseminoma","NSGCT","non.seminomatous","mixed.GCT.*nonseminoma"
+      ],
+      "description": "Pure seminoma, clinical stage IA/IB/IS after radical inguinal orchiectomy. Primary treatment: surveillance (strongly preferred), adjuvant carboplatin (AUC=7, 1-2 cycles), or adjuvant RT (minority). Stage IS: repeat markers and imaging."
+    },
+    {
+      "id": "seminoma_stage2a_2b",
+      "label": "Seminoma — Stage IIA/IIB",
+      "short": "Seminoma Stage IIA/IIB",
+      "section": "Seminoma",
+      "nccn_page": "SEM-3",
+      "order": 2,
+      "color_hex": "258A52",
+      "confidence_base": "HIGH",
+      "include_patterns": [
+        "stage.IIA.*seminoma","stage.IIB.*seminoma","seminoma.*stage.IIA","seminoma.*stage.IIB",
+        "clinical.stage.IIA.*seminoma","clinical.stage.IIB.*seminoma",
+        "CS.IIA.*seminoma","CS.IIB.*seminoma",
+        "seminoma.*retroperitoneal.*lymph.node","seminoma.*nodal.*metastasis",
+        "seminoma.*N1","seminoma.*N2","N1.*seminoma","N2.*seminoma",
+        "seminoma.*first.line.*chemotherapy.*stage.II",
+        "radiation.*seminoma.*stage.II","RT.*seminoma.*stage.IIA",
+        "RPLND.*seminoma.*stage.II"
+      ],
+      "exclude_patterns": [
+        "stage.I[^I].*seminoma","stage.IIC.*seminoma","stage.III.*seminoma",
+        "recurrent","relapsed","second.line","nonseminoma","NSGCT"
+      ],
+      "description": "Pure seminoma, clinical stage IIA or IIB. Radiation therapy (preferred for IIA, option for IIB) or first-line chemotherapy (BEP x3 or EP x4). RPLND option for select IIA with normal markers."
+    },
+    {
+      "id": "seminoma_stage2c_3",
+      "label": "Seminoma — Stage IIC/III (Advanced)",
+      "short": "Seminoma Stage IIC/III",
+      "section": "Seminoma",
+      "nccn_page": "SEM-4",
+      "order": 3,
+      "color_hex": "1B7A4E",
+      "confidence_base": "HIGH",
+      "include_patterns": [
+        "stage.IIC.*seminoma","stage.III.*seminoma","stage.IIIA.*seminoma",
+        "stage.IIIB.*seminoma","stage.IIIC.*seminoma",
+        "seminoma.*stage.IIC","seminoma.*stage.III",
+        "advanced.*seminoma","metastatic.*seminoma",
+        "good.risk.*seminoma","intermediate.risk.*seminoma",
+        "IGCCCG.*seminoma","BEP.*seminoma.*first.line","EP.*seminoma.*first.line",
+        "disseminated.*seminoma","CS.IIC.*seminoma","CS.III.*seminoma",
+        "seminoma.*visceral.metastases","seminoma.*pulmonary.metastases",
+        "seminoma.*brain.metastases"
+      ],
+      "exclude_patterns": [
+        "stage.I[^I].*seminoma","stage.IIA.*only","stage.IIB.*only",
+        "recurrent.*seminoma","relapsed.*seminoma","second.line.*seminoma",
+        "nonseminomatous","nonseminoma","\\bNSGCT\\b"
+      ],
+      "description": "Pure seminoma, advanced (stage IIC/III). IGCCCG risk-stratified first-line chemotherapy: good risk → BEP x3 or EP x4; intermediate risk (non-pulmonary visceral mets) → BEP x4. No IGCCCG poor risk category for seminoma."
+    },
+    {
+      "id": "seminoma_post_first_line",
+      "label": "Seminoma — Post First-Line Chemo Management",
+      "short": "Seminoma Post-1L",
+      "section": "Seminoma",
+      "nccn_page": "SEM-5",
+      "order": 4,
+      "color_hex": "145C38",
+      "confidence_base": "MEDIUM",
+      "include_patterns": [
+        "post.*chemotherapy.*seminoma","after.*chemotherapy.*seminoma",
+        "post.first.line.*seminoma","residual.*mass.*seminoma",
+        "FDG.PET.*seminoma","PET.*seminoma.*post.chemo",
+        "complete.response.*seminoma","seminoma.*CR.*chemotherapy",
+        "seminoma.*residual.*>3.cm","seminoma.*residual.*mass",
+        "seminoma.*post.treatment.*management","seminoma.*consolidation"
+      ],
+      "exclude_patterns": [
+        "recurrent.*seminoma","stage.I[^I].*seminoma",
+        "first.line.*naive","treatment.naive","nonseminomatous","nonseminoma","\\bNSGCT\\b"
+      ],
+      "description": "Seminoma after first-line chemotherapy: CR → surveillance; residual ≤3 cm → surveillance or FDG-PET; residual >3 cm → FDG-PET to guide further management."
+    },
+    {
+      "id": "seminoma_recurrent_2l",
+      "label": "Seminoma — Recurrent / Second-Line",
+      "short": "Seminoma Recurrent 2L",
+      "section": "Seminoma",
+      "nccn_page": "SEM-6/SEM-7",
+      "order": 5,
+      "color_hex": "0D4A2A",
+      "confidence_base": "HIGH",
+      "include_patterns": [
+        "recurrent.*seminoma","relapsed.*seminoma","refractory.*seminoma",
+        "second.line.*seminoma","2L.*seminoma","seminoma.*recurrence",
+        "seminoma.*after.*BEP","seminoma.*after.*first.line.*chemo",
+        "salvage.*seminoma","TIP.*seminoma","VeIP.*seminoma",
+        "high.dose.*chemotherapy.*seminoma","HDCT.*seminoma",
+        "TI.CE.*seminoma","seminoma.*stem.cell",
+        "prior.*chemotherapy.*seminoma.*recurrent"
+      ],
+      "exclude_patterns": [
+        "treatment.naive","first.line.*naive","stage.I[^I].*seminoma",
+        "nonseminomatous","nonseminoma","\\bNSGCT\\b"
+      ],
+      "description": "Recurrent or refractory seminoma after first-line chemotherapy. Conventional-dose second-line (VeIP x4 or TIP x4) or high-dose chemotherapy (preferred at experienced centers). Clinical trial strongly encouraged."
+    },
+    {
+      "id": "seminoma_3l_plus",
+      "label": "Seminoma — Third-Line and Beyond",
+      "short": "Seminoma 3L+",
+      "section": "Seminoma",
+      "nccn_page": "SEM-8",
+      "order": 6,
+      "color_hex": "072E18",
+      "confidence_base": "MEDIUM",
+      "include_patterns": [
+        "third.line.*seminoma","3L.*seminoma","seminoma.*3rd.line",
+        "multi.refractory.*seminoma","heavily.pretreated.*seminoma",
+        "seminoma.*prior.*HDCT","seminoma.*after.*high.dose",
+        "gemcitabine.*oxaliplatin.*seminoma","gemcitabine.*paclitaxel.*seminoma",
+        "seminoma.*≥2.*prior.*chemo","seminoma.*multiple.*prior.*lines",
+        "seminoma.*pan.cancer.*molecular"
+      ],
+      "exclude_patterns": [
+        "first.line.*naive","second.line.*only","nonseminomatous","nonseminoma","\\bNSGCT\\b"
+      ],
+      "description": "Seminoma, third-line and beyond. Clinical trial preferred. High-dose chemotherapy (if not previously received), gemcitabine combinations, or molecular targeted agents for actionable mutations."
+    },
+    {
+      "id": "nsgct_stage1",
+      "label": "NSGCT — Stage I (IA/IB, with/without Risk Factors)",
+      "short": "NSGCT Stage I",
+      "section": "NSGCT",
+      "nccn_page": "NSEM-1/NSEM-2",
+      "order": 7,
+      "color_hex": "1A56DB",
+      "confidence_base": "HIGH",
+      "include_patterns": [
+        "stage.I.*NSGCT","NSGCT.*stage.I","nonseminoma.*stage.I","stage.I.*nonseminoma",
+        "stage.IA.*nonseminoma","stage.IB.*nonseminoma","NSGCT.*stage.IA","NSGCT.*stage.IB",
+        "stage.I.*non.seminomatous","non.seminomatous.*stage.I",
+        "stage.I.*germ.cell","germ.cell.*stage.I.*testicular",
+        "clinical.stage.I.*NSGCT","CS.I.*NSGCT","CS.I.*nonseminoma",
+        "surveillance.*NSGCT","surveillance.*nonseminoma.*stage.I",
+        "nerve.sparing.*RPLND.*stage.I","primary.RPLND.*stage.I",
+        "adjuvant.*BEP.*stage.I","BEP.*1.cycle.*stage.I",
+        "lymphovascular.invasion.*stage.I.*germ","LVI.*stage.I.*testicular",
+        "stage.I.*germ.cell.*risk.factor","stage.I.*NSGCT.*surveillance"
+      ],
+      "exclude_patterns": [
+        "stage.II.*NSGCT","stage.III.*NSGCT","stage.II.*nonseminoma","stage.III.*nonseminoma",
+        "metastatic.*NSGCT","advanced.*NSGCT",
+        "recurrent.*NSGCT","relapsed.*NSGCT",
+        "pure.seminoma.*only","seminoma.*only",
+        "stage.IS.*NSGCT"
+      ],
+      "description": "NSGCT (includes mixed GCT with nonseminoma elements), clinical stage IA or IB. Treatment based on presence/absence of risk factors (LVI, spermatic cord or scrotal invasion). Options: surveillance (preferred), nerve-sparing RPLND, or adjuvant BEP x1 cycle."
+    },
+    {
+      "id": "nsgct_stage_is",
+      "label": "NSGCT — Stage IS (Persistently Elevated Markers)",
+      "short": "NSGCT Stage IS",
+      "section": "NSGCT",
+      "nccn_page": "NSEM-2",
+      "order": 8,
+      "color_hex": "1848C0",
+      "confidence_base": "HIGH",
+      "include_patterns": [
+        "stage.IS.*NSGCT","NSGCT.*stage.IS","nonseminoma.*stage.IS",
+        "stage.IS.*germ.cell","stage.IS.*testicular",
+        "persistently.*elevated.*markers.*germ","persistently.*rising.*AFP",
+        "persistently.*rising.*hCG","persistently.*rising.*beta.hCG",
+        "elevated.*tumor.markers.*post.orchiectomy.*NSGCT",
+        "marker.elevation.*post.orchiectomy.*nonseminoma"
+      ],
+      "exclude_patterns": [
+        "pure.seminoma.*only","seminoma.*only","stage.I.*without.*marker"
+      ],
+      "description": "NSGCT, stage IS: persistently elevated or rising tumor markers (AFP, beta-hCG) after orchiectomy without radiographic evidence of disease. Treat with first-line chemotherapy (BEP x3 or EP x4)."
+    },
+    {
+      "id": "nsgct_stage2a_2b",
+      "label": "NSGCT — Stage IIA/IIB",
+      "short": "NSGCT Stage IIA/IIB",
+      "section": "NSGCT",
+      "nccn_page": "NSEM-3",
+      "order": 9,
+      "color_hex": "1440A0",
+      "confidence_base": "HIGH",
+      "include_patterns": [
+        "stage.IIA.*NSGCT","stage.IIB.*NSGCT","NSGCT.*stage.IIA","NSGCT.*stage.IIB",
+        "nonseminoma.*stage.IIA","nonseminoma.*stage.IIB",
+        "stage.IIA.*nonseminoma","stage.IIB.*nonseminoma",
+        "CS.IIA.*NSGCT","CS.IIB.*NSGCT","CS.IIA.*nonseminoma",
+        "RPLND.*NSGCT.*stage.II","nerve.sparing.*RPLND.*nonseminoma.*stage.II",
+        "BEP.*NSGCT.*stage.II","EP.*NSGCT.*stage.II",
+        "stage.II.*germ.cell.*retroperitoneal","germ.cell.*N1.*N2"
+      ],
+      "exclude_patterns": [
+        "stage.I.*NSGCT","stage.IIC.*NSGCT","stage.III.*NSGCT",
+        "recurrent","relapsed","second.line",
+        "pure.seminoma.*only","seminoma.*only"
+      ],
+      "description": "NSGCT stage IIA or IIB. Primary nerve-sparing RPLND (preferred for IIA with negative markers) or first-line chemotherapy (BEP x3 or EP x4). Stage IIB: chemotherapy preferred."
+    },
+    {
+      "id": "nsgct_good_risk_advanced",
+      "label": "NSGCT — Stage IIC/III, IGCCCG Good Risk",
+      "short": "NSGCT Good Risk 1L",
+      "section": "NSGCT",
+      "nccn_page": "NSEM-5/NSEM-6",
+      "order": 10,
+      "color_hex": "0D3080",
+      "confidence_base": "HIGH",
+      "include_patterns": [
+        "good.risk.*NSGCT","good.risk.*germ.cell","good.risk.*nonseminoma",
+        "IGCCCG.*good.*NSGCT","IGCCCG.*good.*nonseminoma",
+        "good.risk.*metastatic.*germ.cell","good.risk.*advanced.*GCT",
+        "BEP.*3.cycles.*good.risk","EP.*4.cycles.*good.risk",
+        "stage.IIC.*good.risk.*GCT","stage.IIIA.*good.risk.*GCT",
+        "AFP.*<.*1000.*germ.cell","hCG.*<.*5000.*germ.cell",
+        "LDH.*<.*1.5.*ULN.*germ.cell",
+        "good.prognosis.*germ.cell.*tumor","good.prognosis.*testicular"
+      ],
+      "exclude_patterns": [
+        "intermediate.risk.*GCT","poor.risk.*GCT","stage.I.*only",
+        "recurrent","relapsed","second.line",
+        "pure.seminoma.*only","seminoma.*only"
+      ],
+      "description": "NSGCT/NSGCT, advanced (stage IIC/III), IGCCCG good risk: testicular/retroperitoneal primary, no non-pulmonary visceral mets, AFP <1000, hCG <5000, LDH <1.5×ULN. BEP x3 (preferred) or EP x4."
+    },
+    {
+      "id": "nsgct_intermediate_poor_risk_advanced",
+      "label": "NSGCT — Stage IIC/III, IGCCCG Intermediate/Poor Risk",
+      "short": "NSGCT Int/Poor Risk 1L",
+      "section": "NSGCT",
+      "nccn_page": "NSEM-5/NSEM-6",
+      "order": 11,
+      "color_hex": "071858",
+      "confidence_base": "HIGH",
+      "include_patterns": [
+        "intermediate.risk.*NSGCT","poor.risk.*NSGCT","intermediate.risk.*nonseminoma",
+        "poor.risk.*nonseminoma","poor.risk.*germ.cell","intermediate.risk.*germ.cell",
+        "IGCCCG.*intermediate.*NSGCT","IGCCCG.*poor.*NSGCT",
+        "IGCCCG.*intermediate.*GCT","IGCCCG.*poor.*GCT",
+        "BEP.*4.*cycles.*NSGCT","BEP.*4.*cycles.*nonseminoma","VIP.*advanced.*GCT","VIP.*poor.risk",
+        "poor.prognosis.*germ.cell","intermediate.prognosis.*germ.cell",
+        "AFP.*>.*1000.*germ.cell","AFP.*>.*10000.*germ.cell",
+        "hCG.*>.*5000.*germ.cell","hCG.*>.*50000.*germ.cell",
+        "mediastinal.*primary.*GCT","primary.mediastinal.*nonseminoma",
+        "non.pulmonary.*visceral.*metastases.*GCT","liver.*mets.*GCT","bone.*mets.*GCT","brain.*mets.*GCT"
+      ],
+      "exclude_patterns": [
+        "good.risk.*only","stage.I.*only","stage.II.*only",
+        "recurrent","relapsed","second.line",
+        "pure.seminoma.*only","seminoma.*only"
+      ],
+      "description": "NSGCT, advanced (stage IIC/III), IGCCCG intermediate or poor risk. Intermediate: testicular/retroperitoneal primary, no non-pulmonary visceral mets, elevated markers mid-range. Poor: mediastinal primary OR non-pulmonary visceral mets OR AFP >10000 OR hCG >50000 OR LDH >10×ULN. BEP x4 or VIP x4."
+    },
+    {
+      "id": "nsgct_post_first_line",
+      "label": "NSGCT — Post First-Line Chemo Management / PC-RPLND",
+      "short": "NSGCT Post-1L / PC-RPLND",
+      "section": "NSGCT",
+      "nccn_page": "NSEM-4/NSEM-7",
+      "order": 12,
+      "color_hex": "0A1850",
+      "confidence_base": "MEDIUM",
+      "include_patterns": [
+        "post.chemotherapy.*RPLND","PC.RPLND","post.chemo.*retroperitoneal",
+        "residual.*mass.*NSGCT","residual.*mass.*nonseminoma",
+        "post.first.line.*NSGCT","after.*BEP.*NSGCT","after.*EP.*NSGCT",
+        "post.chemotherapy.*germ.cell","residual.*retroperitoneal.*GCT",
+        "post.chemo.*surgery.*GCT","resection.*residual.*germ.cell",
+        "teratoma.*residual.*post.chemo","viable.germ.cell.*residual",
+        "NSGCT.*CR.*chemotherapy","nonseminoma.*complete.response",
+        "NSGCT.*post.treatment.*management","growing.teratoma.*syndrome"
+      ],
+      "exclude_patterns": [
+        "treatment.naive","first.line.*naive","stage.I.*only",
+        "pure.seminoma.*only","seminoma.*only"
+      ],
+      "description": "NSGCT after first-line chemotherapy. Complete response → surveillance or RPLND (selected). Residual masses → PC-RPLND (surgery for all residual). Pathology: necrosis/fibrosis → surveillance; teratoma → surveillance; viable GCT → 2 additional cycles."
+    },
+    {
+      "id": "nsgct_recurrent_2l",
+      "label": "NSGCT — Recurrent / Second-Line",
+      "short": "NSGCT Recurrent 2L",
+      "section": "NSGCT",
+      "nccn_page": "NSEM-8/NSEM-9",
+      "order": 13,
+      "color_hex": "061040",
+      "confidence_base": "HIGH",
+      "include_patterns": [
+        "recurrent.*NSGCT","relapsed.*NSGCT","refractory.*NSGCT",
+        "recurrent.*nonseminoma","relapsed.*nonseminoma","refractory.*nonseminoma",
+        "second.line.*NSGCT","2L.*NSGCT","NSGCT.*recurrence",
+        "recurrent.*germ.cell","relapsed.*germ.cell","refractory.*germ.cell",
+        "second.line.*germ.cell.tumor","2L.*GCT",
+        "TIP.*GCT","TIP.*germ.cell","VeIP.*germ.cell","VeIP.*NSGCT",
+        "high.dose.*chemotherapy.*GCT","HDCT.*germ.cell","TI.CE.*germ.cell",
+        "TI.CE.*NSGCT","stem.cell.rescue.*germ.cell",
+        "salvage.*germ.cell","salvage.*NSGCT","salvage.*nonseminoma",
+        "after.*BEP.*recurrent","after.*first.line.*GCT.*recurrent",
+        "prior.*cisplatin.*germ.cell.*relapsed","cisplatin.refractory.*GCT"
+      ],
+      "exclude_patterns": [
+        "treatment.naive","first.line.*naive","stage.I.*only",
+        "pure.seminoma.*only","seminoma.*only.*second.line"
+      ],
+      "description": "Recurrent or refractory NSGCT after first-line chemotherapy. Conventional-dose second-line (TIP x4 or VeIP x4) or high-dose chemotherapy with stem cell rescue (TI-CE). Clinical trial strongly encouraged. High-volume center referral recommended."
+    },
+    {
+      "id": "nsgct_3l_plus",
+      "label": "NSGCT — Third-Line and Beyond / Post-HDCT",
+      "short": "NSGCT 3L+ / Post-HDCT",
+      "section": "NSGCT",
+      "nccn_page": "NSEM-10",
+      "order": 14,
+      "color_hex": "040C30",
+      "confidence_base": "MEDIUM",
+      "include_patterns": [
+        "third.line.*NSGCT","3L.*NSGCT","NSGCT.*3rd.line",
+        "third.line.*germ.cell","3L.*GCT","3rd.line.*GCT",
+        "heavily.pretreated.*GCT","multi.refractory.*germ.cell",
+        "after.*high.dose.*chemotherapy.*GCT","post.HDCT.*GCT",
+        "post.TI.CE.*GCT","prior.*HDCT.*germ.cell.*recurrent",
+        "gemcitabine.*oxaliplatin.*GCT","gemcitabine.*paclitaxel.*GCT",
+        "gemcitabine.*oxaliplatin.*paclitaxel.*GCT",
+        "NSGCT.*≥2.*prior.*chemo","GCT.*multiple.*prior.*lines",
+        "pan.cancer.*molecular.*GCT","NSGCT.*MSI.H","GCT.*TMB.H",
+        "molecular.targeted.*GCT","actionable.mutation.*germ.cell"
+      ],
+      "exclude_patterns": [
+        "first.line.*naive","second.line.*only","pure.seminoma.*only"
+      ],
+      "description": "NSGCT/GCT, third-line and beyond, or after prior high-dose chemotherapy. Clinical trial preferred. High-dose chemo (if not previously received), gemcitabine combinations (GemOx, GemOxP, GemPaclitaxel). Molecular/pan-cancer agents for actionable mutations."
+    },
+    {
+      "id": "gct_stage1_general",
+      "label": "GCT — Stage I (Any Histology / Unspecified)",
+      "short": "GCT Stage I",
+      "section": "Shared_GCT",
+      "nccn_page": "TEST-1/SEM-1/NSEM-1",
+      "order": 15,
+      "color_hex": "7B2D8B",
+      "confidence_base": "MEDIUM",
+      "include_patterns": [
+        "stage.I.*testicular.*cancer","stage.I.*germ.cell.*tumor",
+        "stage.I.*GCT","stage.I.*testis.*cancer",
+        "localized.*germ.cell.*tumor","localized.*testicular",
+        "clinical.stage.I.*germ.cell","CS.I.*germ.cell",
+        "orchiectomy.*stage.I.*germ.cell","radical.orchiectomy.*stage.I",
+        "surveillance.*stage.I.*germ.cell","surveillance.*orchiectomy",
+        "stage.I.*GCT.*surveillance","adjuvant.*stage.I.*GCT",
+        "low.stage.*germ.cell.*tumor","early.stage.*testicular"
+      ],
+      "exclude_patterns": [
+        "stage.II.*GCT","stage.III.*GCT","metastatic.*GCT",
+        "advanced.*GCT","recurrent.*GCT","relapsed.*GCT"
+      ],
+      "description": "Testicular GCT, stage I, any or unspecified histology — use when trial does not restrict to seminoma or NSGCT only. Multi-label with seminoma_stage1 or nsgct_stage1 when histology is specified."
+    },
+    {
+      "id": "gct_advanced_general",
+      "label": "GCT — Advanced / Metastatic (Any Histology / Unspecified)",
+      "short": "Advanced GCT General",
+      "section": "Shared_GCT",
+      "nccn_page": "TEST-D/TEST-E",
+      "order": 16,
+      "color_hex": "5C1B8B",
+      "confidence_base": "MEDIUM",
+      "include_patterns": [
+        "advanced.*germ.cell.*tumor","metastatic.*germ.cell","advanced.*GCT",
+        "metastatic.*GCT","disseminated.*germ.cell","advanced.*testicular",
+        "metastatic.*testicular.*cancer","stage.II.*GCT","stage.III.*GCT",
+        "BEP.*advanced.*GCT","BEP.*metastatic.*germ.cell",
+        "cisplatin.*etoposide.*bleomycin","cisplatin.*based.*GCT",
+        "IGCCCG.*risk.*GCT","IGCCCG.*germ.cell","risk.stratif.*GCT",
+        "first.line.*chemotherapy.*germ.cell","first.line.*GCT",
+        "germ.cell.*tumor.*systemic","germ.cell.*chemotherapy",
+        "testicular.cancer.*advanced","testicular.cancer.*metastatic",
+        "retroperitoneal.*lymph.node.*GCT","visceral.metastases.*GCT",
+        "serum.tumor.marker.*GCT","AFP.*hCG.*LDH.*GCT"
+      ],
+      "exclude_patterns": [
+        "stage.I.*GCT.*only","stage.I.*testicular.*only",
+        "recurrent.*only","relapsed.*only","second.line.*only",
+        "primary.CNS.*only","primary.mediastinal.*only"
+      ],
+      "description": "Advanced or metastatic GCT, any or unspecified histology — use when trial enrolls both seminoma and NSGCT. Multi-label with histology-specific categories when applicable."
+    },
+    {
+      "id": "extragonadal_gct",
+      "label": "Extragonadal GCT (Mediastinal / Retroperitoneal Primary)",
+      "short": "Extragonadal GCT",
+      "section": "Extragonadal",
+      "nccn_page": "TEST-D/NSEM-5",
+      "order": 9,
+      "color_hex": "8B5E1B",
+      "confidence_base": "HIGH",
+      "include_patterns": [
+        "extragonadal.*germ.cell","extragonadal.*GCT",
+        "primary.mediastinal.*germ.cell","mediastinal.*GCT",
+        "mediastinal.*nonseminoma","primary.mediastinal.*NSGCT",
+        "retroperitoneal.*primary.*GCT","primary.retroperitoneal.*GCT",
+        "mediastinal.*seminoma.*primary","mediastinal.*germ.cell.*tumor",
+        "non.testicular.*germ.cell","non.gonadal.*GCT",
+        "pineal.*germ.cell","intracranial.*GCT.*extragonadal",
+        "high.volume.center.*GCT","high.volume.center.*germ.cell"
+      ],
+      "exclude_patterns": [
+        "testicular.*primary.*only","gonadal.*primary.*only"
+      ],
+      "description": "Primary extragonadal GCT — mediastinal (primary mediastinal NSGCT is an IGCCCG poor-risk factor) or retroperitoneal origin. High-volume center referral strongly recommended. Mediastinal primary NSGCT = IGCCCG poor risk regardless of markers."
+    }
+  ],
+  "clinical_axes": {
+    "histology": {
+      "description": "Tumor histology — the primary treatment-determining axis. Pure seminoma and nonseminoma (NSGCT) have completely separate treatment pathways. Mixed GCT with any nonseminomatous elements is treated as NSGCT.",
+      "values": [
+        "pure_seminoma",
+        "nsgct",
+        "mixed_seminoma_nsgct",
+        "spermatocytic_tumor",
+        "teratoma",
+        "yolk_sac_tumor",
+        "embryonal_carcinoma",
+        "choriocarcinoma",
+        "unknown"
+      ],
+      "detection_rules": {
+        "pure_seminoma": ["pure.seminoma","seminoma.*pure","seminoma.*AFP.normal","seminoma.*histology.*no.AFP","\\bseminoma\\b(?!.*nonseminoma)(?!.*NSGCT)(?!.*mixed)"],
+        "nsgct": ["nonseminoma","NSGCT","non.seminomatous","non-seminomatous","nonseminomatous.germ.cell","germ.cell.*nonseminoma"],
+        "mixed_seminoma_nsgct": ["mixed.*germ.cell","mixed.*seminoma.*nonseminoma","mixed.*GCT","seminoma.*elevated.*AFP","seminoma.*histology.*AFP.*elevated"],
+        "spermatocytic_tumor": ["spermatocytic.*tumor","spermatocytic.*seminoma"],
+        "teratoma": ["teratoma","teratomatous","growing.teratoma","mature.teratoma","immature.teratoma"],
+        "yolk_sac_tumor": ["yolk.sac.*tumor","endodermal.sinus","yolk.sac.*carcinoma"],
+        "embryonal_carcinoma": ["embryonal.carcinoma","embryonal.*GCT"],
+        "choriocarcinoma": ["choriocarcinoma","trophoblastic.*GCT","chorionic.*carcinoma"]
+      },
+      "_ui_note": "If histology=unknown: surface both seminoma and NSGCT trials with flag 'Confirm histology — pure seminoma vs nonseminoma (NSGCT) determines the entire treatment pathway including first-line regimen, RT eligibility, and post-chemo management. AFP elevation in a seminoma histology reclassifies the patient as NSGCT.'"
+    },
+    "clinical_stage": {
+      "description": "AJCC 8th edition clinical stage after orchiectomy (post-orchiectomy serum tumor markers used for S-stage). Stage I = no nodal or distant mets; Stage IS = persistently elevated markers; Stage IIA/IIB = retroperitoneal lymph node enlargement ≤5 cm; Stage IIC = retroperitoneal LN >5 cm; Stage III = distant mets.",
+      "values": ["stage_1a", "stage_1b", "stage_1s", "stage_2a", "stage_2b", "stage_2c", "stage_3a", "stage_3b", "stage_3c", "stage_1_unspecified", "stage_2_unspecified", "stage_3_unspecified", "unknown"],
+      "detection_rules": {
+        "stage_1a": ["\\bstage.IA\\b","\\bCS.IA\\b","\\bpT1.*N0.*M0.*S0\\b","clinical.stage.IA"],
+        "stage_1b": ["\\bstage.IB\\b","\\bCS.IB\\b","\\bpT2.*N0.*M0\\b","\\bpT3.*N0.*M0\\b","\\bpT4.*N0.*M0\\b","clinical.stage.IB"],
+        "stage_1s": ["\\bstage.IS\\b","\\bCS.IS\\b","persistently.*elevated.*marker","stage.IS.*germ.cell","marker.*elevation.*no.*radiographic"],
+        "stage_2a": ["\\bstage.IIA\\b","\\bCS.IIA\\b","clinical.stage.IIA.*germ","\\bcN1\\b.*germ.cell"],
+        "stage_2b": ["\\bstage.IIB\\b","\\bCS.IIB\\b","clinical.stage.IIB.*germ","\\bcN2\\b.*germ.cell"],
+        "stage_2c": ["\\bstage.IIC\\b","\\bCS.IIC\\b","clinical.stage.IIC.*germ","\\bcN3\\b.*germ.cell"],
+        "stage_3a": ["\\bstage.IIIA\\b","\\bCS.IIIA\\b","clinical.stage.IIIA.*germ"],
+        "stage_3b": ["\\bstage.IIIB\\b","\\bCS.IIIB\\b","clinical.stage.IIIB.*germ"],
+        "stage_3c": ["\\bstage.IIIC\\b","\\bCS.IIIC\\b","clinical.stage.IIIC.*germ"],
+        "stage_1_unspecified": ["stage.I.*germ.cell","stage.I.*testicular","stage.I.*GCT","localized.*germ.cell"],
+        "stage_2_unspecified": ["stage.II.*germ.cell","stage.II.*testicular","stage.II.*GCT","nodal.*germ.cell"],
+        "stage_3_unspecified": ["stage.III.*germ.cell","stage.III.*testicular","stage.III.*GCT","metastatic.*germ.cell","advanced.*germ.cell","disseminated.*germ.cell"]
+      },
+      "_ui_note": "If clinical_stage=unknown: surface all stage-relevant trials with flag 'Confirm post-orchiectomy clinical stage — imaging and serum tumor markers (AFP, beta-hCG, LDH) needed to assign AJCC stage and IGCCCG risk group.'"
+    },
+    "igcccg_risk": {
+      "description": "IGCCCG (International Germ-Cell Cancer Collaborative Group) risk classification for advanced/metastatic GCT. Applied post-orchiectomy on Day 1 of chemotherapy. Note: IGCCCG does not include a poor-risk category for pure seminoma — seminoma is either good or intermediate risk.",
+      "values": ["good", "intermediate", "poor", "unknown"],
+      "detection_rules": {
+        "good": ["good.risk.*germ.cell","good.risk.*GCT","good.risk.*seminoma","good.risk.*NSGCT","IGCCCG.*good","good.prognosis.*germ.cell","low.risk.*advanced.*GCT","AFP.*<.*1000","hCG.*<.*5000","LDH.*<.*1.5.*ULN"],
+        "intermediate": ["intermediate.risk.*germ.cell","intermediate.risk.*GCT","intermediate.risk.*seminoma","IGCCCG.*intermediate","intermediate.prognosis.*germ.cell","non.pulmonary.*visceral.*metastases.*seminoma","AFP.*1000.*10000","hCG.*5000.*50000","LDH.*1.5.*10.*ULN"],
+        "poor": ["poor.risk.*germ.cell","poor.risk.*GCT","poor.risk.*NSGCT","IGCCCG.*poor","poor.prognosis.*germ.cell","mediastinal.*primary.*NSGCT","non.pulmonary.*visceral.*mets.*NSGCT","AFP.*>.*10000","hCG.*>.*50000","LDH.*>.*10.*ULN","brain.*metastases.*GCT","liver.*metastases.*GCT","bone.*metastases.*GCT"]
+      },
+      "_ui_note": "If igcccg_risk=unknown and trial restricts to a specific risk group: surface trial with flag 'IGCCCG risk classification not confirmed — calculate using AFP, beta-hCG, LDH measured on Day 1 of chemotherapy, primary site, and presence of non-pulmonary visceral metastases.'"
+    },
+    "primary_site": {
+      "description": "Primary tumor location — testicular (gonadal) vs extragonadal. Mediastinal primary is a key determinant of IGCCCG poor risk for NSGCT regardless of marker levels.",
+      "values": ["testicular", "mediastinal", "retroperitoneal_primary", "intracranial", "unknown"],
+      "detection_rules": {
+        "testicular": ["testicular.*primary","testis.*primary","(?<!extra)gonadal.*primary","radical.*orchiectomy.*primary","testicular.*germ.cell","scrotal.*germ.cell"],
+        "mediastinal": ["mediastinal.*primary","primary.*mediastinal","mediastinal.*GCT","mediastinal.*nonseminoma","mediastinal.*germ.cell"],
+        "retroperitoneal_primary": ["retroperitoneal.*primary","primary.*retroperitoneal","retroperitoneal.*GCT.*no.testicular","retroperitoneal.*germ.cell.*primary"],
+        "intracranial": ["pineal.*germ.cell","intracranial.*GCT","CNS.*primary.*germ.cell","intracranial.*germinoma"]
+      },
+      "_ui_note": "If primary_site=unknown and trial requires mediastinal or extragonadal primary: surface trial with flag 'Confirm primary tumor site — mediastinal primary NSGCT is classified as IGCCCG poor risk regardless of tumor markers.'"
+    },
+    "prior_chemo_lines": {
+      "description": "Number of prior chemotherapy regimens for GCT (not counting adjuvant single-agent carboplatin for seminoma as a 'line').",
+      "values": ["0", "1", "2", "3_plus", "unknown"],
+      "detection_rules": {
+        "0": ["chemotherapy.naive.*GCT","treatment.naive.*GCT","first.line.*GCT","first.line.*germ.cell","treatment.naive.*testicular","untreated.*GCT","chemo.naive.*germ.cell","no.*prior.*systemic.*chemotherapy.*germ"],
+        "1": ["one.*prior.*chemotherapy.*GCT","1.*prior.*line.*GCT","after.*BEP","after.*EP","second.line.*GCT","second.line.*germ.cell","2L.*GCT","prior.*BEP","prior.*EP","post.first.line.*GCT","relapsed.*after.*one.*line"],
+        "2": ["two.*prior.*chemotherapy.*GCT","2.*prior.*lines.*GCT","third.line.*GCT","after.*TIP","after.*VeIP","after.*second.line.*GCT","≥2.*prior.*GCT","at.least.2.*prior.*GCT"],
+        "3_plus": ["three.or.more.*prior.*GCT","≥3.*prior.*GCT","heavily.pretreated.*GCT","multiple.*prior.*lines.*GCT","post.HDCT.*recurrent","after.*high.dose.*chemo.*GCT"]
+      },
+      "_ui_note": "If prior_chemo_lines=unknown and trial targets a specific treatment line: surface trial with flag 'Confirm number of prior chemotherapy regimens — GCT trials are strictly line-defined (1st-line BEP/EP, 2nd-line TIP/VeIP, 3rd-line HD-chemo).'"
+    },
+    "prior_hdct": {
+      "description": "Prior high-dose chemotherapy (HDCT) with stem cell rescue (e.g., TI-CE, carboplatin/etoposide HD). Determines eligibility for further HDCT vs conventional-dose salvage.",
+      "values": ["no", "yes", "unknown"],
+      "detection_rules": {
+        "no": ["no.*prior.*high.dose","HDCT.naive","high.dose.*not.*previously","high.dose.*chemo.*not.*received","no.*prior.*stem.cell","no.*prior.*autologous","HDCT.*not.*previously.*received"],
+        "yes": ["prior.*high.dose.*chemotherapy","prior.*HDCT","after.*high.dose","post.HDCT","prior.*TI.CE","prior.*autologous.*stem.cell.*rescue.*GCT","received.*HDCT","stem.cell.*rescue.*previously"]
+      },
+      "_ui_note": "If prior_hdct=unknown and trial restricts by HDCT history: surface trial with flag 'Confirm prior high-dose chemotherapy history — some salvage regimens (TI-CE) are only eligible for patients who have not previously received HDCT.'"
+    },
+    "rplnd_status": {
+      "description": "Whether retroperitoneal lymph node dissection (RPLND) has been performed — primary (diagnostic/therapeutic) or post-chemotherapy (PC-RPLND).",
+      "values": ["prior_primary_rplnd", "prior_pc_rplnd", "no_rplnd", "unknown"],
+      "detection_rules": {
+        "prior_primary_rplnd": ["prior.{0,20}RPLND","post.RPLND","underwent.*RPLND","nerve.sparing.*RPLND","primary.{0,20}RPLND","following.{0,20}RPLND"],
+        "prior_pc_rplnd": ["post.chemotherapy.{0,40}RPLND","PC.RPLND","after.*PC.RPLND","following.*post.chemo.*RPLND"],
+        "no_rplnd": ["no.{0,30}RPLND","RPLND.naive","without.*RPLND","RPLND.*not.*performed","surveillance.*no.*RPLND"]
+      },
+      "_ui_note": "If rplnd_status=unknown and trial requires or excludes RPLND: surface trial with flag 'Confirm whether retroperitoneal lymph node dissection has been performed — primary RPLND and post-chemotherapy RPLND have distinct eligibility implications.'"
+    },
+    "marker_status": {
+      "description": "Post-orchiectomy serum tumor marker status (AFP, beta-hCG, LDH). Critical for staging (S-classification) and IGCCCG risk. AFP elevation in seminoma histology reclassifies as NSGCT.",
+      "values": ["markers_normal", "afp_elevated", "hcg_elevated", "ldh_elevated", "multiple_elevated", "unknown"],
+      "detection_rules": {
+        "markers_normal": ["normal.*tumor.markers","markers.*normal","AFP.*normal","hCG.*normal","LDH.*normal","serum.*markers.*negative","normalized.*markers","marker.negative"],
+        "afp_elevated": ["AFP.*elevated","elevated.*AFP","AFP.*>.*\\d","AFP.*positive","rising.*AFP","AFP.*above.*normal"],
+        "hcg_elevated": ["hCG.*elevated","elevated.*hCG","beta.hCG.*elevated","hCG.*>.*\\d","hCG.*positive","rising.*hCG","rising.*beta.hCG"],
+        "ldh_elevated": ["LDH.*elevated","elevated.*LDH","LDH.*>.*\\d","LDH.*above.*ULN","elevated.*lactate.dehydrogenase"],
+        "multiple_elevated": ["AFP.*hCG.*elevated","elevated.*AFP.*hCG","multiple.*markers.*elevated","AFP.*and.*hCG.*elevated","serum.tumor.markers.*elevated"]
+      },
+      "_ui_note": "If marker_status=unknown and trial uses markers for eligibility or risk stratification: surface trial with flag 'Confirm serum tumor marker levels (AFP, beta-hCG, LDH) — these are required for IGCCCG risk classification and AJCC S-staging.'"
+    },
+    "stage1_risk_factors": {
+      "description": "Risk factors for recurrence in stage I NSGCT: lymphovascular invasion (LVI) or invasion of spermatic cord or scrotum. Determines treatment decision in stage I NSGCT (surveillance vs RPLND vs adjuvant BEP x1).",
+      "values": ["with_risk_factors", "without_risk_factors", "unknown"],
+      "detection_rules": {
+        "with_risk_factors": ["lymphovascular.invasion","\\bLVI\\b","LVI.*positive","spermatic.cord.*invasion","scrotal.*invasion","vascular.invasion.*stage.I","risk.factor.*stage.I.*NSGCT","high.risk.*stage.I.*NSGCT","stage.IB.*germ.cell"],
+        "without_risk_factors": ["no.*lymphovascular.invasion","LVI.*negative","no.*LVI","without.*LVI","stage.IA.*germ.cell","low.risk.*stage.I.*NSGCT","no.risk.factors.*stage.I"]
+      },
+      "_ui_note": "If stage1_risk_factors=unknown and trial stratifies stage I NSGCT by risk: surface trial with flag 'Confirm lymphovascular invasion (LVI) and spermatic cord/scrotal invasion status — these risk factors determine surveillance vs RPLND vs adjuvant BEP x1 in stage I NSGCT.'"
+    }
+  },
+  "standard_therapies_by_state": {
+    "seminoma_stage1": ["Surveillance (strongly preferred)", "Adjuvant carboplatin AUC=7 x1 cycle or AUC=7 x2 cycles", "Adjuvant radiation therapy (minority — stage I only)"],
+    "seminoma_stage2a_2b": ["Radiation therapy (preferred stage IIA; option IIB)", "BEP x3 cycles or EP x4 cycles (first-line chemo)", "Nerve-sparing RPLND (select stage IIA, normal markers)"],
+    "seminoma_stage2c_3": ["BEP x3 cycles (good risk) or EP x4 cycles (good risk alternative)", "BEP x4 cycles (intermediate risk — non-pulmonary visceral mets)"],
+    "seminoma_recurrent_2l": ["TIP x4 cycles (conventional-dose)", "VeIP x4 cycles (conventional-dose)", "High-dose chemotherapy with stem cell rescue (preferred)", "Clinical trial (strongly encouraged)"],
+    "seminoma_3l_plus": ["Clinical trial (preferred)", "High-dose chemotherapy if not previously received", "Gemcitabine/oxaliplatin (GemOx)", "Molecular targeted agents (actionable mutations)"],
+    "nsgct_stage1": ["Surveillance (preferred for all stage I)", "Nerve-sparing RPLND", "Adjuvant BEP x1 cycle"],
+    "nsgct_stage_is": ["BEP x3 cycles or EP x4 cycles (first-line chemotherapy)"],
+    "nsgct_stage2a_2b": ["Nerve-sparing RPLND (preferred stage IIA, negative markers)", "BEP x3 cycles or EP x4 cycles (stage IIA marker+; stage IIB preferred)", "Post-RPLND surveillance or adjuvant chemotherapy"],
+    "nsgct_good_risk_advanced": ["BEP x3 cycles (preferred)", "EP x4 cycles (alternative)"],
+    "nsgct_intermediate_poor_risk_advanced": ["BEP x4 cycles (preferred)", "VIP x4 cycles (alternative)"],
+    "nsgct_post_first_line": ["PC-RPLND (resection of all residual masses)", "Surveillance (select complete responders)", "2 additional cycles EP/TIP/VIP/VeIP (residual viable GCT on pathology)"],
+    "nsgct_recurrent_2l": ["TIP x4 cycles (preferred conventional-dose)", "VeIP x4 cycles (preferred conventional-dose)", "TI-CE high-dose chemotherapy (preferred overall at experienced centers)", "Clinical trial (strongly encouraged)"],
+    "nsgct_3l_plus": ["Clinical trial (preferred)", "High-dose chemotherapy (if not previously received)", "Gemcitabine/oxaliplatin/paclitaxel (GemOxP)", "Gemcitabine/oxaliplatin (GemOx)", "Gemcitabine/paclitaxel", "Molecular targeted agents"],
+    "extragonadal_gct": ["High-volume center referral (strongly recommended)", "IGCCCG risk-stratified first-line chemotherapy", "BEP x3-4 cycles per risk group", "PC-RPLND after chemotherapy (NSGCT)"]
+  },
+  "known_trial_anchors": {
+    "description": "Named landmark trials for cross-reference and classification validation",
+    "trials": [
+      {"name": "TE19", "state": "seminoma_stage1", "intervention": "Carboplatin AUC=7 vs radiation therapy, stage I seminoma"},
+      {"name": "SWENOTECA surveillance", "state": "seminoma_stage1", "intervention": "Surveillance vs adjuvant therapy, stage I seminoma"},
+      {"name": "TIGR / TIGER", "state": "nsgct_recurrent_2l", "intervention": "TI-CE high-dose chemo vs TIP conventional-dose, relapsed GCT"},
+      {"name": "TI-CE protocol", "state": "nsgct_recurrent_2l", "intervention": "High-dose carboplatin/etoposide x2 cycles with stem cell rescue"},
+      {"name": "IGCCCG 2021 update", "state": "gct_advanced_general", "intervention": "Updated prognostic model (Gillessen et al., JCO 2021) — nomogram at eortc.shinyapps.io/IGCCCG-Update"}
+    ]
+  },
+  "igcccg_risk_model": {
+    "description": "International Germ-Cell Cancer Collaborative Group (IGCCCG) risk classification — applied post-orchiectomy, using Day 1 of first-line chemotherapy marker values. Updated nomogram: Gillessen S, et al. J Clin Oncol 2021;39:1563-1574.",
+    "seminoma": {
+      "good_risk": {"criteria": "Any primary site, non-mediastinal origin, no non-pulmonary visceral metastases, any AFP, any LDH, any hCG", "5yr_survival_pct": 86},
+      "intermediate_risk": {"criteria": "Any primary site, non-mediastinal origin, non-pulmonary visceral metastases (liver, bone, brain, other)", "5yr_survival_pct": 72},
+      "poor_risk": "Not applicable — IGCCCG does not define poor risk for seminoma"
+    },
+    "nsgct": {
+      "good_risk": {"criteria": "Testicular/retroperitoneal primary AND no non-pulmonary visceral mets AND AFP <1000 AND hCG <5000 AND LDH <1.5×ULN", "5yr_survival_pct": 92},
+      "intermediate_risk": {"criteria": "Testicular/retroperitoneal primary AND no non-pulmonary visceral mets AND [AFP 1000-10000 OR hCG 5000-50000 OR LDH 1.5-10×ULN]", "5yr_survival_pct": 80},
+      "poor_risk": {"criteria": "Mediastinal primary OR non-pulmonary visceral mets OR AFP >10000 OR hCG >50000 OR LDH >10×ULN", "5yr_survival_pct": 48}
+    }
+  },
+  "key_chemotherapy_regimens": {
+    "first_line": {
+      "BEP": "Bleomycin 30 units IV weekly (D1,8,15) + Etoposide 100 mg/m2 IV D1-5 + Cisplatin 20 mg/m2 IV D1-5; q21d. Good risk x3 cycles; intermediate/poor risk x4 cycles.",
+      "EP": "Etoposide 100 mg/m2 IV D1-5 + Cisplatin 20 mg/m2 IV D1-5; q21d x4 cycles. Good risk only. Bleomycin-free alternative.",
+      "VIP": "Etoposide 75 mg/m2 IV D1-5 + Ifosfamide 1200 mg/m2 IV D1-5 + Cisplatin 20 mg/m2 IV D1-5; q21d. Alternative to BEP for intermediate/poor risk.",
+      "carboplatin_AUC7": "Carboplatin AUC=7 x1 or x2 cycles. Adjuvant for stage I seminoma only."
+    },
+    "second_line": {
+      "TIP": "Paclitaxel 250 mg/m2 IV D1 + Ifosfamide 1500 mg/m2 IV D2-5 + Cisplatin 25 mg/m2 IV D2-5; q21d x4 cycles.",
+      "VeIP": "Vinblastine 0.11 mg/kg IV D1-2 + Ifosfamide 1200 mg/m2 IV D1-5 + Cisplatin 20 mg/m2 IV D1-5; q21d x4 cycles.",
+      "TI_CE_HD": "TI induction: Paclitaxel + Ifosfamide x2 cycles, then CE high-dose: Carboplatin AUC 8 D-5 to D-3 + Etoposide 400 mg/m2 D-5 to D-3; x3 cycles with autologous PBSC rescue (Feldman 2010)."
+    },
+    "third_line": {
+      "carbo_etop_HD": "Carboplatin 700 mg/m2/day IV D-5,-4,-3 + Etoposide 750 mg/m2/day IV D-5,-4,-3; x2 cycles with PBSC rescue.",
+      "PICE_HD": "Paclitaxel + Ifosfamide + Carboplatin + Etoposide (high-dose), x2 cycles with PBSC rescue.",
+      "GemOxP": "Gemcitabine 800 mg/m2 + Paclitaxel 80 mg/m2 IV D1,8 + Oxaliplatin 130 mg/m2 IV D1; q21d x8 cycles.",
+      "GemOx": "Gemcitabine 1000-1250 mg/m2 IV D1,8 + Oxaliplatin 130 mg/m2 IV D1; q21d until progression."
+    }
+  }
+}

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinical Trials - Southern California</title>
+    <meta name="description" content="Find and explore clinical trials in Southern California hospitals">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="icon" type="image/x-icon" href="assets/favicon/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/apple-touch-icon.png">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">
+                    <a href="index-php.html">
+                        Clinical Trials SoCal
+                    </a>
+                </h1>
+                <nav class="nav">
+                    <ul class="nav-list">
+                        <li><a href="index-php.html" class="nav-link active">Browse Trials</a></li>
+                        <li><a href="about-php.html" class="nav-link">About</a></li>
+                        <li><a href="physician-community-php.html" class="nav-link">Physician Community</a></li>
+                        <li><a href="admin-login-php.html" class="nav-link">Admin Login</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <section class="hero">
+                <div class="hero-content">
+                    <h2 class="hero-title">Find Genitourinary Cancer Clinical Trials in Southern California</h2>
+                    <p class="hero-description">
+                        Learn about ongoing, past, and upcoming clinical research opportunities in
+                        prostate, bladder, kidney, and testicular cancers across Southern California.
+                    </p>
+                </div>
+            </section>
+
+            <section class="search-section">
+                <div class="search-container">
+                    <div class="search-bar">
+                        <input 
+                            type="text" 
+                            id="searchInput" 
+                            class="search-input" 
+                            placeholder="Search trials by title, condition, or location..."
+                            autocomplete="off"
+                        >
+                        <button id="searchBtn" class="search-btn">
+                            <span class="search-icon">🔍</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content">
+                <div class="content-layout">
+                    <aside class="filters-sidebar">
+                        <div class="filters-container">
+                            <h3 class="filters-title">Filter Trials</h3>
+                            
+                            <div class="filter-group">
+                                <h4 class="filter-label">Status</h4>
+                                <div class="filter-options">
+                                    <label class="filter-option">
+                                        <input type="radio" name="status" value="all" checked>
+                                        <span class="filter-text">All Trials</span>
+                                    </label>
+                                    <label class="filter-option">
+                                        <input type="radio" name="status" value="recruiting">
+                                        <span class="filter-text">Recruiting</span>
+                                    </label>
+                                    <label class="filter-option">
+                                        <input type="radio" name="status" value="active_not_recruiting">
+                                        <span class="filter-text">Active, Not Recruiting</span>
+                                    </label>
+                                    <label class="filter-option">
+                                        <input type="radio" name="status" value="completed">
+                                        <span class="filter-text">Completed</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="filter-group">
+                                <h4 class="filter-label">Location</h4>
+                                <select id="locationFilter" class="filter-select filter-multi-select" multiple size="6">
+                                </select>
+                                <p class="filter-help">Use Cmd/Ctrl to select multiple locations.</p>
+                            </div>
+
+                            <div class="filter-group">
+                                <h4 class="filter-label">Phase</h4>
+                                <select id="phaseFilter" class="filter-select">
+                                    <option value="all">All Phases</option>
+                                    <option value="Phase I">Phase I</option>
+                                    <option value="Phase II">Phase II</option>
+                                    <option value="Phase III">Phase III</option>
+                                    <option value="Phase IV">Phase IV</option>
+                                </select>
+                            </div>
+
+                            <div class="filter-group">
+                                <h4 class="filter-label">Cancer Type</h4>
+                                <select id="cancerTypeFilter" class="filter-select">
+                                    <option value="all">All Cancer Types</option>
+                                    <option value="Prostate">Prostate</option>
+                                    <option value="Kidney">Kidney</option>
+                                    <option value="Bladder">Bladder</option>
+                                    <option value="Testicular">Testicular</option>
+                                    <option value="Others">Others</option>
+                                </select>
+                            </div>
+
+                            <button id="clearFilters" class="clear-filters-btn">
+                                Clear All Filters
+                            </button>
+                        </div>
+                    </aside>
+
+                    <div class="main-content">
+                        <div class="results-header">
+                            <div class="results-info">
+                                <span id="resultsCount" class="results-count">Loading trials...</span>
+                            </div>
+                            <div class="sort-controls">
+                                <label for="sortBy" class="sort-label">Sort by:</label>
+                                <select id="sortBy" class="sort-select">
+                                    <option value="title">Title</option>
+                                    <option value="status">Status</option>
+                                    <option value="startDate">Start Date</option>
+                                    <option value="location">Location</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="trialsContainer" class="trials-grid">
+                            <div class="loading-spinner">
+                                <div class="spinner"></div>
+                                <p>Loading clinical trials...</p>
+                            </div>
+                        </div>
+
+                        <div id="noResults" class="no-results" style="display: none;">
+                            <div class="no-results-content">
+                                <h3>No trials found</h3>
+                                <p>Try adjusting your search criteria or filters to find more results.</p>
+                                <button id="resetSearch" class="reset-btn">Reset Search</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <img src="assets/favicon/apple-touch-icon.png" alt="" class="footer-icon" aria-hidden="true">
+                <p class="footer-text">
+                    &copy; 2026 Genitourinary Cancer Clinical Trials in Southern California
+                </p>
+                <p class="footer-disclaimer">
+                    Always discuss clinical trial options with your healthcare provider to understand which study may be right for you.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- PHP Version Scripts -->
+    <script src="js/utils.js"></script>
+    <script src="js/trial-manager-php.js"></script>
+    <script src="js/search-filter.js"></script>
+    <script src="js/main-php.js"></script>
+</body>
+</html>
