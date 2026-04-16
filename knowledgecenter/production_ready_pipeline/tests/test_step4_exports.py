@@ -146,6 +146,21 @@ def test_exports() -> None:
         check(first_trial.get("availableInstitutions") == ["UCLA"], "Website catalog preserves institution list")
         check(first_trial.get("sites", [{}])[0].get("email") == "jane.smith@example.org", "Website catalog preserves site contacts")
 
+        invalid_catalog_path = tmpdir_path / "website_trials_invalid_email.json"
+        invalid_site_rows = [dict(site_rows[0], **{"PI email": "clinicaltrials.@hoag.org"})]
+        write_website_catalog(
+            study_records=study_records,
+            site_rows=invalid_site_rows,
+            out_path=invalid_catalog_path,
+            run_ts="2026-04-16_1200",
+            pipeline_version="3.0.0",
+            source_run_dir=str(tmpdir_path),
+        )
+        invalid_payload = json.loads(invalid_catalog_path.read_text(encoding="utf-8"))
+        invalid_trial = invalid_payload.get("trials", [{}])[0]
+        check(invalid_trial.get("contactEmail") == "", "Website catalog drops invalid contact email")
+        check(invalid_trial.get("sites", [{}])[0].get("email") == "", "Website catalog drops invalid site email")
+
 
 if __name__ == "__main__":
     test_exports()

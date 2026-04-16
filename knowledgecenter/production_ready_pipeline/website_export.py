@@ -17,6 +17,24 @@ def _collapse_whitespace(value: str) -> str:
     return re.sub(r"\s+", " ", (value or "").strip())
 
 
+def _normalize_email(value: str) -> str:
+    email = _collapse_whitespace(value)
+    if not email:
+        return ""
+
+    # Keep email validation strict enough to match PHP's FILTER_VALIDATE_EMAIL
+    # behavior for common malformed site contacts such as "clinicaltrials.@hoag.org".
+    if not re.fullmatch(
+        r"[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+)*"
+        r"@"
+        r"[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+",
+        email,
+    ):
+        return ""
+
+    return email
+
+
 def _split_pipe_list(value: str) -> list[str]:
     return [item.strip() for item in (value or "").split(" | ") if item.strip()]
 
@@ -91,7 +109,7 @@ def _normalize_site_rows(site_rows: list[dict]) -> dict[str, list[dict]]:
             "state": "CA",
             "address": "",
             "piName": row.get("PI name", "").strip(),
-            "email": row.get("PI email", "").strip(),
+            "email": _normalize_email(row.get("PI email", "")),
             "phone": row.get("PI phone", "").strip(),
             "affiliation": row.get("PI affiliation", "").strip(),
         })
