@@ -1,5 +1,6 @@
 .DS_Store
 .claude/
+.private_docs/
 
 # Local runtime data
 data/physician_forum.sqlite
