@@ -50,16 +50,29 @@ jobs:
           install -m 700 -d ~/.ssh
           printf '%s\n' "${{ secrets.NAMECHEAP_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -p "${{ secrets.NAMECHEAP_PORT }}" "${{ secrets.NAMECHEAP_HOST }}" >> ~/.ssh/known_hosts
+          cat > ~/.ssh/config <<EOF
+          Host namecheap-shared
+            HostName ${{ secrets.NAMECHEAP_HOST }}
+            User ${{ secrets.NAMECHEAP_USER }}
+            Port ${{ secrets.NAMECHEAP_PORT }}
+            IdentityFile ~/.ssh/id_rsa
+            IdentitiesOnly yes
+            HostKeyAlgorithms +ssh-rsa
+            PubkeyAcceptedAlgorithms +ssh-rsa
+            StrictHostKeyChecking yes
+          EOF
+          chmod 600 ~/.ssh/config
+          ssh-keyscan -t rsa -p "${{ secrets.NAMECHEAP_PORT }}" "${{ secrets.NAMECHEAP_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Test SSH connectivity
+        run: |
+          ssh namecheap-shared "hostname -f && php -v | head -n 1"
 
       - name: Upload catalog to Namecheap
         run: |
-          scp -i ~/.ssh/id_rsa -P "${{ secrets.NAMECHEAP_PORT }}" \
-            build/website_trials.json \
-            "${{ secrets.NAMECHEAP_USER }}@${{ secrets.NAMECHEAP_HOST }}:~/website_trials.json"
+          scp build/website_trials.json namecheap-shared:~/website_trials.json
 
       - name: Import catalog on server
         run: |
-          ssh -i ~/.ssh/id_rsa -p "${{ secrets.NAMECHEAP_PORT }}" \
-            "${{ secrets.NAMECHEAP_USER }}@${{ secrets.NAMECHEAP_HOST }}" \
+          ssh namecheap-shared \
             "php '${{ secrets.REMOTE_APP_ROOT }}/scripts/import_website_catalog.php' ~/website_trials.json && rm -f ~/website_trials.json"
