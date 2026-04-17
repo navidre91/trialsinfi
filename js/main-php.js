@@ -7,6 +7,12 @@ class ClinicalTrialsApp {
     this.searchFilter = null;
     this.currentPage = 'index';
     this.isLoading = false;
+    this.patientSearchState = {
+      active: false,
+      rawQuery: '',
+      parsedQuery: null,
+      matches: null
+    };
   }
 
   /**
@@ -23,20 +29,28 @@ class ClinicalTrialsApp {
       this.searchFilter = new SearchFilter(this.trialManager);
       this.searchFilter.init();
 
+      // Make app instance available globally before additional UI bindings
+      window.currentPage = this;
+
       // Populate filter dropdowns with data
       this.searchFilter.populateLocationFilter();
 
-      // Apply initial filters (from URL if any)
-      this.searchFilter.applyFilters();
+      // Setup patient-search workflow on top of the loaded catalog
+      this.setupPatientSearch();
+      this.updateCatalogMeta();
+
+      const restoredPatientSearch = this.restorePatientSearch();
+
+      // Apply initial filters (from URL if any) when patient search is not active
+      if (!restoredPatientSearch) {
+        this.searchFilter.applyFilters();
+      }
 
       // Display trials
       this.updateTrialsDisplay();
       
       // Set up pagination
       this.setupPagination();
-      
-      // Make app instance available globally for debugging
-      window.currentPage = this;
       
     } catch (error) {
       console.error('Error initializing app:', error);
@@ -74,6 +88,14 @@ class ClinicalTrialsApp {
     const noResults = document.getElementById('noResults');
     
     if (!trialsContainer) return;
+
+    if (this.patientSearchState.active) {
+      this.renderPatientSearchResults(trialsContainer, noResults);
+      this.updateResultsCount();
+      this.updatePagination();
+      this.isLoading = false;
+      return;
+    }
 
     const currentTrials = this.trialManager.getCurrentPageTrials();
     const totalTrials = this.trialManager.getFilteredTrials().length;
@@ -114,7 +136,7 @@ class ClinicalTrialsApp {
    * @param {Object} trial - Trial data
    * @returns {HTMLElement} Trial card element
    */
-  createTrialCard(trial) {
+  createTrialCard(trial, matchContext = null) {
     const statusConfig = Utils.getStatusConfig(trial.status);
     const institutions = Utils.getTrialInstitutions(trial);
     const primaryInstitution = institutions[0] || trial.location?.hospital || 'Not specified';
@@ -130,13 +152,44 @@ class ClinicalTrialsApp {
     const classificationConfidence = trial.classificationConfidence || 'Not specified';
     const phaseLabel = Utils.getDisplayPhase(trial);
     const cancerTypes = Utils.getDisplayCancerTypes(trial);
+    const detailUrl = this.buildDetailUrl(trial.id, Boolean(matchContext));
+    const sourceTags = matchContext ? (matchContext.sourceTagSummary || []) : [];
+    const badgeHTML = matchContext
+      ? `<div style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700; background: ${matchContext.badgeTone === 'strong' ? '#dcfce7' : '#fef3c7'}; color: ${matchContext.badgeTone === 'strong' ? '#166534' : '#92400e'};">${Utils.sanitizeHTML(matchContext.badge)}</div>`
+      : '';
+    const reasonHTML = matchContext?.reasonText
+      ? `<div style="margin-top: 0.85rem; padding: 0.75rem; border-radius: 12px; background: #f8fafc; color: var(--text-primary); font-size: 0.925rem; line-height: 1.45;"><strong>Reason:</strong> ${Utils.sanitizeHTML(matchContext.reasonText)}</div>`
+      : '';
+    const flagsHTML = matchContext?.flags?.length
+      ? `
+        <div style="margin-top: 0.85rem;">
+          ${matchContext.flags.map(flag => `
+            <div style="padding: 0.7rem 0.8rem; border: 1px solid #fde68a; background: #fffbeb; border-radius: 12px; margin-top: 0.45rem;">
+              <div style="font-size: 0.82rem; font-weight: 700; color: #92400e; margin-bottom: 0.2rem;">${Utils.sanitizeHTML(flag.title)}</div>
+              <div style="font-size: 0.84rem; color: #78350f; line-height: 1.45;">${Utils.sanitizeHTML(flag.message)}</div>
+            </div>
+          `).join('')}
+        </div>
+      `
+      : '';
+    const sourceTagsHTML = sourceTags.length > 0
+      ? `
+        <div style="display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.85rem;">
+          ${sourceTags.map(tag => `
+            <span style="display: inline-flex; align-items: center; padding: 0.25rem 0.55rem; border-radius: 999px; border: 1px solid var(--border-color); color: var(--text-secondary); font-size: 0.72rem; font-weight: 600;">${Utils.sanitizeHTML(tag)}</span>
+          `).join('')}
+        </div>
+      `
+      : '';
     
     const cardHTML = `
-      <div class="trial-card" data-trial-id="${trial.id}" onclick="window.clinicalTrialsApp.viewTrialDetail('${trial.id}')">
+      <div class="trial-card" data-trial-id="${trial.id}" onclick="window.clinicalTrialsApp.viewTrialDetail('${trial.id}', ${matchContext ? 'true' : 'false'})">
         <div class="trial-card-header">
           <h3 class="trial-title">${Utils.sanitizeHTML(trial.title)}</h3>
           <span class="trial-status ${statusConfig.className}">${statusConfig.label}</span>
         </div>
+
+        ${badgeHTML}
         
         <p class="trial-description">
           ${Utils.sanitizeHTML(Utils.truncateText(trial.description, 150))}
@@ -178,6 +231,10 @@ class ClinicalTrialsApp {
             </div>
           </div>
         </div>
+
+        ${reasonHTML}
+        ${flagsHTML}
+        ${sourceTagsHTML}
         
         <div class="trial-card-footer">
           <div class="trial-dates">
@@ -187,7 +244,7 @@ class ClinicalTrialsApp {
           <div style="display: flex; align-items: center; gap: 0.5rem;">
             ${contactEmail ? `<a href="mailto:${Utils.sanitizeHTML(contactEmail)}" class="trial-view-btn" style="background: transparent; color: var(--primary-color); border: 1px solid var(--border-color);" onclick="event.stopPropagation();">Email PI</a>` : ''}
             ${trial.ctGovUrl ? `<a href="${Utils.sanitizeHTML(trial.ctGovUrl)}" target="_blank" rel="noopener noreferrer" class="trial-view-btn" style="background: transparent; color: var(--primary-color); border: 1px solid var(--border-color);" onclick="event.stopPropagation();">CT.gov</a>` : ''}
-            <a href="trial-detail-php.html?id=${trial.id}" class="trial-view-btn" onclick="event.stopPropagation();">
+            <a href="${detailUrl}" class="trial-view-btn" onclick="event.stopPropagation();">
               View Details
             </a>
           </div>
@@ -202,8 +259,296 @@ class ClinicalTrialsApp {
    * View trial detail (for card click)
    * @param {string} trialId - Trial ID
    */
-  viewTrialDetail(trialId) {
-    window.location.href = `trial-detail-php.html?id=${trialId}`;
+  viewTrialDetail(trialId, fromPatientSearch = false) {
+    window.location.href = this.buildDetailUrl(trialId, fromPatientSearch);
+  }
+
+  buildDetailUrl(trialId, fromPatientSearch = false) {
+    const params = new URLSearchParams({ id: trialId });
+    if (fromPatientSearch) {
+      params.set('patientSearch', '1');
+    }
+    return `trial-detail-php.html?${params.toString()}`;
+  }
+
+  setupPatientSearch() {
+    const input = document.getElementById('patientQueryInput');
+    const runButton = document.getElementById('runPatientSearch');
+    const clearButton = document.getElementById('clearPatientSearch');
+
+    if (!input || !runButton || !clearButton) {
+      return;
+    }
+
+    runButton.addEventListener('click', () => {
+      this.runPatientSearch(input.value);
+    });
+
+    clearButton.addEventListener('click', () => {
+      this.clearPatientSearch();
+    });
+
+    input.addEventListener('keydown', (event) => {
+      if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+        event.preventDefault();
+        this.runPatientSearch(input.value);
+      }
+    });
+  }
+
+  restorePatientSearch() {
+    const input = document.getElementById('patientQueryInput');
+    const storedQuery = window.localStorage.getItem('cts_patient_query');
+    if (!input || !storedQuery) {
+      return false;
+    }
+
+    input.value = storedQuery;
+    return this.runPatientSearch(storedQuery, { persist: false, silentUnsupported: true });
+  }
+
+  runPatientSearch(rawQuery, options = {}) {
+    const query = (rawQuery || '').toString().trim();
+    const status = document.getElementById('patientSearchStatus');
+    const noResultsText = document.querySelector('#noResults p');
+
+    if (!query) {
+      this.clearPatientSearch();
+      if (status) {
+        status.textContent = 'Enter a patient description to run protocol-style matching.';
+      }
+      return false;
+    }
+
+    const parsedQuery = window.PatientQueryParser?.parse(query);
+    if (!parsedQuery?.supported) {
+      this.patientSearchState = {
+        active: false,
+        rawQuery: query,
+        parsedQuery,
+        matches: null
+      };
+      this.renderPatientQueryChips(parsedQuery);
+      this.setCatalogLayoutForPatientSearch(false);
+      if (status && !options.silentUnsupported) {
+        status.textContent = parsedQuery?.unsupportedReason || 'This matching mode currently supports prostate queries only.';
+      }
+      if (noResultsText) {
+        noResultsText.textContent = 'Try adjusting your search criteria or filters to find more results.';
+      }
+      if (options.persist !== false) {
+        window.localStorage.removeItem('cts_patient_query');
+      }
+      this.searchFilter.applyFilters();
+      return false;
+    }
+
+    const matches = window.PatientTrialMatcher?.matchTrials({
+      trials: this.trialManager.getAllTrials(),
+      parsedQuery
+    }) || {
+      parsedQuery,
+      strongMatches: [],
+      possibleMatches: []
+    };
+
+    this.patientSearchState = {
+      active: true,
+      rawQuery: query,
+      parsedQuery,
+      matches
+    };
+
+    if (options.persist !== false) {
+      window.localStorage.setItem('cts_patient_query', query);
+    }
+
+    if (status) {
+      status.textContent = 'Protocol-style prostate matching is active. Catalog filters are hidden until you clear the patient search.';
+    }
+
+    this.renderPatientQueryChips(parsedQuery);
+    this.setCatalogLayoutForPatientSearch(true);
+    this.updateCatalogMeta();
+    this.updateTrialsDisplay();
+    Utils.scrollToElement('.results-header');
+    return true;
+  }
+
+  clearPatientSearch() {
+    const input = document.getElementById('patientQueryInput');
+    const status = document.getElementById('patientSearchStatus');
+    const chips = document.getElementById('patientQueryChips');
+    const noResultsText = document.querySelector('#noResults p');
+
+    this.patientSearchState = {
+      active: false,
+      rawQuery: '',
+      parsedQuery: null,
+      matches: null
+    };
+
+    window.localStorage.removeItem('cts_patient_query');
+
+    if (input) {
+      input.value = '';
+    }
+    if (status) {
+      status.textContent = '';
+    }
+    if (chips) {
+      chips.innerHTML = '';
+      chips.style.display = 'none';
+    }
+    if (noResultsText) {
+      noResultsText.textContent = 'Try adjusting your search criteria or filters to find more results.';
+    }
+
+    this.setCatalogLayoutForPatientSearch(false);
+    this.updateCatalogMeta();
+    if (this.searchFilter) {
+      this.searchFilter.applyFilters();
+    } else {
+      this.updateTrialsDisplay();
+    }
+  }
+
+  renderPatientQueryChips(parsedQuery) {
+    const container = document.getElementById('patientQueryChips');
+    if (!container) {
+      return;
+    }
+
+    container.innerHTML = '';
+    const chips = Array.isArray(parsedQuery?.chips) ? parsedQuery.chips : [];
+    if (chips.length === 0) {
+      container.style.display = 'none';
+      return;
+    }
+
+    container.style.display = 'flex';
+    chips.forEach(chip => {
+      const element = document.createElement('span');
+      element.style.cssText = 'display:inline-flex;align-items:center;gap:0.35rem;padding:0.3rem 0.7rem;border-radius:999px;background:#ffffff;border:1px solid var(--border-color);font-size:0.8rem;color:var(--text-secondary);';
+      element.innerHTML = `<strong style="color: var(--text-primary);">${Utils.sanitizeHTML(chip.group)}:</strong> <span>${Utils.sanitizeHTML(chip.label)}</span>`;
+      container.appendChild(element);
+    });
+  }
+
+  setCatalogLayoutForPatientSearch(active) {
+    const sidebar = document.querySelector('.filters-sidebar');
+    const layout = document.querySelector('.content-layout');
+    const sortControls = document.querySelector('.sort-controls');
+
+    if (sidebar) {
+      sidebar.style.display = active ? 'none' : '';
+    }
+    if (layout) {
+      layout.style.gridTemplateColumns = active ? '1fr' : '';
+    }
+    if (sortControls) {
+      sortControls.style.display = active ? 'none' : '';
+    }
+  }
+
+  renderPatientSearchResults(trialsContainer, noResults) {
+    const matches = this.patientSearchState.matches || { strongMatches: [], possibleMatches: [] };
+    const strongMatches = matches.strongMatches || [];
+    const possibleMatches = matches.possibleMatches || [];
+    const totalMatches = strongMatches.length + possibleMatches.length;
+    const noResultsTitle = document.querySelector('#noResults h3');
+    const noResultsText = document.querySelector('#noResults p');
+
+    Utils.clearElement(trialsContainer);
+    this.hidePagination();
+
+    if (totalMatches === 0) {
+      trialsContainer.style.display = 'none';
+      if (noResults) {
+        noResults.style.display = 'block';
+      }
+      if (noResultsTitle) {
+        noResultsTitle.textContent = 'No patient-matched trials found';
+      }
+      if (noResultsText) {
+        noResultsText.textContent = 'Try adding disease setting, prior treatment history, or key biomarkers. Incomplete prostate queries should still return possible matches with verification flags.';
+      }
+      return;
+    }
+
+    trialsContainer.style.display = 'block';
+    if (noResults) {
+      noResults.style.display = 'none';
+    }
+    if (noResultsTitle) {
+      noResultsTitle.textContent = 'No trials found';
+    }
+    if (noResultsText) {
+      noResultsText.textContent = 'Try adjusting your search criteria or filters to find more results.';
+    }
+
+    trialsContainer.appendChild(this.renderPatientSearchGroup(
+      'Strong Matches',
+      strongMatches,
+      '#166534',
+      '#dcfce7',
+      'No strong matches for the current query.'
+    ));
+    trialsContainer.appendChild(this.renderPatientSearchGroup(
+      'Possible Matches',
+      possibleMatches,
+      '#92400e',
+      '#fef3c7',
+      'No possible matches for the current query.'
+    ));
+  }
+
+  renderPatientSearchGroup(title, entries, accentColor, backgroundColor, emptyState) {
+    const section = document.createElement('section');
+    section.style.cssText = 'margin-bottom: 2rem;';
+
+    const header = document.createElement('div');
+    header.style.cssText = `display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem 1.25rem;border-radius:16px;background:${backgroundColor};margin-bottom:1rem;`;
+    header.innerHTML = `
+      <div>
+        <h3 style="margin:0;font-size:1.15rem;color:${accentColor};">${Utils.sanitizeHTML(title)}</h3>
+        <p style="margin:0.2rem 0 0;color:${accentColor};opacity:0.88;font-size:0.9rem;">${entries.length} trial${entries.length === 1 ? '' : 's'}</p>
+      </div>
+    `;
+    section.appendChild(header);
+
+    if (!entries.length) {
+      const empty = document.createElement('div');
+      empty.style.cssText = 'padding: 1rem 1.25rem; border-radius: 16px; background: var(--card-background); color: var(--text-secondary); box-shadow: var(--shadow-sm);';
+      empty.textContent = emptyState;
+      section.appendChild(empty);
+      return section;
+    }
+
+    const grid = document.createElement('div');
+    grid.className = 'trials-grid';
+    entries.forEach(entry => {
+      grid.appendChild(this.createTrialCard(entry.trial, entry.match));
+    });
+    section.appendChild(grid);
+    return section;
+  }
+
+  updateCatalogMeta() {
+    const meta = document.getElementById('catalogMeta');
+    if (!meta) {
+      return;
+    }
+
+    const metadata = this.trialManager.catalogMetadata || {};
+    const totalTrials = Number(metadata.trialCount || this.trialManager.getAllTrials().length || 0);
+    const syncDate = Utils.formatDate(metadata.lastSyncAt || '');
+    const institutionCount = Number(metadata.institutionCount || 0);
+    const scopeText = this.patientSearchState.active
+      ? 'Patient search view'
+      : 'Catalog view';
+
+    meta.textContent = `${scopeText} · ${totalTrials} synced trial${totalTrials === 1 ? '' : 's'} · ${institutionCount || 'SoCal'} institutions · Last sync ${syncDate}`;
   }
 
   /**
@@ -212,6 +557,20 @@ class ClinicalTrialsApp {
   updateResultsCount() {
     const resultsCount = document.getElementById('resultsCount');
     if (!resultsCount) return;
+
+    if (this.patientSearchState.active) {
+      const strongCount = this.patientSearchState.matches?.strongMatches?.length || 0;
+      const possibleCount = this.patientSearchState.matches?.possibleMatches?.length || 0;
+      const totalCount = strongCount + possibleCount;
+
+      if (totalCount === 0) {
+        resultsCount.textContent = 'No patient-matched trials found';
+        return;
+      }
+
+      resultsCount.textContent = `${strongCount} strong match${strongCount === 1 ? '' : 'es'} · ${possibleCount} possible match${possibleCount === 1 ? '' : 'es'}`;
+      return;
+    }
 
     const paginationInfo = this.trialManager.getPaginationInfo();
     const activeFilters = this.searchFilter ? this.searchFilter.getActiveFilterCount() : 0;
@@ -236,6 +595,11 @@ class ClinicalTrialsApp {
    * Setup pagination controls
    */
   setupPagination() {
+    if (this.patientSearchState.active) {
+      this.hidePagination();
+      return;
+    }
+
     const paginationInfo = this.trialManager.getPaginationInfo();
     
     if (paginationInfo.totalPages <= 1) {

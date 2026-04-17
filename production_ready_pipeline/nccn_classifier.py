@@ -20,7 +20,9 @@ _TESTICULAR_TAX = default_store.get_for_cancer_type("Testicular/GCT")
 @dataclass
 class TrialClassification:
     disease_settings: list[str] = field(default_factory=list)
+    disease_setting_ids: list[str] = field(default_factory=list)
     disease_setting_primary: str = "Unclassified"
+    disease_setting_primary_id: str = ""
     disease_setting_all: str = ""
     classification_confidence: str = "UNCLASSIFIED"
     classification_evidence: list[str] = field(default_factory=list)
@@ -207,7 +209,13 @@ def _resolve_categories(matched_categories: list[dict], evidence: list[str], res
     matched_categories.sort(
         key=lambda category: (category.get("order", 99), confidence_rank.get(category["_confidence"], 3))
     )
+    result.disease_setting_ids = [
+        str(category.get("id", "")).strip()
+        for category in matched_categories
+        if str(category.get("id", "")).strip()
+    ]
     result.disease_settings = [category["label"] for category in matched_categories]
+    result.disease_setting_primary_id = result.disease_setting_ids[0] if result.disease_setting_ids else ""
     result.disease_setting_primary = matched_categories[0]["label"]
     result.disease_setting_all = " | ".join(result.disease_settings)
     confidences = [category["_confidence"] for category in matched_categories]

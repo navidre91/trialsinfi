@@ -52,6 +52,69 @@ def _split_bullet_block(value: str) -> list[str]:
     return lines
 
 
+def _normalize_axis_value(value: str) -> str:
+    normalized = _collapse_whitespace(value)
+    return "" if normalized == "Not applicable" else normalized
+
+
+def _build_clinical_axes(record: dict) -> dict[str, str]:
+    axes = {
+        "bcgStatus": _normalize_axis_value(record.get("BCG status", "")),
+        "cisplatinStatus": _normalize_axis_value(record.get("Cisplatin status", "")),
+        "castrationStatus": _normalize_axis_value(record.get("Castration status", "")),
+        "metastaticStatus": _normalize_axis_value(record.get("Metastatic status", "")),
+        "diseaseVolume": _normalize_axis_value(record.get("Disease volume", "")),
+        "priorArpi": _normalize_axis_value(record.get("Prior ARPI", "")),
+        "priorDocetaxel": _normalize_axis_value(record.get("Prior docetaxel", "")),
+        "biomarkerHrr": _normalize_axis_value(record.get("HRR biomarker", "")),
+        "psmaStatus": _normalize_axis_value(record.get("PSMA status", "")),
+        "genomicClassifier": _normalize_axis_value(record.get("Genomic classifier", "")),
+        "histology": _normalize_axis_value(record.get("Histology", "")),
+        "imdcRisk": _normalize_axis_value(record.get("IMDC risk", "")),
+        "priorSystemicLines": _normalize_axis_value(record.get("Prior systemic lines", "")),
+        "priorIo": _normalize_axis_value(record.get("Prior IO", "")),
+        "priorVegfTki": _normalize_axis_value(record.get("Prior VEGF/TKI", "")),
+        "nephrectomyStatus": _normalize_axis_value(record.get("Nephrectomy status", "")),
+        "vhlStatus": _normalize_axis_value(record.get("VHL status", "")),
+        "metAlteration": _normalize_axis_value(record.get("MET alteration", "")),
+        "sarcomatoid": _normalize_axis_value(record.get("Sarcomatoid", "")),
+        "clinicalStage": _normalize_axis_value(record.get("Clinical stage", "")),
+        "igcccgRisk": _normalize_axis_value(record.get("IGCCCG risk", "")),
+        "primarySite": _normalize_axis_value(record.get("Primary site", "")),
+        "priorChemoLines": _normalize_axis_value(record.get("Prior chemo lines", "")),
+        "priorHdct": _normalize_axis_value(record.get("Prior HDCT", "")),
+        "rplndStatus": _normalize_axis_value(record.get("RPLND status", "")),
+        "markerStatus": _normalize_axis_value(record.get("Marker status", "")),
+        "stage1RiskFactors": _normalize_axis_value(record.get("Stage I risk factors", "")),
+    }
+    return {key: value for key, value in axes.items() if value}
+
+
+def _build_source_tags(clinical_axes: dict[str, str]) -> dict:
+    source_tags = {
+        "title": "CT.gov",
+        "status": "CT.gov",
+        "phase": "CT.gov",
+        "description": "CT.gov",
+        "sponsor": "CT.gov",
+        "eligibilityCriteria": "CT.gov",
+        "sites": "CT.gov",
+        "piName": "CT.gov",
+        "contactEmail": "CT.gov",
+        "diseaseSettingPrimary": "NCCN-inferred",
+        "diseaseSettingAll": "NCCN-inferred",
+        "classificationConfidence": "NCCN-inferred",
+        "classificationEvidence": "NCCN-inferred",
+        "treatmentModality": "AI-extracted",
+        "delivery": "AI-extracted",
+        "clinicalAxes": {
+            key: "AI-extracted"
+            for key in clinical_axes
+        },
+    }
+    return source_tags
+
+
 def _map_status(status: str) -> str:
     normalized = (status or "").strip().upper()
     aliases = {
@@ -173,9 +236,13 @@ def build_website_catalog(
             eligibility_criteria.append(f"Exclusion: {exclusion_text}")
 
         disease_settings = _split_pipe_list(record.get("Disease setting (all)", ""))
+        disease_setting_ids = _split_pipe_list(record.get("Disease setting IDs (all)", ""))
+        classification_evidence = _split_pipe_list(record.get("Classification evidence", ""))
         primary_outcomes = _split_bullet_block(record.get("Primary outcomes", ""))
         secondary_outcomes = _split_bullet_block(record.get("Secondary outcomes", ""))
         phase_raw = record.get("Phase", "").strip()
+        clinical_axes = _build_clinical_axes(record)
+        source_tags = _build_source_tags(clinical_axes)
 
         trials.append({
             "id": nct_id,
@@ -209,10 +276,15 @@ def build_website_catalog(
             "eligibilityCriteria": eligibility_criteria,
             "lastUpdated": export_time,
             "diseaseSettingPrimary": record.get("Disease setting (primary)", "").strip(),
+            "diseaseSettingPrimaryId": record.get("Disease setting ID (primary)", "").strip(),
             "diseaseSettingAll": disease_settings,
+            "diseaseSettingAllIds": disease_setting_ids,
             "classificationConfidence": record.get("Classification confidence", "").strip(),
+            "classificationEvidence": classification_evidence,
             "treatmentModality": record.get("Treatment modality", "").strip(),
             "delivery": record.get("Delivery", "").strip(),
+            "clinicalAxes": clinical_axes,
+            "sourceTags": source_tags,
             "nccnTaxonomyVersion": record.get("NCCN taxonomy version", "").strip(),
             "ctGovUrl": record.get("ClinicalTrials URL", "").strip(),
             "conditions": _split_semicolon_list(record.get("Conditions", "")),

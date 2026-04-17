@@ -111,6 +111,10 @@ class SearchFilter {
     const resetSearchBtn = document.getElementById('resetSearch');
     if (resetSearchBtn) {
       resetSearchBtn.addEventListener('click', () => {
+        if (window.currentPage?.patientSearchState?.active && typeof window.currentPage.clearPatientSearch === 'function') {
+          window.currentPage.clearPatientSearch();
+          return;
+        }
         this.clearAllFilters();
       });
     }

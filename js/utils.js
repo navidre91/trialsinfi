@@ -515,10 +515,15 @@ class Utils {
       'type',
       'sponsor',
       'diseaseSettingPrimary',
+      'diseaseSettingPrimaryId',
       'diseaseSettingAll',
+      'diseaseSettingAllIds',
       'classificationConfidence',
+      'classificationEvidence',
       'treatmentModality',
       'delivery',
+      'clinicalAxes',
+      'sourceTags',
       'nccnTaxonomyVersion',
       'ctGovUrl',
       'availableInstitutions',
@@ -639,6 +644,23 @@ class Utils {
       .filter(Boolean);
   }
 
+  static parseJsonObject(value) {
+    if (!value) {
+      return {};
+    }
+
+    if (typeof value === 'object' && !Array.isArray(value)) {
+      return value;
+    }
+
+    try {
+      const parsed = JSON.parse(value);
+      return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+    } catch (error) {
+      return {};
+    }
+  }
+
   static formatPipeSeparatedList(values) {
     if (!Array.isArray(values)) {
       return '';
@@ -681,11 +703,51 @@ class Utils {
         .map(item => (item === null || item === undefined ? '' : String(item).trim()))
         .filter(Boolean)
       : [];
+    const normalizedDiseaseSettingAllIds = Array.isArray(trial?.diseaseSettingAllIds)
+      ? trial.diseaseSettingAllIds
+        .map(item => (item === null || item === undefined ? '' : String(item).trim()))
+        .filter(Boolean)
+      : [];
     const normalizeStringList = values => Array.isArray(values)
       ? values
         .map(item => (item === null || item === undefined ? '' : String(item).trim()))
         .filter(Boolean)
       : [];
+    const normalizeStringMap = values => {
+      const map = Utils.parseJsonObject(values);
+      const normalized = {};
+
+      Object.entries(map).forEach(([key, value]) => {
+        const normalizedKey = (key || '').toString().trim();
+        if (!normalizedKey) {
+          return;
+        }
+
+        if (value && typeof value === 'object' && !Array.isArray(value)) {
+          const nested = {};
+          Object.entries(value).forEach(([nestedKey, nestedValue]) => {
+            const normalizedNestedKey = (nestedKey || '').toString().trim();
+            const normalizedNestedValue = (nestedValue === null || nestedValue === undefined ? '' : String(nestedValue).trim());
+            if (normalizedNestedKey && normalizedNestedValue) {
+              nested[normalizedNestedKey] = normalizedNestedValue;
+            }
+          });
+          if (Object.keys(nested).length > 0) {
+            normalized[normalizedKey] = nested;
+          }
+          return;
+        }
+
+        const normalizedValue = (value === null || value === undefined ? '' : String(value).trim());
+        if (normalizedValue) {
+          normalized[normalizedKey] = normalizedValue;
+        }
+      });
+
+      return normalized;
+    };
+    const normalizedClinicalAxes = normalizeStringMap(trial?.clinicalAxes);
+    const normalizedSourceTags = normalizeStringMap(trial?.sourceTags);
 
     return {
       id: (trial?.id || '').toString().trim(),
@@ -727,10 +789,15 @@ class Utils {
         : [],
       lastUpdated: (trial?.lastUpdated || '').toString().trim(),
       diseaseSettingPrimary: (trial?.diseaseSettingPrimary || Utils.getDiseaseSettingLabel(trial) || '').toString().trim(),
+      diseaseSettingPrimaryId: (trial?.diseaseSettingPrimaryId || '').toString().trim(),
       diseaseSettingAll: normalizedDiseaseSettingAll,
+      diseaseSettingAllIds: normalizedDiseaseSettingAllIds,
       classificationConfidence: (trial?.classificationConfidence || '').toString().trim(),
+      classificationEvidence: normalizeStringList(trial?.classificationEvidence),
       treatmentModality: (trial?.treatmentModality || '').toString().trim(),
       delivery: (trial?.delivery || '').toString().trim(),
+      clinicalAxes: normalizedClinicalAxes,
+      sourceTags: normalizedSourceTags,
       nccnTaxonomyVersion: (trial?.nccnTaxonomyVersion || '').toString().trim(),
       ctGovUrl: (trial?.ctGovUrl || '').toString().trim(),
       conditions: normalizeStringList(trial?.conditions),
@@ -767,10 +834,15 @@ class Utils {
       type: normalizedTrial.cancerType,
       sponsor: normalizedTrial.sponsor,
       diseaseSettingPrimary: normalizedTrial.diseaseSettingPrimary,
+      diseaseSettingPrimaryId: normalizedTrial.diseaseSettingPrimaryId,
       diseaseSettingAll: Utils.formatPipeSeparatedList(normalizedTrial.diseaseSettingAll),
+      diseaseSettingAllIds: Utils.formatPipeSeparatedList(normalizedTrial.diseaseSettingAllIds),
       classificationConfidence: normalizedTrial.classificationConfidence,
+      classificationEvidence: Utils.formatPipeSeparatedList(normalizedTrial.classificationEvidence),
       treatmentModality: normalizedTrial.treatmentModality,
       delivery: normalizedTrial.delivery,
+      clinicalAxes: JSON.stringify(normalizedTrial.clinicalAxes),
+      sourceTags: JSON.stringify(normalizedTrial.sourceTags),
       nccnTaxonomyVersion: normalizedTrial.nccnTaxonomyVersion,
       ctGovUrl: normalizedTrial.ctGovUrl,
       availableInstitutions: Utils.formatPipeSeparatedList(normalizedTrial.availableInstitutions),
@@ -816,10 +888,15 @@ class Utils {
       cancerTypes: Utils.parsePipeSeparatedList(row?.cancerTypes),
       sponsor: row?.sponsor,
       diseaseSettingPrimary: row?.diseaseSettingPrimary,
+      diseaseSettingPrimaryId: row?.diseaseSettingPrimaryId,
       diseaseSettingAll: Utils.parsePipeSeparatedList(row?.diseaseSettingAll),
+      diseaseSettingAllIds: Utils.parsePipeSeparatedList(row?.diseaseSettingAllIds),
       classificationConfidence: row?.classificationConfidence,
+      classificationEvidence: Utils.parsePipeSeparatedList(row?.classificationEvidence),
       treatmentModality: row?.treatmentModality,
       delivery: row?.delivery,
+      clinicalAxes: Utils.parseJsonObject(row?.clinicalAxes),
+      sourceTags: Utils.parseJsonObject(row?.sourceTags),
       nccnTaxonomyVersion: row?.nccnTaxonomyVersion,
       ctGovUrl: row?.ctGovUrl,
       availableInstitutions: Utils.parsePipeSeparatedList(row?.availableInstitutions),

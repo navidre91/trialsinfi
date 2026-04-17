@@ -811,6 +811,61 @@ function cts_normalize_sites_field($value): array
     return $normalized;
 }
 
+function cts_normalize_clinical_axes_field($value): array
+{
+    if (!is_array($value)) {
+        return [];
+    }
+
+    $normalized = [];
+    foreach ($value as $key => $axisValue) {
+        $normalizedKey = trim((string)$key);
+        $normalizedValue = trim((string)$axisValue);
+        if ($normalizedKey !== '' && $normalizedValue !== '') {
+            $normalized[$normalizedKey] = $normalizedValue;
+        }
+    }
+
+    return $normalized;
+}
+
+function cts_normalize_source_tags_field($value): array
+{
+    if (!is_array($value)) {
+        return [];
+    }
+
+    $normalized = [];
+    foreach ($value as $key => $tagValue) {
+        $normalizedKey = trim((string)$key);
+        if ($normalizedKey === '') {
+            continue;
+        }
+
+        if (is_array($tagValue)) {
+            $nested = [];
+            foreach ($tagValue as $nestedKey => $nestedValue) {
+                $normalizedNestedKey = trim((string)$nestedKey);
+                $normalizedNestedValue = trim((string)$nestedValue);
+                if ($normalizedNestedKey !== '' && $normalizedNestedValue !== '') {
+                    $nested[$normalizedNestedKey] = $normalizedNestedValue;
+                }
+            }
+            if (!empty($nested)) {
+                $normalized[$normalizedKey] = $nested;
+            }
+            continue;
+        }
+
+        $normalizedValue = trim((string)$tagValue);
+        if ($normalizedValue !== '') {
+            $normalized[$normalizedKey] = $normalizedValue;
+        }
+    }
+
+    return $normalized;
+}
+
 function cts_normalize_catalog_metadata($metadata): array
 {
     if (!is_array($metadata)) {
@@ -842,11 +897,14 @@ function cts_normalize_trial_shape($trial): array
     $availableInstitutions = cts_normalize_list_field($trial['availableInstitutions'] ?? []);
     $cancerTypes = cts_normalize_list_field($trial['cancerTypes'] ?? []);
     $diseaseSettingAll = cts_normalize_list_field($trial['diseaseSettingAll'] ?? []);
+    $diseaseSettingAllIds = cts_normalize_list_field($trial['diseaseSettingAllIds'] ?? []);
     $conditions = cts_normalize_list_field($trial['conditions'] ?? []);
     $interventions = cts_normalize_list_field($trial['interventions'] ?? []);
     $primaryOutcomes = cts_normalize_list_field($trial['primaryOutcomes'] ?? []);
     $secondaryOutcomes = cts_normalize_list_field($trial['secondaryOutcomes'] ?? []);
     $classificationEvidence = cts_normalize_list_field($trial['classificationEvidence'] ?? []);
+    $clinicalAxes = cts_normalize_clinical_axes_field($trial['clinicalAxes'] ?? []);
+    $sourceTags = cts_normalize_source_tags_field($trial['sourceTags'] ?? []);
 
     if (empty($availableInstitutions) && !empty($sites)) {
         foreach ($sites as $site) {
@@ -913,11 +971,15 @@ function cts_normalize_trial_shape($trial): array
         'eligibilityCriteria' => cts_normalize_list_field($trial['eligibilityCriteria'] ?? []),
         'lastUpdated' => trim((string)($trial['lastUpdated'] ?? '')),
         'diseaseSettingPrimary' => trim((string)($trial['diseaseSettingPrimary'] ?? '')),
+        'diseaseSettingPrimaryId' => trim((string)($trial['diseaseSettingPrimaryId'] ?? '')),
         'diseaseSettingAll' => $diseaseSettingAll,
+        'diseaseSettingAllIds' => $diseaseSettingAllIds,
         'classificationConfidence' => trim((string)($trial['classificationConfidence'] ?? '')),
         'classificationEvidence' => $classificationEvidence,
         'treatmentModality' => trim((string)($trial['treatmentModality'] ?? '')),
         'delivery' => trim((string)($trial['delivery'] ?? '')),
+        'clinicalAxes' => $clinicalAxes,
+        'sourceTags' => $sourceTags,
         'nccnTaxonomyVersion' => trim((string)($trial['nccnTaxonomyVersion'] ?? '')),
         'ctGovUrl' => trim((string)($trial['ctGovUrl'] ?? '')),
         'conditions' => $conditions,

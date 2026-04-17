@@ -38,7 +38,7 @@ CANCER_TYPE_DEFS = [
 
 
 def _classify_records(study_records: list[dict], site_rows: list[dict]) -> None:
-    classifications: dict[str, dict[str, str]] = {}
+    classifications: dict[str, dict[str, object]] = {}
 
     for record in study_records:
         cancer_types = record.get("Cancer type", "")
@@ -54,11 +54,40 @@ def _classify_records(study_records: list[dict], site_rows: list[dict]) -> None:
         )
 
         record["Disease setting (primary)"] = classification.disease_setting_primary
+        record["Disease setting ID (primary)"] = classification.disease_setting_primary_id
         record["Disease setting (all)"] = classification.disease_setting_all
+        record["Disease setting IDs (all)"] = " | ".join(classification.disease_setting_ids)
         record["Classification confidence"] = classification.classification_confidence
+        record["Classification evidence"] = " | ".join(classification.classification_evidence)
         record["BCG status"] = classification.bcg_status
         record["Cisplatin status"] = classification.cisplatin_status
+        record["Castration status"] = classification.castration_status
+        record["Metastatic status"] = classification.metastatic_status
+        record["Disease volume"] = classification.disease_volume
+        record["Prior ARPI"] = classification.prior_arpi
+        record["Prior docetaxel"] = classification.prior_docetaxel
+        record["HRR biomarker"] = classification.biomarker_hrr
+        record["PSMA status"] = classification.psma_status
+        record["Genomic classifier"] = classification.genomic_classifier
+        record["Histology"] = classification.histology
+        record["IMDC risk"] = classification.imdc_risk
+        record["Prior systemic lines"] = classification.prior_systemic_lines
+        record["Prior IO"] = classification.prior_io
+        record["Prior VEGF/TKI"] = classification.prior_vegf_tki
+        record["Nephrectomy status"] = classification.nephrectomy_status
+        record["VHL status"] = classification.vhl_status
+        record["MET alteration"] = classification.met_alteration
+        record["Sarcomatoid"] = classification.sarcomatoid
+        record["Clinical stage"] = classification.clinical_stage
+        record["IGCCCG risk"] = classification.igcccg_risk
+        record["Primary site"] = classification.primary_site
+        record["Prior chemo lines"] = classification.prior_chemo_lines
+        record["Prior HDCT"] = classification.prior_hdct
+        record["RPLND status"] = classification.rplnd_status
+        record["Marker status"] = classification.marker_status
+        record["Stage I risk factors"] = classification.stage1_risk_factors
         record["Treatment modality"] = classification.treatment_modality_str
+        record["Treatment modalities"] = " | ".join(classification.treatment_modalities)
         record["Is combination"] = classification.is_combination
         record["Delivery"] = classification.delivery
         record["NCCN taxonomy version"] = (

@@ -79,6 +79,20 @@
                     <p id="trialDescription" style="font-size: 1.125rem; line-height: 1.6; color: var(--text-secondary); margin: 0;"></p>
                 </section>
 
+                <section id="patientMatchSection" style="display: none; background: linear-gradient(135deg, #f8fafc 0%, #eef6ff 100%); border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 1.5rem; margin-bottom: 2rem; box-shadow: var(--shadow-sm);">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.85rem;">
+                        <div>
+                            <h2 style="font-size: 1.15rem; margin: 0;">Patient Match Summary</h2>
+                            <p style="margin: 0.3rem 0 0; color: var(--text-secondary); line-height: 1.5;">Computed from the last patient search run on this browser.</p>
+                        </div>
+                        <div id="patientMatchBadge"></div>
+                    </div>
+                    <div id="patientMatchChips" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;"></div>
+                    <div id="patientMatchReason" style="color: var(--text-primary); line-height: 1.6; margin-bottom: 1rem;"></div>
+                    <div id="patientMatchFlags"></div>
+                    <p id="patientMatchAiNote" style="display: none; margin-top: 1rem; color: var(--text-secondary); line-height: 1.5;">AI-extracted eligibility signals should always be verified directly with the trial team before referral.</p>
+                </section>
+
                 <!-- Main Content Grid -->
                 <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; align-items: start;">
                     <!-- Left Column - Main Information -->
@@ -119,6 +133,21 @@
                                     <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.025em; margin-bottom: 0.25rem;">NCCN Taxonomy</div>
                                     <div id="nccnTaxonomyVersion" style="font-weight: 500; color: var(--text-primary);"></div>
                                 </div>
+                            </div>
+
+                            <div id="sourceTagsSection" style="margin-bottom: 1.5rem;">
+                                <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.6rem; color: var(--text-primary);">Source Tags</h3>
+                                <div id="sourceTagsList" style="display: flex; flex-wrap: wrap; gap: 0.5rem;"></div>
+                            </div>
+
+                            <div id="classificationEvidenceSection" style="display: none; margin-bottom: 1.5rem;">
+                                <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.6rem; color: var(--text-primary);">Classification Evidence</h3>
+                                <ul id="classificationEvidenceList" style="margin: 0; padding-left: 1.25rem; color: var(--text-secondary); line-height: 1.6;"></ul>
+                            </div>
+
+                            <div id="clinicalAxesSection" style="display: none; margin-bottom: 1.5rem;">
+                                <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.6rem; color: var(--text-primary);">Clinical Axes</h3>
+                                <div id="clinicalAxesGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem;"></div>
                             </div>
                             
                             <div style="margin-bottom: 1.5rem;">
@@ -256,12 +285,15 @@
 
     <script src="js/utils.js"></script>
     <script src="js/trial-manager-php.js"></script>
+    <script src="js/patient-query-parser.js"></script>
+    <script src="js/patient-trial-matcher.js"></script>
     <script>
         // Trial Detail Page specific functionality
         class TrialDetailPage {
             constructor() {
                 this.trialManager = new TrialManager();
                 this.currentTrial = null;
+                this.patientQueryState = null;
             }
 
             async init() {
@@ -285,6 +317,8 @@
                         this.showError('Trial not found');
                         return;
                     }
+
+                    this.patientQueryState = this.getActivePatientQuery();
 
                     // Display trial details
                     this.displayTrial();
@@ -347,6 +381,10 @@
                 document.getElementById('nccnTaxonomyVersion').textContent = trial.nccnTaxonomyVersion || 'Not specified';
                 document.getElementById('primaryObjective').textContent = primaryOutcome;
                 this.displaySecondaryObjectives(secondaryItems);
+                this.displaySourceTags(trial);
+                this.displayClassificationEvidence(trial);
+                this.displayClinicalAxes(trial);
+                this.displayPatientMatchIfActive(trial);
 
                 // Timeline
                 document.getElementById('startDate').textContent = Utils.formatDate(trial.startDate);
@@ -366,7 +404,7 @@
                 document.getElementById('piName').textContent = primaryPiName;
 
                 // Institution information
-                document.getElementById('hospitalName').textContent = primarySite.institution || trial.location.hospital || 'Not specified';
+                document.getElementById('hospitalName').textContent = primarySite.institution || trial.location?.hospital || 'Not specified';
                 document.getElementById('institutionMeta').textContent = [primarySite.city, primarySite.state].filter(Boolean).join(', ') || 'Southern California site';
                 this.displaySites(trial.sites || []);
 
@@ -384,6 +422,286 @@
                     ctGovLink.href = '#';
                     ctGovLink.textContent = 'Not available';
                 }
+            }
+
+            getActivePatientQuery() {
+                const urlParams = Utils.getUrlParams();
+                if (urlParams.get('patientSearch') !== '1') {
+                    return null;
+                }
+
+                const rawQuery = window.localStorage.getItem('cts_patient_query');
+                if (!rawQuery) {
+                    return null;
+                }
+
+                const parsedQuery = window.PatientQueryParser?.parse(rawQuery);
+                if (!parsedQuery?.supported) {
+                    return null;
+                }
+
+                return { rawQuery, parsedQuery };
+            }
+
+            formatAxisLabel(key) {
+                const labels = {
+                    bcgStatus: 'BCG status',
+                    biomarkerHrr: 'BRCA / HRR biomarker',
+                    castrationStatus: 'Castration status',
+                    cisplatinStatus: 'Cisplatin status',
+                    clinicalStage: 'Clinical stage',
+                    diseaseVolume: 'Disease volume',
+                    genomicClassifier: 'Genomic classifier',
+                    histology: 'Histology',
+                    igcccgRisk: 'IGCCCG risk',
+                    imdcRisk: 'IMDC risk',
+                    markerStatus: 'Tumor marker status',
+                    metAlteration: 'MET alteration',
+                    metastaticStatus: 'Metastatic status',
+                    nephrectomyStatus: 'Nephrectomy status',
+                    priorArpi: 'Prior ARPI',
+                    priorChemoLines: 'Prior chemotherapy lines',
+                    priorDocetaxel: 'Prior docetaxel',
+                    priorHdct: 'Prior HDCT',
+                    priorIo: 'Prior IO',
+                    priorSystemicLines: 'Prior systemic lines',
+                    priorVegfTki: 'Prior VEGF / TKI',
+                    primarySite: 'Primary site',
+                    psmaStatus: 'PSMA status',
+                    rplndStatus: 'RPLND status',
+                    sarcomatoid: 'Sarcomatoid',
+                    stage1RiskFactors: 'Stage I risk factors',
+                    vhlStatus: 'VHL status'
+                };
+
+                if (labels[key]) {
+                    return labels[key];
+                }
+
+                return key
+                    .replace(/([a-z])([A-Z])/g, '$1 $2')
+                    .replace(/_/g, ' ')
+                    .replace(/\b\w/g, char => char.toUpperCase());
+            }
+
+            formatAxisValue(value) {
+                const labels = {
+                    ai_pathology_required: 'AI pathology required',
+                    available: 'Available',
+                    castration_resistant: 'Castration-resistant',
+                    castration_sensitive: 'Castration-sensitive',
+                    classifier_required: 'Classifier required',
+                    expression_test_required: 'Expression test required',
+                    high_volume: 'High-volume',
+                    localized: 'Localized',
+                    low_volume: 'Low-volume',
+                    metastatic: 'Metastatic',
+                    negative: 'Negative',
+                    no: 'No',
+                    nonmetastatic_crpc: 'Non-metastatic CRPC',
+                    not_required: 'Not required',
+                    oligometastatic: 'Oligometastatic',
+                    positive: 'Positive',
+                    regional_n1: 'Regional N1',
+                    required: 'Required',
+                    unknown: 'Unknown',
+                    yes: 'Yes'
+                };
+
+                const normalized = (value || '').toString().trim();
+                if (!normalized) {
+                    return 'Not specified';
+                }
+
+                if (labels[normalized]) {
+                    return labels[normalized];
+                }
+
+                return normalized
+                    .replace(/_/g, ' ')
+                    .replace(/\b\w/g, char => char.toUpperCase());
+            }
+
+            formatSourceLabel(key, nestedKey = '') {
+                if (key === 'clinicalAxes' && nestedKey) {
+                    return `Clinical axis · ${this.formatAxisLabel(nestedKey)}`;
+                }
+
+                const labels = {
+                    classificationConfidence: 'Classification confidence',
+                    classificationEvidence: 'Classification evidence',
+                    contactEmail: 'Contact email',
+                    description: 'Description',
+                    diseaseSettingAll: 'Disease setting list',
+                    diseaseSettingPrimary: 'Disease setting',
+                    eligibilityCriteria: 'Eligibility criteria',
+                    phase: 'Phase',
+                    piName: 'PI name',
+                    sites: 'Sites',
+                    sponsor: 'Sponsor',
+                    status: 'Status',
+                    title: 'Title',
+                    treatmentModality: 'Treatment modality'
+                };
+
+                return labels[key] || this.formatAxisLabel(key);
+            }
+
+            displayPatientMatchIfActive(trial) {
+                const section = document.getElementById('patientMatchSection');
+                const badge = document.getElementById('patientMatchBadge');
+                const chips = document.getElementById('patientMatchChips');
+                const reason = document.getElementById('patientMatchReason');
+                const flags = document.getElementById('patientMatchFlags');
+                const aiNote = document.getElementById('patientMatchAiNote');
+                const patientQueryState = this.patientQueryState || this.getActivePatientQuery();
+
+                if (!section || !badge || !chips || !reason || !flags || !aiNote || !patientQueryState) {
+                    if (section) {
+                        section.style.display = 'none';
+                    }
+                    return;
+                }
+
+                const match = window.PatientTrialMatcher?.matchSingleTrial(trial, patientQueryState.parsedQuery);
+                section.style.display = 'block';
+                chips.innerHTML = '';
+                flags.innerHTML = '';
+
+                (patientQueryState.parsedQuery.chips || []).forEach(chip => {
+                    const element = document.createElement('span');
+                    element.style.cssText = 'display:inline-flex;align-items:center;gap:0.35rem;padding:0.3rem 0.7rem;border-radius:999px;background:#ffffff;border:1px solid var(--border-color);font-size:0.8rem;color:var(--text-secondary);';
+                    element.innerHTML = `<strong style="color: var(--text-primary);">${Utils.sanitizeHTML(chip.group)}:</strong> <span>${Utils.sanitizeHTML(chip.label)}</span>`;
+                    chips.appendChild(element);
+                });
+
+                if (!match?.included) {
+                    badge.innerHTML = '<div style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.35rem 0.85rem;border-radius:999px;background:#e2e8f0;color:#334155;font-size:0.8rem;font-weight:700;">Not matched</div>';
+                    reason.innerHTML = `<strong>Reason:</strong> ${Utils.sanitizeHTML(match?.excludedReason || 'This trial no longer matches the active patient query.')}`;
+                    aiNote.style.display = 'none';
+                    return;
+                }
+
+                const badgeColor = match.badgeTone === 'strong'
+                    ? { background: '#dcfce7', color: '#166534' }
+                    : { background: '#fef3c7', color: '#92400e' };
+                badge.innerHTML = `<div style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.35rem 0.85rem;border-radius:999px;background:${badgeColor.background};color:${badgeColor.color};font-size:0.8rem;font-weight:700;">${Utils.sanitizeHTML(match.badge)}</div>`;
+                reason.innerHTML = `<strong>Reason:</strong> ${Utils.sanitizeHTML(match.reasonText)}`;
+
+                (match.flags || []).forEach(flag => {
+                    const block = document.createElement('div');
+                    block.style.cssText = 'padding: 0.75rem 0.9rem; border: 1px solid #fde68a; background: #fffbeb; border-radius: 12px; margin-top: 0.55rem;';
+                    block.innerHTML = `
+                        <div style="font-size: 0.82rem; font-weight: 700; color: #92400e; margin-bottom: 0.25rem;">${Utils.sanitizeHTML(flag.title)}</div>
+                        <div style="font-size: 0.9rem; color: #78350f; line-height: 1.5;">${Utils.sanitizeHTML(flag.message)}</div>
+                    `;
+                    flags.appendChild(block);
+                });
+
+                const sourceSummary = Array.isArray(match.sourceTagSummary) ? match.sourceTagSummary : [];
+                const hasAiExtracted = sourceSummary.includes('AI-extracted') || match.aiExtractedReview;
+                aiNote.style.display = hasAiExtracted ? 'block' : 'none';
+            }
+
+            displaySourceTags(trial) {
+                const section = document.getElementById('sourceTagsSection');
+                const list = document.getElementById('sourceTagsList');
+                if (!section || !list) {
+                    return;
+                }
+
+                Utils.clearElement(list);
+                const tags = (trial.sourceTags && typeof trial.sourceTags === 'object' && !Array.isArray(trial.sourceTags))
+                    ? trial.sourceTags
+                    : {};
+                const entries = [];
+
+                Object.entries(tags).forEach(([key, value]) => {
+                    if (value && typeof value === 'object' && !Array.isArray(value)) {
+                        Object.entries(value).forEach(([nestedKey, nestedValue]) => {
+                            if (nestedValue) {
+                                entries.push({
+                                    label: this.formatSourceLabel(key, nestedKey),
+                                    source: nestedValue
+                                });
+                            }
+                        });
+                        return;
+                    }
+
+                    if (value) {
+                        entries.push({
+                            label: this.formatSourceLabel(key),
+                            source: value
+                        });
+                    }
+                });
+
+                if (entries.length === 0) {
+                    section.style.display = 'none';
+                    return;
+                }
+
+                section.style.display = 'block';
+                entries.forEach(entry => {
+                    const chip = document.createElement('span');
+                    chip.style.cssText = 'display:inline-flex;align-items:center;gap:0.35rem;padding:0.35rem 0.7rem;border-radius:999px;border:1px solid var(--border-color);background:#f8fafc;font-size:0.78rem;color:var(--text-secondary);';
+                    chip.innerHTML = `<strong style="color: var(--text-primary);">${Utils.sanitizeHTML(entry.label)}</strong><span>${Utils.sanitizeHTML(entry.source)}</span>`;
+                    list.appendChild(chip);
+                });
+            }
+
+            displayClassificationEvidence(trial) {
+                const section = document.getElementById('classificationEvidenceSection');
+                const list = document.getElementById('classificationEvidenceList');
+                if (!section || !list) {
+                    return;
+                }
+
+                Utils.clearElement(list);
+                const evidence = Array.isArray(trial.classificationEvidence) ? trial.classificationEvidence.filter(Boolean) : [];
+                if (evidence.length === 0) {
+                    section.style.display = 'none';
+                    return;
+                }
+
+                section.style.display = 'block';
+                evidence.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = item;
+                    li.style.marginBottom = '0.35rem';
+                    list.appendChild(li);
+                });
+            }
+
+            displayClinicalAxes(trial) {
+                const section = document.getElementById('clinicalAxesSection');
+                const grid = document.getElementById('clinicalAxesGrid');
+                if (!section || !grid) {
+                    return;
+                }
+
+                Utils.clearElement(grid);
+                const axes = (trial.clinicalAxes && typeof trial.clinicalAxes === 'object' && !Array.isArray(trial.clinicalAxes))
+                    ? trial.clinicalAxes
+                    : {};
+                const entries = Object.entries(axes).filter(([, value]) => value);
+
+                if (entries.length === 0) {
+                    section.style.display = 'none';
+                    return;
+                }
+
+                section.style.display = 'block';
+                entries.forEach(([key, value]) => {
+                    const card = document.createElement('div');
+                    card.style.cssText = 'padding: 0.9rem 1rem; border: 1px solid var(--border-color); border-radius: 14px; background: #f8fafc;';
+                    card.innerHTML = `
+                        <div style="font-size: 0.74rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 0.35rem;">${Utils.sanitizeHTML(this.formatAxisLabel(key))}</div>
+                        <div style="font-size: 0.98rem; color: var(--text-primary); font-weight: 600;">${Utils.sanitizeHTML(this.formatAxisValue(value))}</div>
+                    `;
+                    grid.appendChild(card);
+                });
             }
 
             displayEligibilityCriteria(trial) {
@@ -454,11 +772,20 @@
 
                 sites.forEach(site => {
                     const block = document.createElement('div');
-                    block.style.marginBottom = '0.75rem';
+                    block.style.cssText = 'margin-bottom: 0.9rem; padding-bottom: 0.9rem; border-bottom: 1px solid var(--border-color);';
+                    const emailMarkup = site.email
+                        ? `<a href="mailto:${Utils.sanitizeHTML(site.email)}" style="color: var(--primary-color); text-decoration: none;">${Utils.sanitizeHTML(site.email)}</a>`
+                        : 'Not listed';
+                    const phoneMarkup = site.phone
+                        ? Utils.sanitizeHTML(site.phone)
+                        : 'Not listed';
                     block.innerHTML = `
                         <div style="font-weight: 600; color: var(--text-primary);">${Utils.sanitizeHTML(site.institution || 'Unknown site')}</div>
                         <div>${Utils.sanitizeHTML([site.city, site.state].filter(Boolean).join(', ') || 'Location not specified')}</div>
                         <div>PI: ${Utils.sanitizeHTML(site.piName || 'Not specified')}</div>
+                        <div>Email: ${emailMarkup}</div>
+                        <div>Phone: ${phoneMarkup}</div>
+                        ${site.affiliation ? `<div>Affiliation: ${Utils.sanitizeHTML(site.affiliation)}</div>` : ''}
                     `;
                     container.appendChild(block);
                 });
