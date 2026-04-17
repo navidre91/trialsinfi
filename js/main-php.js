@@ -504,6 +504,7 @@ class ClinicalTrialsApp {
     const status = document.getElementById('patientSearchStatus');
     const chips = document.getElementById('patientQueryChips');
     const noResultsText = document.querySelector('#noResults p');
+    const shouldReturnToBrowse = this.activeView === 'patient-search';
 
     this.patientSearchState = {
       active: false,
@@ -528,13 +529,18 @@ class ClinicalTrialsApp {
       noResultsText.textContent = 'Try adjusting your search criteria or filters to find more results.';
     }
 
-    this.setCatalogLayoutForPatientSearch(false);
+    if (shouldReturnToBrowse) {
+      this.setActiveView('browse');
+      return;
+    }
+
     this.updateCatalogMeta();
     if (this.searchFilter) {
       this.searchFilter.applyFilters();
-    } else {
-      this.updateTrialsDisplay();
+      return;
     }
+
+    this.updateTrialsDisplay();
   }
 
   renderPatientQueryChips(parsedQuery) {
