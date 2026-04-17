@@ -504,7 +504,7 @@ class ClinicalTrialsApp {
     const status = document.getElementById('patientSearchStatus');
     const chips = document.getElementById('patientQueryChips');
     const noResultsText = document.querySelector('#noResults p');
-    const shouldReturnToBrowse = this.activeView === 'patient-search';
+    const isPatientSearchView = this.activeView === 'patient-search';
 
     this.patientSearchState = {
       active: false,
@@ -519,7 +519,9 @@ class ClinicalTrialsApp {
       input.value = '';
     }
     if (status) {
-      status.textContent = '';
+      status.textContent = isPatientSearchView
+        ? 'Enter a patient description to run protocol-style matching.'
+        : '';
     }
     if (chips) {
       chips.innerHTML = '';
@@ -529,8 +531,10 @@ class ClinicalTrialsApp {
       noResultsText.textContent = 'Try adjusting your search criteria or filters to find more results.';
     }
 
-    if (shouldReturnToBrowse) {
-      this.setActiveView('browse');
+    if (isPatientSearchView) {
+      this.updateViewUI({ updateUrl: false });
+      this.updateCatalogMeta();
+      this.updateTrialsDisplay();
       return;
     }
 
