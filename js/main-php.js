@@ -289,7 +289,7 @@ class ClinicalTrialsApp {
     });
 
     input.addEventListener('keydown', (event) => {
-      if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+      if (event.key === 'Enter' && !event.shiftKey) {
         event.preventDefault();
         this.runPatientSearch(input.value);
       }
@@ -316,6 +316,23 @@ class ClinicalTrialsApp {
       this.clearPatientSearch();
       if (status) {
         status.textContent = 'Enter a patient description to run protocol-style matching.';
+      }
+      return false;
+    }
+
+    if (!window.PatientQueryParser || !window.PatientTrialMatcher) {
+      this.patientSearchState = {
+        active: false,
+        rawQuery: query,
+        parsedQuery: null,
+        matches: null
+      };
+      this.setCatalogLayoutForPatientSearch(false);
+      if (status) {
+        status.textContent = 'Patient search scripts did not load. Hard refresh the page or re-deploy the updated js files.';
+      }
+      if (options.persist !== false) {
+        window.localStorage.removeItem('cts_patient_query');
       }
       return false;
     }
