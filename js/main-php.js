@@ -666,20 +666,25 @@ class ClinicalTrialsApp {
       noResultsText.textContent = 'Try adjusting your search criteria or filters to find more results.';
     }
 
-    trialsContainer.appendChild(this.renderPatientSearchGroup(
-      'Strong Matches',
-      strongMatches,
-      '#166534',
-      '#dcfce7',
-      'No strong matches for the current query.'
-    ));
-    trialsContainer.appendChild(this.renderPatientSearchGroup(
-      'Possible Matches',
-      possibleMatches,
-      '#92400e',
-      '#fef3c7',
-      'No possible matches for the current query.'
-    ));
+    if (strongMatches.length > 0) {
+      trialsContainer.appendChild(this.renderPatientSearchGroup(
+        'Strong Matches',
+        strongMatches,
+        '#166534',
+        '#dcfce7',
+        'No strong matches for the current query.'
+      ));
+    }
+
+    if (possibleMatches.length > 0) {
+      trialsContainer.appendChild(this.renderPatientSearchGroup(
+        'Possible Matches',
+        possibleMatches,
+        '#92400e',
+        '#fef3c7',
+        'No possible matches for the current query.'
+      ));
+    }
   }
 
   renderPatientSearchGroup(title, entries, accentColor, backgroundColor, emptyState) {
