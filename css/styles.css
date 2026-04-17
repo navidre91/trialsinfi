@@ -142,43 +142,6 @@ textarea {
   margin: 0 auto;
 }
 
-.view-switcher {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-  margin-bottom: 1.5rem;
-}
-
-.view-switcher-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 10rem;
-  padding: 0.85rem 1.25rem;
-  border-radius: 999px;
-  border: 1px solid var(--border-color);
-  background: var(--card-background);
-  color: var(--text-secondary);
-  text-decoration: none;
-  font-weight: 600;
-  box-shadow: var(--shadow-sm);
-  transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
-}
-
-.view-switcher-link:hover {
-  color: var(--primary-color);
-  border-color: #bfdbfe;
-  transform: translateY(-1px);
-}
-
-.view-switcher-link.active {
-  color: #ffffff;
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
-  border-color: transparent;
-}
-
 .patient-search-panel {
   margin-bottom: 1.5rem;
 }
@@ -1199,14 +1162,6 @@ textarea {
 
   .hero-description {
     font-size: 1rem;
-  }
-
-  .view-switcher {
-    justify-content: stretch;
-  }
-
-  .view-switcher-link {
-    flex: 1 1 12rem;
   }
 
   .content-layout {
