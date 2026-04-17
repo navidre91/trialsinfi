@@ -22,7 +22,8 @@
                 </h1>
                 <nav class="nav">
                     <ul class="nav-list">
-                        <li><a href="index-php.html" class="nav-link active">Browse Trials</a></li>
+                        <li><a href="index-php.html" class="nav-link active" data-app-view-target="browse">Browse Trials</a></li>
+                        <li><a href="index-php.html?view=patient-search" class="nav-link" data-app-view-target="patient-search">Patient Search</a></li>
                         <li><a href="about-php.html" class="nav-link">About</a></li>
                         <li><a href="physician-community-php.html" class="nav-link">Physician Community</a></li>
                         <li><a href="admin-login-php.html" class="nav-link">Admin Login</a></li>
@@ -44,7 +45,12 @@
                 </div>
             </section>
 
-            <section style="background: linear-gradient(135deg, #f8fafc 0%, #eef6ff 100%); border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 1.5rem; margin-bottom: 1.5rem;">
+            <section class="view-switcher" aria-label="Clinical trial views">
+                <a href="index-php.html" class="view-switcher-link active" data-app-view-target="browse">Browse Trials</a>
+                <a href="index-php.html?view=patient-search" class="view-switcher-link" data-app-view-target="patient-search">Patient Search</a>
+            </section>
+
+            <section id="patientSearchPanel" class="patient-search-panel" style="background: linear-gradient(135deg, #f8fafc 0%, #eef6ff 100%); border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 1.5rem; margin-bottom: 1.5rem;" hidden>
                 <div style="display: flex; justify-content: space-between; gap: 1rem; align-items: flex-start; flex-wrap: wrap; margin-bottom: 0.75rem;">
                     <div>
                         <h3 style="margin: 0 0 0.25rem; font-size: 1.25rem;">Patient Search</h3>
@@ -68,7 +74,7 @@
                 <div id="patientQueryChips" style="display: none; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;"></div>
             </section>
 
-            <section class="search-section">
+            <section id="browseSearchSection" class="search-section">
                 <div class="search-container">
                     <div class="search-bar">
                         <input 

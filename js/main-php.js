@@ -7,6 +7,7 @@ class ClinicalTrialsApp {
     this.searchFilter = null;
     this.currentPage = 'index';
     this.isLoading = false;
+    this.activeView = 'browse';
     this.patientSearchState = {
       active: false,
       rawQuery: '',
@@ -28,6 +29,7 @@ class ClinicalTrialsApp {
       // Initialize search and filter functionality
       this.searchFilter = new SearchFilter(this.trialManager);
       this.searchFilter.init();
+      this.activeView = this.getInitialView();
 
       // Make app instance available globally before additional UI bindings
       window.currentPage = this;
@@ -37,12 +39,14 @@ class ClinicalTrialsApp {
 
       // Setup patient-search workflow on top of the loaded catalog
       this.setupPatientSearch();
+      this.setupViewTabs();
+      this.updateViewUI({ updateUrl: false });
       this.updateCatalogMeta();
 
-      const restoredPatientSearch = this.restorePatientSearch();
+      this.restorePatientSearch();
 
       // Apply initial filters (from URL if any) when patient search is not active
-      if (!restoredPatientSearch) {
+      if (this.activeView !== 'patient-search') {
         this.searchFilter.applyFilters();
       }
 
@@ -89,8 +93,8 @@ class ClinicalTrialsApp {
     
     if (!trialsContainer) return;
 
-    if (this.patientSearchState.active) {
-      this.renderPatientSearchResults(trialsContainer, noResults);
+    if (this.activeView === 'patient-search') {
+      this.renderPatientSearchView(trialsContainer, noResults);
       this.updateResultsCount();
       this.updatePagination();
       this.isLoading = false;
@@ -271,6 +275,93 @@ class ClinicalTrialsApp {
     return `trial-detail-php.html?${params.toString()}`;
   }
 
+  getInitialView() {
+    const url = new URL(window.location.href);
+    return url.searchParams.get('view') === 'patient-search' ? 'patient-search' : 'browse';
+  }
+
+  setupViewTabs() {
+    const tabLinks = document.querySelectorAll('[data-app-view-target]');
+    if (!tabLinks.length) {
+      return;
+    }
+
+    tabLinks.forEach(link => {
+      link.addEventListener('click', (event) => {
+        const view = link.getAttribute('data-app-view-target');
+        if (!view) {
+          return;
+        }
+        event.preventDefault();
+        this.setActiveView(view);
+      });
+    });
+  }
+
+  setActiveView(view, options = {}) {
+    const normalizedView = view === 'patient-search' ? 'patient-search' : 'browse';
+    const viewChanged = this.activeView !== normalizedView;
+    this.activeView = normalizedView;
+    this.updateViewUI({ updateUrl: options.updateUrl !== false });
+    this.updateCatalogMeta();
+
+    if (this.activeView === 'browse' && this.searchFilter) {
+      this.searchFilter.applyFilters();
+    } else {
+      this.updateTrialsDisplay();
+    }
+
+    if (options.scroll === false) {
+      return;
+    }
+
+    const scrollTarget = this.activeView === 'patient-search' ? '#patientSearchPanel' : '#browseSearchSection';
+    Utils.scrollToElement(scrollTarget);
+
+    if (!viewChanged) {
+      return;
+    }
+
+    const focusTarget = this.activeView === 'patient-search'
+      ? document.getElementById('patientQueryInput')
+      : document.getElementById('searchInput');
+    focusTarget?.focus();
+  }
+
+  updateViewUI(options = {}) {
+    const updateUrl = options.updateUrl !== false;
+    const isPatientView = this.activeView === 'patient-search';
+    this.syncViewTabs();
+    this.setCatalogLayoutForPatientSearch(isPatientView);
+    if (updateUrl) {
+      this.updateViewUrl();
+    }
+  }
+
+  syncViewTabs() {
+    const tabLinks = document.querySelectorAll('[data-app-view-target]');
+    tabLinks.forEach(link => {
+      const targetView = link.getAttribute('data-app-view-target');
+      const isActive = targetView === this.activeView;
+      link.classList.toggle('active', isActive);
+      if (isActive) {
+        link.setAttribute('aria-current', 'page');
+      } else {
+        link.removeAttribute('aria-current');
+      }
+    });
+  }
+
+  updateViewUrl() {
+    const url = new URL(window.location.href);
+    if (this.activeView === 'patient-search') {
+      url.searchParams.set('view', 'patient-search');
+    } else {
+      url.searchParams.delete('view');
+    }
+    window.history.replaceState(null, '', url);
+  }
+
   setupPatientSearch() {
     const input = document.getElementById('patientQueryInput');
     const runButton = document.getElementById('runPatientSearch');
@@ -304,7 +395,11 @@ class ClinicalTrialsApp {
     }
 
     input.value = storedQuery;
-    return this.runPatientSearch(storedQuery, { persist: false, silentUnsupported: true });
+    return this.runPatientSearch(storedQuery, {
+      persist: false,
+      silentUnsupported: true,
+      activateView: this.activeView === 'patient-search'
+    });
   }
 
   runPatientSearch(rawQuery, options = {}) {
@@ -327,7 +422,9 @@ class ClinicalTrialsApp {
         parsedQuery: null,
         matches: null
       };
-      this.setCatalogLayoutForPatientSearch(false);
+      this.updateViewUI({ updateUrl: false });
+      this.updateCatalogMeta();
+      this.updateTrialsDisplay();
       if (status) {
         status.textContent = 'Patient search scripts did not load. Hard refresh the page or re-deploy the updated js files.';
       }
@@ -346,7 +443,7 @@ class ClinicalTrialsApp {
         matches: null
       };
       this.renderPatientQueryChips(parsedQuery);
-      this.setCatalogLayoutForPatientSearch(false);
+      this.updateViewUI({ updateUrl: false });
       if (status && !options.silentUnsupported) {
         status.textContent = parsedQuery?.unsupportedReason || 'This matching mode currently supports prostate queries only.';
       }
@@ -356,7 +453,12 @@ class ClinicalTrialsApp {
       if (options.persist !== false) {
         window.localStorage.removeItem('cts_patient_query');
       }
-      this.searchFilter.applyFilters();
+      this.updateCatalogMeta();
+      if (this.activeView === 'browse') {
+        this.searchFilter.applyFilters();
+      } else {
+        this.updateTrialsDisplay();
+      }
       return false;
     }
 
@@ -376,6 +478,11 @@ class ClinicalTrialsApp {
       matches
     };
 
+    if (this.activeView !== 'patient-search' && options.activateView !== false) {
+      this.activeView = 'patient-search';
+      this.updateViewUI();
+    }
+
     if (options.persist !== false) {
       window.localStorage.setItem('cts_patient_query', query);
     }
@@ -385,7 +492,6 @@ class ClinicalTrialsApp {
     }
 
     this.renderPatientQueryChips(parsedQuery);
-    this.setCatalogLayoutForPatientSearch(true);
     this.updateCatalogMeta();
     this.updateTrialsDisplay();
     Utils.scrollToElement('.results-header');
@@ -453,19 +559,64 @@ class ClinicalTrialsApp {
   }
 
   setCatalogLayoutForPatientSearch(active) {
+    const patientPanel = document.getElementById('patientSearchPanel');
+    const browseSearchSection = document.getElementById('browseSearchSection');
     const sidebar = document.querySelector('.filters-sidebar');
     const layout = document.querySelector('.content-layout');
     const sortControls = document.querySelector('.sort-controls');
 
+    if (patientPanel) {
+      patientPanel.hidden = !active;
+    }
+    if (browseSearchSection) {
+      browseSearchSection.hidden = active;
+    }
     if (sidebar) {
-      sidebar.style.display = active ? 'none' : '';
+      sidebar.hidden = active;
     }
     if (layout) {
       layout.style.gridTemplateColumns = active ? '1fr' : '';
     }
     if (sortControls) {
-      sortControls.style.display = active ? 'none' : '';
+      sortControls.hidden = active;
     }
+  }
+
+  renderPatientSearchView(trialsContainer, noResults) {
+    if (this.patientSearchState.active) {
+      this.renderPatientSearchResults(trialsContainer, noResults);
+      return;
+    }
+
+    this.renderPatientSearchLandingState(trialsContainer, noResults);
+  }
+
+  renderPatientSearchLandingState(trialsContainer, noResults) {
+    const noResultsTitle = document.querySelector('#noResults h3');
+    const noResultsText = document.querySelector('#noResults p');
+
+    Utils.clearElement(trialsContainer);
+    this.hidePagination();
+    trialsContainer.style.display = 'block';
+
+    if (noResults) {
+      noResults.style.display = 'none';
+    }
+    if (noResultsTitle) {
+      noResultsTitle.textContent = 'No trials found';
+    }
+    if (noResultsText) {
+      noResultsText.textContent = 'Try adjusting your search criteria or filters to find more results.';
+    }
+
+    const emptyState = Utils.createElementFromHTML(`
+      <section class="patient-search-empty">
+        <h3>Patient search is separate from the catalog now</h3>
+        <p>Describe a prostate patient in plain language to generate protocol-style strong and possible matches. The browse tab still shows the full trial catalog with normal filters.</p>
+        <div class="patient-search-empty-note">Prostate only for this MVP</div>
+      </section>
+    `);
+    trialsContainer.appendChild(emptyState);
   }
 
   renderPatientSearchResults(trialsContainer, noResults) {
@@ -561,7 +712,7 @@ class ClinicalTrialsApp {
     const totalTrials = Number(metadata.trialCount || this.trialManager.getAllTrials().length || 0);
     const syncDate = Utils.formatDate(metadata.lastSyncAt || '');
     const institutionCount = Number(metadata.institutionCount || 0);
-    const scopeText = this.patientSearchState.active
+    const scopeText = this.activeView === 'patient-search'
       ? 'Patient search view'
       : 'Catalog view';
 
@@ -575,7 +726,12 @@ class ClinicalTrialsApp {
     const resultsCount = document.getElementById('resultsCount');
     if (!resultsCount) return;
 
-    if (this.patientSearchState.active) {
+    if (this.activeView === 'patient-search') {
+      if (!this.patientSearchState.active) {
+        resultsCount.textContent = 'Patient search ready';
+        return;
+      }
+
       const strongCount = this.patientSearchState.matches?.strongMatches?.length || 0;
       const possibleCount = this.patientSearchState.matches?.possibleMatches?.length || 0;
       const totalCount = strongCount + possibleCount;
@@ -612,7 +768,7 @@ class ClinicalTrialsApp {
    * Setup pagination controls
    */
   setupPagination() {
-    if (this.patientSearchState.active) {
+    if (this.activeView === 'patient-search') {
       this.hidePagination();
       return;
     }
@@ -746,9 +902,10 @@ class ClinicalTrialsApp {
           
         case '/':
           e.preventDefault();
-          const searchInput = document.getElementById('searchInput');
-          if (searchInput) {
-            searchInput.focus();
+          if (this.activeView === 'patient-search') {
+            document.getElementById('patientQueryInput')?.focus();
+          } else {
+            document.getElementById('searchInput')?.focus();
           }
           break;
       }
