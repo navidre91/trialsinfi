@@ -103,6 +103,75 @@
     return normalized;
   }
 
+  function deriveLegacyDiseaseSettingIds(trial) {
+    const primaryLabel = normalizeWhitespace(trial.diseaseSettingPrimary);
+    const fallbackLabels = normalizeList(trial.diseaseSettingAll);
+    const haystack = (primaryLabel || fallbackLabels[0] || "").toLowerCase();
+    const ids = [];
+
+    if (!haystack) {
+      return ids;
+    }
+
+    if (/crpc/.test(haystack)) {
+      if (/non[- ]metastatic|nmcrpc/.test(haystack)) {
+        ids.push("crpc_nonmetastatic", "crpc_general");
+      } else if (/metastatic/.test(haystack)) {
+        if (/post[- ]arpi|2l\+/.test(haystack)) {
+          ids.push("crpc_metastatic_postARPI", "crpc_general");
+        } else if (/pre[- ]arpi|1l/.test(haystack)) {
+          ids.push("crpc_metastatic_preARPI", "crpc_general");
+        } else {
+          ids.push("crpc_metastatic_preARPI", "crpc_metastatic_postARPI", "crpc_general");
+        }
+      } else {
+        ids.push("crpc_general");
+      }
+    }
+
+    if (/mcspc|hormone[- ]sensitive/.test(haystack)) {
+      if (/oligometastatic|low-volume/.test(haystack)) {
+        ids.push("cspc_oligometastatic", "cspc_general");
+      } else if (/high-volume/.test(haystack)) {
+        ids.push("cspc_high_volume", "cspc_general");
+      } else {
+        ids.push("cspc_general");
+      }
+    }
+
+    if (/\bbcr\b|biochemical recurrence/.test(haystack)) {
+      if (/after rp|post[- ]rp|prostatectomy/.test(haystack)) {
+        ids.push("bcr_post_rp", "bcr_general");
+      } else if (/after rt|post[- ]rt|radiation/.test(haystack)) {
+        ids.push("bcr_post_rt", "bcr_general");
+      } else {
+        ids.push("bcr_general");
+      }
+    }
+
+    if (/unfavorable intermediate/.test(haystack)) {
+      ids.push("localized_unfavorable_ir", "localized_general");
+    }
+
+    if (/high\s*\/\s*very high risk|high[- ]risk|very high[- ]risk/.test(haystack)) {
+      ids.push("localized_high_very_high_risk", "localized_general");
+    }
+
+    if (/low\s*\/\s*favorable intermediate|favorable intermediate|low risk/.test(haystack)) {
+      ids.push("localized_low_favorable_ir", "localized_general");
+    }
+
+    if (/regional\s*\(n1\)|regional n1/.test(haystack)) {
+      ids.push("localized_regional_n1", "localized_general");
+    }
+
+    if (/localized/.test(haystack) && ids.length === 0) {
+      ids.push("localized_general");
+    }
+
+    return Array.from(new Set(ids));
+  }
+
   function uniqueSources(trial) {
     const tags = normalizeMap(trial.sourceTags);
     const flat = new Set();
@@ -173,10 +242,18 @@
   }
 
   function normalizeTrial(trial) {
+    const diseaseSettingAll = normalizeList(trial.diseaseSettingAll);
+    const diseaseSettingAllIds = normalizeList(trial.diseaseSettingAllIds);
+    const diseaseSettingPrimaryId = normalizeWhitespace(trial.diseaseSettingPrimaryId);
+    const derivedDiseaseSettingIds = diseaseSettingAllIds.length > 0 || diseaseSettingPrimaryId
+      ? []
+      : deriveLegacyDiseaseSettingIds({ ...trial, diseaseSettingAll });
+
     return {
       ...trial,
-      diseaseSettingAllIds: normalizeList(trial.diseaseSettingAllIds),
-      diseaseSettingAll: normalizeList(trial.diseaseSettingAll),
+      diseaseSettingPrimaryId: diseaseSettingPrimaryId || derivedDiseaseSettingIds[0] || "",
+      diseaseSettingAllIds: diseaseSettingAllIds.length > 0 ? diseaseSettingAllIds : derivedDiseaseSettingIds,
+      diseaseSettingAll,
       classificationEvidence: normalizeList(trial.classificationEvidence),
       availableInstitutions: normalizeList(trial.availableInstitutions),
       clinicalAxes: normalizeMap(trial.clinicalAxes),
