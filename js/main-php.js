@@ -445,7 +445,7 @@ class ClinicalTrialsApp {
       this.renderPatientQueryChips(parsedQuery);
       this.updateViewUI({ updateUrl: false });
       if (status && !options.silentUnsupported) {
-        status.textContent = parsedQuery?.unsupportedReason || 'This matching mode currently supports prostate queries only.';
+        status.textContent = parsedQuery?.unsupportedReason || 'Patient search currently supports prostate, bladder, kidney, and testicular queries.';
       }
       if (noResultsText) {
         noResultsText.textContent = 'Try adjusting your search criteria or filters to find more results.';
@@ -488,7 +488,8 @@ class ClinicalTrialsApp {
     }
 
     if (status) {
-      status.textContent = 'Protocol-style prostate matching is active. Catalog filters are hidden until you clear the patient search.';
+      const cancerLabel = parsedQuery?.cancerType ? `${parsedQuery.cancerType.toLowerCase()} matching` : 'patient matching';
+      status.textContent = `${cancerLabel.charAt(0).toUpperCase()}${cancerLabel.slice(1)} is active. Catalog filters are hidden until you clear the patient search.`;
     }
 
     this.renderPatientQueryChips(parsedQuery);
@@ -612,8 +613,8 @@ class ClinicalTrialsApp {
     const emptyState = Utils.createElementFromHTML(`
       <section class="patient-search-empty">
         <h3>Patient search is separate from the catalog now</h3>
-        <p>Describe a prostate patient in plain language to generate protocol-style strong and possible matches. The browse tab still shows the full trial catalog with normal filters.</p>
-        <div class="patient-search-empty-note">Prostate only for this MVP</div>
+        <p>Describe a prostate, bladder, kidney, or testicular patient in plain language to generate protocol-style strong and possible matches. The browse tab still shows the full trial catalog with normal filters.</p>
+        <div class="patient-search-empty-note">Deterministic multi-cancer matching</div>
       </section>
     `);
     trialsContainer.appendChild(emptyState);
@@ -639,7 +640,7 @@ class ClinicalTrialsApp {
         noResultsTitle.textContent = 'No patient-matched trials found';
       }
       if (noResultsText) {
-        noResultsText.textContent = 'Try adding disease setting, prior treatment history, or key biomarkers. Incomplete prostate queries should still return possible matches with verification flags.';
+        noResultsText.textContent = 'Try adding disease setting, prior treatment history, histology, biomarkers, or risk-group details. Incomplete queries should still return possible matches with verification flags.';
       }
       return;
     }

@@ -26,7 +26,7 @@
     },
     disease_volume: {
       title: "Confirm disease volume",
-      message: "Review imaging for bone lesion count and visceral disease. High-volume = 4 or more bone metastases or any visceral metastasis."
+      message: "Review imaging for bone lesion count and visceral disease. High-volume usually means 4 or more bone metastases or any visceral metastasis."
     },
     prior_arpi: {
       title: "Confirm ARPI history",
@@ -51,6 +51,78 @@
     adt_history: {
       title: "Confirm ADT history",
       message: "Most mCSPC intensification studies require ADT-naive disease or tightly limit prior ADT exposure."
+    },
+    bcg_status: {
+      title: "Confirm BCG history",
+      message: "Confirm whether the patient is BCG-unresponsive, BCG-intolerant, or BCG-naive before referring to NMIBC trials."
+    },
+    cisplatin_eligibility: {
+      title: "Confirm cisplatin eligibility",
+      message: "Confirm renal function, hearing, neuropathy, and performance status to determine cisplatin eligibility."
+    },
+    systemic_line: {
+      title: "Confirm prior systemic therapy line",
+      message: "Clarify whether the patient is treatment-naive, post-platinum, or more heavily pretreated before referral."
+    },
+    histology: {
+      title: "Confirm histology",
+      message: "Confirm the relevant histologic subtype, because several kidney and testicular trials are histology-restricted."
+    },
+    imdc_risk: {
+      title: "Confirm IMDC risk group",
+      message: "Assign IMDC risk before referral to risk-stratified metastatic RCC trials."
+    },
+    io_history: {
+      title: "Confirm prior immunotherapy exposure",
+      message: "Clarify whether the patient has previously received PD-1, PD-L1, or CTLA-4 therapy."
+    },
+    vegf_tki_history: {
+      title: "Confirm prior VEGF-TKI exposure",
+      message: "Clarify whether the patient has previously received VEGF-targeted TKI therapy."
+    },
+    nephrectomy_status: {
+      title: "Confirm nephrectomy status",
+      message: "Clarify whether the patient has had prior nephrectomy, still has the primary tumor in place, or is not a surgical candidate."
+    },
+    vhl_status: {
+      title: "Confirm VHL status",
+      message: "Confirm hereditary or tumor VHL status before referring to VHL-directed or hereditary RCC trials."
+    },
+    met_alteration: {
+      title: "Confirm MET alteration",
+      message: "Confirm the presence of a MET mutation or amplification before referring to MET-directed RCC trials."
+    },
+    sarcomatoid: {
+      title: "Confirm sarcomatoid features",
+      message: "Clarify whether sarcomatoid features are present, because some RCC studies are enriched for this subgroup."
+    },
+    clinical_stage: {
+      title: "Confirm clinical stage",
+      message: "Clarify whether the patient has stage I, stage II, or advanced/metastatic disease before referral."
+    },
+    igcccg_risk: {
+      title: "Confirm IGCCCG risk group",
+      message: "Assign IGCCCG risk before referring to advanced germ-cell tumor trials."
+    },
+    primary_site: {
+      title: "Confirm primary site",
+      message: "Clarify whether the primary site is testicular or extragonadal, such as mediastinal or intracranial."
+    },
+    chemo_lines: {
+      title: "Confirm prior chemotherapy lines",
+      message: "Clarify whether the patient is first-line, salvage, or more heavily pretreated before referral."
+    },
+    hdct_history: {
+      title: "Confirm high-dose chemotherapy history",
+      message: "Clarify whether the patient has already received high-dose chemotherapy with stem-cell rescue."
+    },
+    marker_status: {
+      title: "Confirm tumor marker status",
+      message: "Clarify whether AFP, beta-hCG, and LDH are normal, rising, or persistently elevated."
+    },
+    stage1_risk_factors: {
+      title: "Confirm stage I risk factors",
+      message: "Clarify whether stage I risk factors such as lymphovascular invasion are present."
     }
   };
 
@@ -103,70 +175,80 @@
     return normalized;
   }
 
+  function canonicalToken(value) {
+    return normalizeWhitespace(value).toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+  }
+
+  function isMeaningfulAxisValue(value) {
+    const token = canonicalToken(value);
+    return Boolean(token) && ![
+      "unknown",
+      "not_applicable",
+      "not_specified",
+      "not_required",
+      "bcg_relevant_unspecified",
+      "cisplatin_relevant_unspecified"
+    ].includes(token);
+  }
+
   function deriveLegacyDiseaseSettingIds(trial) {
     const primaryLabel = normalizeWhitespace(trial.diseaseSettingPrimary);
     const fallbackLabels = normalizeList(trial.diseaseSettingAll);
-    const haystack = (primaryLabel || fallbackLabels[0] || "").toLowerCase();
+    const haystack = [trial.cancerType, primaryLabel, fallbackLabels.join(" ")].join(" ").toLowerCase();
     const ids = [];
 
     if (!haystack) {
       return ids;
     }
 
-    if (/crpc/.test(haystack)) {
-      if (/non[- ]metastatic|nmcrpc/.test(haystack)) {
-        ids.push("crpc_nonmetastatic", "crpc_general");
-      } else if (/metastatic/.test(haystack)) {
-        if (/post[- ]arpi|2l\+/.test(haystack)) {
-          ids.push("crpc_metastatic_postARPI", "crpc_general");
-        } else if (/pre[- ]arpi|1l/.test(haystack)) {
-          ids.push("crpc_metastatic_preARPI", "crpc_general");
-        } else {
-          ids.push("crpc_metastatic_preARPI", "crpc_metastatic_postARPI", "crpc_general");
+    if (/prostate/.test(haystack)) {
+      if (/crpc/.test(haystack)) {
+        if (/non[- ]metastatic|nmcrpc/.test(haystack)) {
+          ids.push("crpc_nonmetastatic", "crpc_general");
+        } else if (/metastatic/.test(haystack)) {
+          if (/post[- ]arpi|2l\+/.test(haystack)) {
+            ids.push("crpc_metastatic_postARPI", "crpc_general");
+          } else {
+            ids.push("crpc_metastatic_preARPI", "crpc_metastatic_postARPI", "crpc_general");
+          }
         }
-      } else {
-        ids.push("crpc_general");
       }
-    }
-
-    if (/mcspc|hormone[- ]sensitive/.test(haystack)) {
-      if (/oligometastatic|low-volume/.test(haystack)) {
-        ids.push("cspc_oligometastatic", "cspc_general");
-      } else if (/high-volume/.test(haystack)) {
-        ids.push("cspc_high_volume", "cspc_general");
-      } else {
-        ids.push("cspc_general");
+      if (/mcspc|hormone[- ]sensitive/.test(haystack)) {
+        ids.push("cspc_high_volume", "cspc_oligometastatic", "cspc_general");
       }
-    }
-
-    if (/\bbcr\b|biochemical recurrence/.test(haystack)) {
-      if (/after rp|post[- ]rp|prostatectomy/.test(haystack)) {
-        ids.push("bcr_post_rp", "bcr_general");
-      } else if (/after rt|post[- ]rt|radiation/.test(haystack)) {
-        ids.push("bcr_post_rt", "bcr_general");
-      } else {
+      if (/biochemical recurrence|\bbcr\b/.test(haystack)) {
         ids.push("bcr_general");
       }
+      if (/localized/.test(haystack)) {
+        ids.push("localized_general");
+      }
     }
 
-    if (/unfavorable intermediate/.test(haystack)) {
-      ids.push("localized_unfavorable_ir", "localized_general");
+    if (/bladder|urothelial/.test(haystack)) {
+      if (/bcg/.test(haystack) || /nmibc/.test(haystack)) {
+        ids.push("nmibc_bcg_unresponsive", "nmibc_high_risk_bcg_naive", "nmibc_intermediate_risk", "nmibc_general");
+      }
+      if (/mibc|muscle[- ]invasive/.test(haystack)) {
+        ids.push("mibc_neoadjuvant", "mibc_adjuvant", "mibc_bladder_preservation", "mibc_general");
+      }
+      if (/metastatic|advanced/.test(haystack)) {
+        ids.push("metastatic_2l_plus", "metastatic_1l_general", "metastatic_general");
+      }
     }
 
-    if (/high\s*\/\s*very high risk|high[- ]risk|very high[- ]risk/.test(haystack)) {
-      ids.push("localized_high_very_high_risk", "localized_general");
+    if (/kidney|renal|rcc/.test(haystack)) {
+      if (/adjuvant/.test(haystack)) ids.push("adjuvant_post_nephrectomy");
+      if (/localized/.test(haystack)) ids.push("localized_t1a", "localized_t1b", "localized_stage2_3");
+      if (/metastatic/.test(haystack)) ids.push("metastatic_ccrcc_general", "metastatic_ncrcc_general");
+      if (/hereditary/.test(haystack)) ids.push("hereditary_rcc");
     }
 
-    if (/low\s*\/\s*favorable intermediate|favorable intermediate|low risk/.test(haystack)) {
-      ids.push("localized_low_favorable_ir", "localized_general");
-    }
-
-    if (/regional\s*\(n1\)|regional n1/.test(haystack)) {
-      ids.push("localized_regional_n1", "localized_general");
-    }
-
-    if (/localized/.test(haystack) && ids.length === 0) {
-      ids.push("localized_general");
+    if (/testicular|seminoma|gct|nsgct/.test(haystack)) {
+      if (/stage i/.test(haystack)) ids.push("gct_stage1_general");
+      if (/recurrent|salvage|relapsed|advanced|metastatic/.test(haystack)) ids.push("gct_advanced_general");
+      if (/seminoma/.test(haystack)) ids.push("seminoma_stage1", "seminoma_stage2c_3");
+      if (/nsgct|nonseminoma/.test(haystack)) ids.push("nsgct_stage1", "nsgct_good_risk_advanced", "nsgct_recurrent_2l");
+      if (/extragonadal|mediastinal/.test(haystack)) ids.push("extragonadal_gct");
     }
 
     return Array.from(new Set(ids));
@@ -232,6 +314,12 @@
       if (pref === "triplet" && /(docetaxel|darolutamide|abiraterone)/i.test(trialText)) score += 1;
       if (pref === "intensification" && /(abiraterone|darolutamide|docetaxel|intensification)/i.test(trialText)) score += 1;
       if (pref === "deintensification" && /(de-?intensification|rt alone|surveillance)/i.test(trialText)) score += 1;
+      if (pref === "intravesical" && /(intravesical|bcg|nadofaragene|nogapendekin|anktiva|tar-200)/i.test(trialText)) score += 2;
+      if (pref === "bladder_preservation" && /(trimodality|tmt|bladder[- ]sparing|chemoradiation)/i.test(trialText)) score += 2;
+      if (pref === "immunotherapy" && /(nivolumab|pembrolizumab|durvalumab|avelumab|atezolizumab|ipilimumab|pd-1|pd-l1)/i.test(trialText)) score += 1;
+      if (pref === "targeted" && /(erdafitinib|fgfr|belzutifan|cabozantinib|axitinib|lenvatinib|met|vhl)/i.test(trialText)) score += 1;
+      if (pref === "surveillance" && /surveillance|active surveillance/i.test(trialText)) score += 1;
+      if (pref === "high_dose" && /high[- ]dose|hdct|stem cell/i.test(trialText)) score += 2;
     });
 
     if (parsedQuery.phasePreference && trial.phase !== parsedQuery.phasePreference) {
@@ -282,11 +370,13 @@
   }
 
   function buildDiseaseFact(parsedQuery) {
-    if (parsedQuery.diseaseLabel === "Unfavorable intermediate risk") {
-      return "unfavorable IR";
-    }
-    if (parsedQuery.diseaseLabel === "High / very high risk") {
-      return "high-risk localized";
+    if (parsedQuery.cancerType === "Prostate") {
+      if (parsedQuery.diseaseLabel === "Unfavorable intermediate risk") {
+        return "unfavorable IR";
+      }
+      if (parsedQuery.diseaseLabel === "High / very high risk") {
+        return "high-risk localized";
+      }
     }
     return parsedQuery.diseaseLabel;
   }
@@ -295,17 +385,20 @@
     return normalizeList(parsedQuery.diseaseSettingIds);
   }
 
+  function getTrialDiseaseIds(trial) {
+    const ids = trial.diseaseSettingAllIds.length > 0
+      ? trial.diseaseSettingAllIds
+      : normalizeList([trial.diseaseSettingPrimaryId]);
+    return Array.from(new Set(ids));
+  }
+
   function trialMatchesDiseaseSetting(trial, parsedQuery) {
     const allowedIds = resolveDiseaseIds(parsedQuery);
     if (allowedIds.length === 0) {
       return true;
     }
 
-    const trialIds = trial.diseaseSettingAllIds.length > 0
-      ? trial.diseaseSettingAllIds
-      : normalizeList([trial.diseaseSettingPrimaryId]);
-
-    return trialIds.some(id => allowedIds.includes(id));
+    return getTrialDiseaseIds(trial).some(id => allowedIds.includes(id));
   }
 
   function resolveArpiFact(parsedQuery) {
@@ -329,6 +422,55 @@
     return `${parsedQuery.clinicalAxes.biomarkerLabel} eligible`;
   }
 
+  function baseMatchState(trial, parsedQuery) {
+    const resolvedFacts = [];
+    const flags = [];
+    const excludes = [];
+    if (parsedQuery.diseaseLabel) {
+      addResolvedFact(resolvedFacts, buildDiseaseFact(parsedQuery));
+    }
+    return {
+      trial,
+      parsedQuery,
+      trialAxes: trial.clinicalAxes || {},
+      queryAxes: parsedQuery.clinicalAxes || {},
+      resolvedFacts,
+      flags,
+      excludes
+    };
+  }
+
+  function finalizeMatch(state) {
+    const preferenceScore = buildPreferenceScore(state.trial, state.parsedQuery);
+    if (preferenceScore < 0) {
+      return { included: false, excludedReason: "Phase preference mismatch." };
+    }
+
+    if (state.excludes.length > 0) {
+      return { included: false, excludedReason: state.excludes[0] };
+    }
+
+    const locationScore = buildLocationScore(state.trial, state.parsedQuery);
+    const badge = state.flags.length > 0 ? "Possible match" : "Strong match";
+    const reasonText = state.resolvedFacts.length > 0
+      ? `Matches: ${state.resolvedFacts.join(" · ")}`
+      : "Matches: disease setting — multiple eligibility axes unresolved";
+
+    return {
+      included: true,
+      badge,
+      badgeTone: state.flags.length > 0 ? "possible" : "strong",
+      reasonText,
+      resolvedFacts: state.resolvedFacts,
+      flags: state.flags,
+      preferenceScore,
+      locationScore,
+      aiExtractedReview: Object.keys(state.trialAxes).length > 0,
+      sourceTagSummary: uniqueSources(state.trial),
+      sortScore: (state.flags.length === 0 ? 1000 : 500) + (preferenceScore * 20) + (locationScore * 10) + (confidenceScore(state.trial) * 5) + Number(state.trial.siteCount || 0)
+    };
+  }
+
   function applyBinaryAxisRule(options) {
     const {
       trialValue,
@@ -341,7 +483,7 @@
       allowValues
     } = options;
 
-    if (!trialValue || trialValue === "unknown" || trialValue === "Not applicable" || trialValue === "not_required") {
+    if (!isMeaningfulAxisValue(trialValue)) {
       return;
     }
 
@@ -363,6 +505,531 @@
     addFlag(flags, flagCode);
   }
 
+  function bladderBcgMatches(trialValue, queryValue) {
+    const trialToken = canonicalToken(trialValue);
+    const queryToken = canonicalToken(queryValue);
+    if (trialToken === "bcg_unresponsive") return queryToken === "bcg_unresponsive";
+    if (trialToken === "bcg_intolerant") return queryToken === "bcg_intolerant";
+    if (trialToken === "bcg_naive") return queryToken === "bcg_naive";
+    return true;
+  }
+
+  function bladderCisplatinMatches(trialValue, queryValue) {
+    const trialToken = canonicalToken(trialValue);
+    const queryToken = canonicalToken(queryValue);
+    if (trialToken === "cisplatin_eligible") return queryToken === "cisplatin_eligible";
+    if (trialToken === "cisplatin_ineligible") return queryToken === "cisplatin_ineligible";
+    return true;
+  }
+
+  function resolveBladderLineRequirement(trial) {
+    const ids = getTrialDiseaseIds(trial);
+    if (ids.includes("metastatic_2l_plus")) return "1_plus";
+    if (ids.some(id => ["metastatic_1l_cisplatin_ineligible", "metastatic_1l_cisplatin_eligible", "metastatic_1l_general"].includes(id))) return "0";
+    return "";
+  }
+
+  function queryMeetsLineRequirement(queryValue, requirement) {
+    if (!requirement) return true;
+    if (!queryValue) return false;
+    if (requirement === "0") return queryValue === "0";
+    if (requirement === "1") return queryValue === "1";
+    if (requirement === "1_plus") return queryValue === "1" || queryValue === "2+";
+    if (requirement === "2+") return queryValue === "2+";
+    return queryValue === requirement;
+  }
+
+  function resolveKidneyLineRequirement(trial) {
+    const trialAxes = trial.clinicalAxes || {};
+    if (isMeaningfulAxisValue(trialAxes.priorSystemicLines)) {
+      return normalizeWhitespace(trialAxes.priorSystemicLines);
+    }
+
+    const ids = getTrialDiseaseIds(trial);
+    if (ids.some(id => ["metastatic_ccrcc_favorable_1l", "metastatic_ccrcc_int_poor_1l", "metastatic_ccrcc_1l_all_risk"].includes(id))) return "0";
+    if (ids.some(id => ["metastatic_ccrcc_2l_io_experienced", "metastatic_ccrcc_2l_io_naive"].includes(id))) return "1";
+    if (ids.includes("metastatic_ccrcc_3l_plus")) return "2+";
+    return "";
+  }
+
+  function resolveTesticularChemoRequirement(trial) {
+    const trialAxes = trial.clinicalAxes || {};
+    if (isMeaningfulAxisValue(trialAxes.priorChemoLines)) {
+      return normalizeWhitespace(trialAxes.priorChemoLines);
+    }
+
+    const ids = getTrialDiseaseIds(trial);
+    if (ids.some(id => ["seminoma_stage1", "nsgct_stage1", "nsgct_stage_is", "nsgct_stage2a_2b", "seminoma_stage2a_2b", "seminoma_stage2c_3", "nsgct_good_risk_advanced", "nsgct_intermediate_poor_risk_advanced", "gct_stage1_general"].includes(id))) return "0";
+    if (ids.some(id => ["seminoma_recurrent_2l", "nsgct_recurrent_2l", "seminoma_post_first_line", "nsgct_post_first_line"].includes(id))) return "1";
+    if (ids.some(id => ["seminoma_3l_plus", "nsgct_3l_plus"].includes(id))) return "2+";
+    return "";
+  }
+
+  function histologyGroup(value) {
+    const token = canonicalToken(value);
+    if (!token) return "";
+    if (token.includes("seminoma")) return "seminoma";
+    if (token.includes("nsgct") || token.includes("nonseminoma") || token.includes("yolk_sac") || token.includes("mixed")) return "nsgct";
+    if (token.includes("clear_cell")) return "clear_cell";
+    if (token.includes("papillary")) return "papillary";
+    if (token.includes("chromophobe")) return "chromophobe";
+    if (token.includes("collecting_duct")) return "collecting_duct";
+    if (token.includes("tfe3") || token.includes("tfeb") || token.includes("translocation")) return "translocation";
+    return token;
+  }
+
+  function histologyMatches(trialValue, queryValue) {
+    const trialGroup = histologyGroup(trialValue);
+    const queryGroup = histologyGroup(queryValue);
+    if (!trialGroup || !queryGroup) {
+      return true;
+    }
+    if (trialGroup === queryGroup) {
+      return true;
+    }
+    if (trialGroup === "papillary" && queryGroup === "papillary_type2") {
+      return true;
+    }
+    return false;
+  }
+
+  function imdcRiskMatches(trialValue, queryValue) {
+    const trialToken = canonicalToken(trialValue);
+    const queryToken = canonicalToken(queryValue);
+    if (trialToken === "intermediate_poor") {
+      return ["intermediate", "poor", "intermediate_poor"].includes(queryToken);
+    }
+    return trialToken === queryToken;
+  }
+
+  function nephrectomyStatusMatches(trialValue, queryValue) {
+    const trialToken = canonicalToken(trialValue);
+    const queryToken = canonicalToken(queryValue);
+    if (trialToken === "prior_nephrectomy") return queryToken === "prior_nephrectomy";
+    if (trialToken === "cytoreductive_candidate") return queryToken === "cytoreductive_candidate";
+    if (trialToken === "no_nephrectomy_not_candidate") return queryToken === "no_nephrectomy_not_candidate";
+    return true;
+  }
+
+  function clinicalStageMatches(trialValue, queryValue) {
+    const trialToken = canonicalToken(trialValue);
+    const queryToken = canonicalToken(queryValue);
+    if (!trialToken || !queryToken) {
+      return true;
+    }
+    if (trialToken === queryToken) {
+      return true;
+    }
+    if (trialToken === "stage_1_unspecified" && queryToken === "stage_1a") return true;
+    if (trialToken === "stage_3_unspecified" && ["stage_2c_3", "stage_3_unspecified"].includes(queryToken)) return true;
+    if (queryToken === "stage_1_unspecified" && trialToken === "stage_1a") return true;
+    return false;
+  }
+
+  function primarySiteMatches(trialValue, queryValue) {
+    const trialToken = canonicalToken(trialValue);
+    const queryToken = canonicalToken(queryValue);
+    if (!trialToken || !queryToken) {
+      return true;
+    }
+    if (trialToken === queryToken) {
+      return true;
+    }
+    if (trialToken === "testicular" && queryToken === "testis") return true;
+    return false;
+  }
+
+  function applyRequirementFlag(state, requirement, queryValue, flagCode, factLabel) {
+    if (!requirement) {
+      return;
+    }
+    if (!queryValue) {
+      addFlag(state.flags, flagCode);
+      return;
+    }
+    if (!queryMeetsLineRequirement(queryValue, requirement)) {
+      state.excludes.push(flagCode);
+      return;
+    }
+    if (factLabel) {
+      addResolvedFact(state.resolvedFacts, factLabel);
+    }
+  }
+
+  function resolveKidneyHistologyFact(value) {
+    const group = histologyGroup(value);
+    if (!group) return "";
+    if (group === "clear_cell") return "clear-cell histology";
+    if (group === "papillary") return "papillary histology";
+    if (group === "chromophobe") return "chromophobe histology";
+    if (group === "collecting_duct") return "collecting-duct histology";
+    if (group === "translocation") return "translocation histology";
+    return group.replace(/_/g, " ");
+  }
+
+  function resolveTesticularHistologyFact(value) {
+    const group = histologyGroup(value);
+    if (group === "seminoma") return "seminoma";
+    if (group === "nsgct") return "NSGCT";
+    return "";
+  }
+
+  function matchProstateTrial(trial, parsedQuery) {
+    const state = baseMatchState(trial, parsedQuery);
+    const trialAxes = state.trialAxes;
+    const queryAxes = state.queryAxes;
+
+    applyBinaryAxisRule({
+      trialValue: trialAxes.castrationStatus,
+      queryValue: queryAxes.castrationStatus,
+      resolvedFacts: state.resolvedFacts,
+      factsLabel: parsedQuery.diseaseGroup === "crpc" ? "castration-resistant" : parsedQuery.diseaseGroup === "cspc" ? "castration-sensitive" : "",
+      flags: state.flags,
+      flagCode: "castration_status",
+      excludes: state.excludes,
+      allowValues: ["castration_sensitive", "castration_resistant"]
+    });
+
+    if (isMeaningfulAxisValue(trialAxes.metastaticStatus) && queryAxes.metastaticStatus) {
+      if (trialAxes.metastaticStatus !== queryAxes.metastaticStatus && !(trialAxes.metastaticStatus === "metastatic" && parsedQuery.diseaseGroup === "cspc")) {
+        state.excludes.push("staging");
+      }
+    } else if (isMeaningfulAxisValue(trialAxes.metastaticStatus) && !queryAxes.metastaticStatus) {
+      addFlag(state.flags, "staging");
+    }
+
+    if (isMeaningfulAxisValue(trialAxes.priorArpi)) {
+      if (queryAxes.priorArpi) {
+        if (trialAxes.priorArpi !== queryAxes.priorArpi) {
+          state.excludes.push("prior_arpi");
+        } else if (queryAxes.priorArpi === "yes") {
+          addResolvedFact(state.resolvedFacts, resolveArpiFact(parsedQuery));
+        }
+      } else {
+        addFlag(state.flags, "prior_arpi");
+      }
+    }
+
+    if (isMeaningfulAxisValue(trialAxes.priorDocetaxel)) {
+      if (queryAxes.priorDocetaxel) {
+        if (trialAxes.priorDocetaxel !== queryAxes.priorDocetaxel) {
+          state.excludes.push("chemotherapy_history");
+        } else if (queryAxes.priorDocetaxel === "no") {
+          addResolvedFact(state.resolvedFacts, "chemo-naive permitted");
+        } else {
+          addResolvedFact(state.resolvedFacts, "post-docetaxel");
+        }
+      } else {
+        addFlag(state.flags, "chemotherapy_history");
+      }
+    }
+
+    if (isMeaningfulAxisValue(trialAxes.biomarkerHrr)) {
+      if (queryAxes.biomarkerHrr) {
+        if (trialAxes.biomarkerHrr !== queryAxes.biomarkerHrr) {
+          state.excludes.push("brca_hrr");
+        } else {
+          addResolvedFact(state.resolvedFacts, resolveBiomarkerFact(parsedQuery));
+        }
+      } else {
+        addFlag(state.flags, "brca_hrr");
+      }
+    }
+
+    if (isMeaningfulAxisValue(trialAxes.psmaStatus)) {
+      if (queryAxes.psmaStatus) {
+        if (queryAxes.psmaStatus === "negative") {
+          state.excludes.push("psma_status");
+        } else {
+          addResolvedFact(state.resolvedFacts, "PSMA-confirmed");
+        }
+      } else {
+        addFlag(state.flags, "psma_status");
+      }
+    }
+
+    if (isMeaningfulAxisValue(trialAxes.genomicClassifier)) {
+      if (queryAxes.genomicClassifier) {
+        addResolvedFact(state.resolvedFacts, "genomic classifier confirmed");
+      } else {
+        addFlag(state.flags, "genomic_classifier");
+      }
+    }
+
+    if (isMeaningfulAxisValue(trialAxes.diseaseVolume)) {
+      if (queryAxes.diseaseVolume) {
+        if (trialAxes.diseaseVolume !== queryAxes.diseaseVolume) {
+          state.excludes.push("disease_volume");
+        } else if (queryAxes.diseaseVolume === "high_volume") {
+          addResolvedFact(state.resolvedFacts, "high-volume confirmed");
+        } else if (queryAxes.diseaseVolume === "oligometastatic") {
+          addResolvedFact(state.resolvedFacts, "oligometastatic");
+        } else {
+          addResolvedFact(state.resolvedFacts, "low-volume confirmed");
+        }
+      } else {
+        addFlag(state.flags, "disease_volume");
+      }
+    }
+
+    if (parsedQuery.diseaseGroup === "cspc" && !queryAxes.adtStatus) {
+      addFlag(state.flags, "adt_history");
+    } else if (parsedQuery.diseaseGroup === "cspc" && queryAxes.adtStatus === "naive") {
+      addResolvedFact(state.resolvedFacts, "ADT-naive");
+    }
+
+    return finalizeMatch(state);
+  }
+
+  function matchBladderTrial(trial, parsedQuery) {
+    const state = baseMatchState(trial, parsedQuery);
+    const trialAxes = state.trialAxes;
+    const queryAxes = state.queryAxes;
+
+    if (isMeaningfulAxisValue(trialAxes.bcgStatus)) {
+      if (queryAxes.bcgStatus) {
+        if (!bladderBcgMatches(trialAxes.bcgStatus, queryAxes.bcgStatus)) {
+          state.excludes.push("bcg_status");
+        } else {
+          addResolvedFact(state.resolvedFacts, normalizeWhitespace(queryAxes.bcgStatus).replace(/^BCG-/, "BCG-"));
+        }
+      } else {
+        addFlag(state.flags, "bcg_status");
+      }
+    }
+
+    if (isMeaningfulAxisValue(trialAxes.cisplatinStatus)) {
+      if (queryAxes.cisplatinStatus) {
+        if (!bladderCisplatinMatches(trialAxes.cisplatinStatus, queryAxes.cisplatinStatus)) {
+          state.excludes.push("cisplatin_eligibility");
+        } else {
+          addResolvedFact(state.resolvedFacts, normalizeWhitespace(queryAxes.cisplatinStatus).toLowerCase());
+        }
+      } else {
+        addFlag(state.flags, "cisplatin_eligibility");
+      }
+    }
+
+    const lineRequirement = resolveBladderLineRequirement(trial);
+    applyRequirementFlag(
+      state,
+      lineRequirement,
+      queryAxes.priorSystemicLines,
+      "systemic_line",
+      lineRequirement === "0" ? "treatment-naive" : lineRequirement === "1_plus" ? "previously treated" : ""
+    );
+
+    return finalizeMatch(state);
+  }
+
+  function matchKidneyTrial(trial, parsedQuery) {
+    const state = baseMatchState(trial, parsedQuery);
+    const trialAxes = state.trialAxes;
+    const queryAxes = state.queryAxes;
+
+    if (isMeaningfulAxisValue(trialAxes.histology)) {
+      if (queryAxes.histology) {
+        if (!histologyMatches(trialAxes.histology, queryAxes.histology)) {
+          state.excludes.push("histology");
+        } else {
+          addResolvedFact(state.resolvedFacts, resolveKidneyHistologyFact(queryAxes.histology));
+        }
+      } else {
+        addFlag(state.flags, "histology");
+      }
+    }
+
+    if (isMeaningfulAxisValue(trialAxes.imdcRisk)) {
+      if (queryAxes.imdcRisk) {
+        if (!imdcRiskMatches(trialAxes.imdcRisk, queryAxes.imdcRisk)) {
+          state.excludes.push("imdc_risk");
+        } else {
+          addResolvedFact(state.resolvedFacts, `IMDC ${normalizeWhitespace(queryAxes.imdcRisk).replace(/_/g, "/")}`);
+        }
+      } else {
+        addFlag(state.flags, "imdc_risk");
+      }
+    }
+
+    const lineRequirement = resolveKidneyLineRequirement(trial);
+    applyRequirementFlag(
+      state,
+      lineRequirement,
+      queryAxes.priorSystemicLines,
+      "systemic_line",
+      lineRequirement === "0" ? "systemic-naive" : lineRequirement === "1" ? "one prior systemic line" : lineRequirement === "2+" ? "multiple prior lines" : ""
+    );
+
+    if (isMeaningfulAxisValue(trialAxes.priorIo)) {
+      if (queryAxes.priorIo) {
+        if (trialAxes.priorIo !== queryAxes.priorIo) {
+          state.excludes.push("io_history");
+        } else {
+          addResolvedFact(state.resolvedFacts, queryAxes.priorIo === "no" ? "IO-naive" : "post-IO");
+        }
+      } else {
+        addFlag(state.flags, "io_history");
+      }
+    }
+
+    if (isMeaningfulAxisValue(trialAxes.priorVegfTki)) {
+      if (queryAxes.priorVegfTki) {
+        if (trialAxes.priorVegfTki !== queryAxes.priorVegfTki) {
+          state.excludes.push("vegf_tki_history");
+        } else {
+          addResolvedFact(state.resolvedFacts, queryAxes.priorVegfTki === "no" ? "VEGF-TKI naive" : "post-VEGF-TKI");
+        }
+      } else {
+        addFlag(state.flags, "vegf_tki_history");
+      }
+    }
+
+    if (isMeaningfulAxisValue(trialAxes.nephrectomyStatus)) {
+      if (queryAxes.nephrectomyStatus) {
+        if (!nephrectomyStatusMatches(trialAxes.nephrectomyStatus, queryAxes.nephrectomyStatus)) {
+          state.excludes.push("nephrectomy_status");
+        } else if (queryAxes.nephrectomyStatus === "prior_nephrectomy") {
+          addResolvedFact(state.resolvedFacts, "post-nephrectomy");
+        } else if (queryAxes.nephrectomyStatus === "cytoreductive_candidate") {
+          addResolvedFact(state.resolvedFacts, "primary in place");
+        }
+      } else {
+        addFlag(state.flags, "nephrectomy_status");
+      }
+    }
+
+    if (isMeaningfulAxisValue(trialAxes.vhlStatus)) {
+      if (queryAxes.vhlStatus) {
+        addResolvedFact(state.resolvedFacts, "VHL-altered");
+      } else {
+        addFlag(state.flags, "vhl_status");
+      }
+    }
+
+    if (isMeaningfulAxisValue(trialAxes.metAlteration)) {
+      if (queryAxes.metAlteration) {
+        if (canonicalToken(trialAxes.metAlteration) !== canonicalToken(queryAxes.metAlteration)) {
+          state.excludes.push("met_alteration");
+        } else {
+          addResolvedFact(state.resolvedFacts, queryAxes.metAlteration === "met_amplification" ? "MET amplification" : "MET mutation");
+        }
+      } else {
+        addFlag(state.flags, "met_alteration");
+      }
+    }
+
+    if (isMeaningfulAxisValue(trialAxes.sarcomatoid)) {
+      if (queryAxes.sarcomatoid) {
+        if (trialAxes.sarcomatoid !== queryAxes.sarcomatoid) {
+          state.excludes.push("sarcomatoid");
+        } else {
+          addResolvedFact(state.resolvedFacts, "sarcomatoid features");
+        }
+      } else {
+        addFlag(state.flags, "sarcomatoid");
+      }
+    }
+
+    return finalizeMatch(state);
+  }
+
+  function matchTesticularTrial(trial, parsedQuery) {
+    const state = baseMatchState(trial, parsedQuery);
+    const trialAxes = state.trialAxes;
+    const queryAxes = state.queryAxes;
+
+    if (isMeaningfulAxisValue(trialAxes.histology)) {
+      if (queryAxes.histology) {
+        if (!histologyMatches(trialAxes.histology, queryAxes.histology)) {
+          state.excludes.push("histology");
+        } else {
+          addResolvedFact(state.resolvedFacts, resolveTesticularHistologyFact(queryAxes.histology));
+        }
+      } else {
+        addFlag(state.flags, "histology");
+      }
+    }
+
+    if (isMeaningfulAxisValue(trialAxes.clinicalStage)) {
+      if (queryAxes.clinicalStage) {
+        if (!clinicalStageMatches(trialAxes.clinicalStage, queryAxes.clinicalStage)) {
+          state.excludes.push("clinical_stage");
+        } else {
+          addResolvedFact(state.resolvedFacts, normalizeWhitespace(queryAxes.clinicalStage).replace(/_/g, " "));
+        }
+      } else {
+        addFlag(state.flags, "clinical_stage");
+      }
+    }
+
+    if (isMeaningfulAxisValue(trialAxes.igcccgRisk)) {
+      if (queryAxes.igcccgRisk) {
+        if (canonicalToken(trialAxes.igcccgRisk) !== canonicalToken(queryAxes.igcccgRisk)) {
+          state.excludes.push("igcccg_risk");
+        } else {
+          addResolvedFact(state.resolvedFacts, `IGCCCG ${normalizeWhitespace(queryAxes.igcccgRisk)}`);
+        }
+      } else {
+        addFlag(state.flags, "igcccg_risk");
+      }
+    }
+
+    if (isMeaningfulAxisValue(trialAxes.primarySite)) {
+      if (queryAxes.primarySite) {
+        if (!primarySiteMatches(trialAxes.primarySite, queryAxes.primarySite)) {
+          state.excludes.push("primary_site");
+        } else if (canonicalToken(queryAxes.primarySite) !== "testicular") {
+          addResolvedFact(state.resolvedFacts, `${normalizeWhitespace(queryAxes.primarySite)} primary`);
+        }
+      } else {
+        addFlag(state.flags, "primary_site");
+      }
+    }
+
+    const chemoRequirement = resolveTesticularChemoRequirement(trial);
+    applyRequirementFlag(
+      state,
+      chemoRequirement,
+      queryAxes.priorChemoLines,
+      "chemo_lines",
+      chemoRequirement === "0" ? "chemo-naive" : chemoRequirement === "1" ? "post first-line chemotherapy" : chemoRequirement === "2+" ? "multi-line treated" : ""
+    );
+
+    if (isMeaningfulAxisValue(trialAxes.priorHdct)) {
+      if (queryAxes.priorHdct) {
+        if (trialAxes.priorHdct !== queryAxes.priorHdct) {
+          state.excludes.push("hdct_history");
+        } else if (queryAxes.priorHdct === "yes") {
+          addResolvedFact(state.resolvedFacts, "post-HDCT");
+        }
+      } else {
+        addFlag(state.flags, "hdct_history");
+      }
+    }
+
+    if (isMeaningfulAxisValue(trialAxes.markerStatus)) {
+      if (queryAxes.markerStatus) {
+        if (canonicalToken(trialAxes.markerStatus) !== canonicalToken(queryAxes.markerStatus)) {
+          state.excludes.push("marker_status");
+        } else {
+          addResolvedFact(state.resolvedFacts, normalizeWhitespace(queryAxes.markerStatus).replace(/_/g, " "));
+        }
+      } else {
+        addFlag(state.flags, "marker_status");
+      }
+    }
+
+    if (isMeaningfulAxisValue(trialAxes.stage1RiskFactors)) {
+      if (queryAxes.stage1RiskFactors) {
+        addResolvedFact(state.resolvedFacts, "stage I risk factors present");
+      } else {
+        addFlag(state.flags, "stage1_risk_factors");
+      }
+    }
+
+    return finalizeMatch(state);
+  }
+
   function matchSingleTrial(trialInput, parsedQueryInput) {
     const trial = normalizeTrial(trialInput);
     const parsedQuery = parsedQueryInput || (parserApi ? parserApi.parse("") : { supported: false });
@@ -371,151 +1038,28 @@
       return { included: false, excludedReason: parsedQuery.unsupportedReason || "Unsupported query." };
     }
 
-    if ((trial.cancerType || "") !== "Prostate") {
-      return { included: false, excludedReason: "Non-prostate trial." };
+    if ((trial.cancerType || "") !== parsedQuery.cancerType) {
+      return { included: false, excludedReason: "Cancer type mismatch." };
     }
 
     if (!trialMatchesDiseaseSetting(trial, parsedQuery)) {
       return { included: false, excludedReason: "Disease setting mismatch." };
     }
 
-    const resolvedFacts = [];
-    const flags = [];
-    const excludes = [];
-    const trialAxes = trial.clinicalAxes || {};
-    const queryAxes = parsedQuery.clinicalAxes || {};
-
-    if (parsedQuery.diseaseLabel) {
-      addResolvedFact(resolvedFacts, buildDiseaseFact(parsedQuery));
+    if (parsedQuery.cancerType === "Prostate") {
+      return matchProstateTrial(trial, parsedQuery);
+    }
+    if (parsedQuery.cancerType === "Bladder") {
+      return matchBladderTrial(trial, parsedQuery);
+    }
+    if (parsedQuery.cancerType === "Kidney") {
+      return matchKidneyTrial(trial, parsedQuery);
+    }
+    if (parsedQuery.cancerType === "Testicular") {
+      return matchTesticularTrial(trial, parsedQuery);
     }
 
-    applyBinaryAxisRule({
-      trialValue: trialAxes.castrationStatus,
-      queryValue: queryAxes.castrationStatus,
-      resolvedFacts,
-      factsLabel: parsedQuery.diseaseGroup === "crpc" ? "castration-resistant" : parsedQuery.diseaseGroup === "cspc" ? "castration-sensitive" : "",
-      flags,
-      flagCode: "castration_status",
-      excludes,
-      allowValues: ["castration_sensitive", "castration_resistant"]
-    });
-
-    if (trialAxes.metastaticStatus && trialAxes.metastaticStatus !== "unknown" && queryAxes.metastaticStatus) {
-      if (trialAxes.metastaticStatus !== queryAxes.metastaticStatus && !(trialAxes.metastaticStatus === "metastatic" && parsedQuery.diseaseGroup === "cspc")) {
-        excludes.push("staging");
-      }
-    } else if (trialAxes.metastaticStatus && trialAxes.metastaticStatus !== "unknown" && !queryAxes.metastaticStatus) {
-      addFlag(flags, "staging");
-    }
-
-    if (trialAxes.priorArpi && trialAxes.priorArpi !== "unknown") {
-      if (queryAxes.priorArpi) {
-        if (trialAxes.priorArpi !== queryAxes.priorArpi) {
-          excludes.push("prior_arpi");
-        } else if (queryAxes.priorArpi === "yes") {
-          addResolvedFact(resolvedFacts, resolveArpiFact(parsedQuery));
-        }
-      } else {
-        addFlag(flags, "prior_arpi");
-      }
-    }
-
-    if (trialAxes.priorDocetaxel && trialAxes.priorDocetaxel !== "unknown") {
-      if (queryAxes.priorDocetaxel) {
-        if (trialAxes.priorDocetaxel !== queryAxes.priorDocetaxel) {
-          excludes.push("chemotherapy_history");
-        } else if (queryAxes.priorDocetaxel === "no") {
-          addResolvedFact(resolvedFacts, "chemo-naive permitted");
-        } else {
-          addResolvedFact(resolvedFacts, "post-docetaxel");
-        }
-      } else {
-        addFlag(flags, "chemotherapy_history");
-      }
-    }
-
-    if (trialAxes.biomarkerHrr && trialAxes.biomarkerHrr !== "unknown" && trialAxes.biomarkerHrr !== "not_required") {
-      if (queryAxes.biomarkerHrr) {
-        if (trialAxes.biomarkerHrr !== queryAxes.biomarkerHrr) {
-          excludes.push("brca_hrr");
-        } else {
-          addResolvedFact(resolvedFacts, resolveBiomarkerFact(parsedQuery));
-        }
-      } else {
-        addFlag(flags, "brca_hrr");
-      }
-    }
-
-    if (trialAxes.psmaStatus && trialAxes.psmaStatus !== "unknown" && trialAxes.psmaStatus !== "not_required") {
-      if (queryAxes.psmaStatus) {
-        if (queryAxes.psmaStatus === "negative") {
-          excludes.push("psma_status");
-        } else {
-          addResolvedFact(resolvedFacts, "PSMA-confirmed");
-        }
-      } else {
-        addFlag(flags, "psma_status");
-      }
-    }
-
-    if (trialAxes.genomicClassifier && trialAxes.genomicClassifier !== "unknown" && trialAxes.genomicClassifier !== "not_required") {
-      if (queryAxes.genomicClassifier) {
-        addResolvedFact(resolvedFacts, "genomic classifier confirmed");
-      } else {
-        addFlag(flags, "genomic_classifier");
-      }
-    }
-
-    if (trialAxes.diseaseVolume && trialAxes.diseaseVolume !== "unknown") {
-      if (queryAxes.diseaseVolume) {
-        if (trialAxes.diseaseVolume !== queryAxes.diseaseVolume) {
-          excludes.push("disease_volume");
-        } else if (queryAxes.diseaseVolume === "high_volume") {
-          addResolvedFact(resolvedFacts, "high-volume confirmed");
-        } else if (queryAxes.diseaseVolume === "oligometastatic") {
-          addResolvedFact(resolvedFacts, "oligometastatic");
-        } else {
-          addResolvedFact(resolvedFacts, "low-volume confirmed");
-        }
-      } else {
-        addFlag(flags, "disease_volume");
-      }
-    }
-
-    if (parsedQuery.diseaseGroup === "cspc" && !queryAxes.adtStatus) {
-      addFlag(flags, "adt_history");
-    } else if (parsedQuery.diseaseGroup === "cspc" && queryAxes.adtStatus === "naive") {
-      addResolvedFact(resolvedFacts, "ADT-naive");
-    }
-
-    const preferenceScore = buildPreferenceScore(trial, parsedQuery);
-    if (preferenceScore < 0) {
-      return { included: false, excludedReason: "Phase preference mismatch." };
-    }
-
-    if (excludes.length > 0) {
-      return { included: false, excludedReason: excludes[0] };
-    }
-
-    const locationScore = buildLocationScore(trial, parsedQuery);
-    const badge = flags.length > 0 ? "Possible match" : "Strong match";
-    const reasonText = resolvedFacts.length > 0
-      ? `Matches: ${resolvedFacts.join(" · ")}`
-      : "Matches: disease setting — multiple eligibility axes unresolved";
-
-    return {
-      included: true,
-      badge,
-      badgeTone: flags.length > 0 ? "possible" : "strong",
-      reasonText,
-      resolvedFacts,
-      flags,
-      preferenceScore,
-      locationScore,
-      aiExtractedReview: Object.keys(trialAxes).length > 0,
-      sourceTagSummary: uniqueSources(trial),
-      sortScore: (flags.length === 0 ? 1000 : 500) + (preferenceScore * 20) + (locationScore * 10) + (confidenceScore(trial) * 5) + Number(trial.siteCount || 0)
-    };
+    return { included: false, excludedReason: "Unsupported cancer type." };
   }
 
   function matchTrials(options) {

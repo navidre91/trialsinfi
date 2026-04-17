@@ -54,16 +54,16 @@
                 <div style="display: flex; justify-content: space-between; gap: 1rem; align-items: flex-start; flex-wrap: wrap; margin-bottom: 0.75rem;">
                     <div>
                         <h3 style="margin: 0 0 0.25rem; font-size: 1.25rem;">Patient Search</h3>
-                        <p style="margin: 0; color: var(--text-secondary); line-height: 1.5;">Prostate matching MVP. Incomplete queries should surface more verification flags, not fewer trials.</p>
+                        <p style="margin: 0; color: var(--text-secondary); line-height: 1.5;">Deterministic matching for prostate, bladder, kidney, and testicular cancers. Incomplete queries should surface more verification flags, not fewer trials.</p>
                     </div>
                     <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0.75rem; background: #ffffff; border: 1px solid var(--border-color); border-radius: 999px; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary);">
                         <span>Protocol Mode</span>
-                        <span style="color: var(--primary-color);">Prostate only</span>
+                        <span style="color: var(--primary-color);">Multi-cancer</span>
                     </div>
                 </div>
 
                 <label for="patientQueryInput" style="display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">Describe the patient in plain language</label>
-                <textarea id="patientQueryInput" rows="4" style="width: 100%; resize: vertical; border: 1px solid var(--border-color); border-radius: 14px; padding: 0.9rem 1rem; font: inherit; line-height: 1.5; background: #ffffff;" placeholder="Male, 65. mCRPC. Progressed on ADT + enzalutamide. PSA rising. PSMA-PET confirmed. BRCA2+. No prior docetaxel."></textarea>
+                <textarea id="patientQueryInput" rows="4" style="width: 100%; resize: vertical; border: 1px solid var(--border-color); border-radius: 14px; padding: 0.9rem 1rem; font: inherit; line-height: 1.5; background: #ffffff;" placeholder="Examples: mCRPC after enzalutamide with PSMA-positive PET; BCG-unresponsive NMIBC after adequate BCG; metastatic clear-cell RCC, IMDC intermediate risk, prior nephrectomy; seminoma stage I after orchiectomy."></textarea>
 
                 <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; margin-top: 0.9rem;">
                     <button id="runPatientSearch" class="btn btn-primary" type="button">Run Patient Search</button>
