@@ -72,6 +72,22 @@
       title: "Confirm HER2 status",
       message: "Confirm HER2 IHC status before referring to HER2-directed urothelial trials."
     },
+    washout_window: {
+      title: "Verify washout interval",
+      message: "Recent systemic therapy may require a protocol-specific washout interval before referral."
+    },
+    recent_imaging: {
+      title: "Verify imaging recency",
+      message: "Confirm required staging or biomarker imaging was performed recently enough for trial screening."
+    },
+    post_surgery_timing: {
+      title: "Verify post-surgery timing",
+      message: "Recent surgery may affect perioperative or recovery-based eligibility windows."
+    },
+    persistent_markers: {
+      title: "Persistent markers after orchiectomy",
+      message: "Clarify the timing and persistence of AFP, beta-hCG, or LDH after orchiectomy before referral."
+    },
     systemic_line: {
       title: "Confirm prior systemic therapy line",
       message: "Clarify whether the patient is treatment-naive, post-platinum, or more heavily pretreated before referral."
@@ -434,6 +450,31 @@
     return `${parsedQuery.clinicalAxes.biomarkerLabel} eligible`;
   }
 
+  function humanizeTherapyLabel(value) {
+    const label = normalizeWhitespace(value).replace(/_/g, " ");
+    return label.toLowerCase() === "systemic therapy" ? "systemic therapy" : label;
+  }
+
+  function applyTemporalSignals(state) {
+    const temporal = state.parsedQuery.temporalFacts || {};
+
+    (temporal.progressedAfterTherapies || []).forEach(therapy => {
+      addResolvedFact(state.resolvedFacts, `progressed after ${humanizeTherapyLabel(therapy)}`);
+    });
+
+    if (Number.isFinite(temporal.recentImagingDays) && temporal.recentImagingDays <= 30) {
+      addResolvedFact(state.resolvedFacts, `imaging ${temporal.recentImagingDays}d ago`);
+    }
+
+    if (temporal.persistentMarkersAfterOrchiectomy === "yes") {
+      addResolvedFact(state.resolvedFacts, "persistent markers after orchiectomy");
+    }
+
+    if (Number.isFinite(temporal.sinceLastSystemicTherapyDays) && temporal.sinceLastSystemicTherapyDays <= 14) {
+      addFlag(state.flags, "washout_window");
+    }
+  }
+
   function baseMatchState(trial, parsedQuery) {
     const resolvedFacts = [];
     const flags = [];
@@ -441,7 +482,7 @@
     if (parsedQuery.diseaseLabel) {
       addResolvedFact(resolvedFacts, buildDiseaseFact(parsedQuery));
     }
-    return {
+    const state = {
       trial,
       parsedQuery,
       trialAxes: trial.clinicalAxes || {},
@@ -450,6 +491,8 @@
       flags,
       excludes
     };
+    applyTemporalSignals(state);
+    return state;
   }
 
   function finalizeMatch(state) {

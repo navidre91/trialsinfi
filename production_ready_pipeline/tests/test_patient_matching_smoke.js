@@ -263,6 +263,12 @@ function buildTesticularTrials() {
 
 function testProstate() {
   const trials = buildProstateTrials();
+  let parsed = PatientQueryParser.parse(
+    'Male, 65. mCRPC. Progressed on enzalutamide. Last systemic therapy 10 days ago. PSMA PET 21 days ago.'
+  );
+  assert.deepEqual(parsed.temporalFacts.progressedAfterTherapies, ['enzalutamide']);
+  assert.equal(parsed.temporalFacts.sinceLastSystemicTherapyDays, 10);
+  assert.equal(parsed.temporalFacts.recentImagingDays, 21);
 
   let result = runQuery(
     trials,
@@ -289,6 +295,13 @@ function testProstate() {
   assert.equal(findEntry(result, 'parp').match.badge, 'Strong match');
   assert.equal(findEntry(result, 'radioligand').match.badge, 'Possible match');
   assert.deepEqual(flagCodes(findEntry(result, 'radioligand')), ['psma_status']);
+
+  result = runQuery(
+    trials,
+    'Male, 65. mCRPC. Progressed on enzalutamide. BRCA2+. No prior docetaxel. Last systemic therapy 10 days ago.'
+  );
+  assert.equal(findEntry(result, 'parp').match.badge, 'Possible match');
+  assert.deepEqual(flagCodes(findEntry(result, 'parp')), ['washout_window']);
 
   result = runQuery(
     trials,
@@ -386,6 +399,10 @@ function testKidney() {
 
 function testTesticular() {
   const trials = buildTesticularTrials();
+  const parsed = PatientQueryParser.parse(
+    'Relapsed NSGCT after first-line BEP. AFP remains elevated after orchiectomy.'
+  );
+  assert.equal(parsed.temporalFacts.persistentMarkersAfterOrchiectomy, 'yes');
 
   let result = runQuery(
     trials,

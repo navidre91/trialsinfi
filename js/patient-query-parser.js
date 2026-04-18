@@ -115,6 +115,17 @@
     };
   }
 
+  function createTemporalFacts() {
+    return {
+      sinceLastSystemicTherapyDays: null,
+      sinceLastRadiationDays: null,
+      sinceLastSurgeryDays: null,
+      recentImagingDays: null,
+      progressedAfterTherapies: [],
+      persistentMarkersAfterOrchiectomy: ""
+    };
+  }
+
   function detectCancerType(text) {
     let bestType = "";
     let bestScore = 0;
@@ -319,6 +330,129 @@
       return "prior";
     }
 
+    return "";
+  }
+
+  function durationMatchToDays(match) {
+    if (!match) {
+      return null;
+    }
+
+    const amount = Number(match[1]);
+    const unit = (match[2] || "").toLowerCase();
+    if (!Number.isFinite(amount)) {
+      return null;
+    }
+
+    if (unit.startsWith("day") || unit === "d") {
+      return amount;
+    }
+    if (unit.startsWith("week") || unit.startsWith("wk") || unit === "w") {
+      return amount * 7;
+    }
+    if (unit.startsWith("month") || unit.startsWith("mo")) {
+      return amount * 30;
+    }
+    return null;
+  }
+
+  function extractRelativeDays(text, patterns) {
+    for (const pattern of patterns) {
+      const days = durationMatchToDays(text.match(pattern));
+      if (days !== null) {
+        return days;
+      }
+    }
+    return null;
+  }
+
+  function normalizeTherapyLabel(raw) {
+    const token = normalizeToken(raw).replace(/[^a-z0-9]+/g, " ").trim();
+    if (!token) return "";
+    if (token.includes("enzalutamide")) return "enzalutamide";
+    if (token.includes("abiraterone")) return "abiraterone";
+    if (token.includes("apalutamide")) return "apalutamide";
+    if (token.includes("darolutamide")) return "darolutamide";
+    if (token.includes("docetaxel")) return "docetaxel";
+    if (token.includes("cabazitaxel")) return "cabazitaxel";
+    if (token.includes("platinum") || token.includes("cisplatin") || token.includes("carboplatin")) return "platinum";
+    if (token.includes("pembrolizumab")) return "pembrolizumab";
+    if (token.includes("nivolumab")) return "nivolumab";
+    if (token.includes("ipilimumab")) return "ipilimumab";
+    if (token.includes("io") || token.includes("immunotherapy")) return "immunotherapy";
+    if (token.includes("cabozantinib")) return "cabozantinib";
+    if (token.includes("axitinib")) return "axitinib";
+    if (token.includes("lenvatinib")) return "lenvatinib";
+    if (token.includes("systemic therapy") || token.includes("therapy") || token.includes("treatment")) return "systemic therapy";
+    return token;
+  }
+
+  function detectProgressedAfterTherapies(text) {
+    const therapies = [];
+    const patterns = [
+      /progress(?:ed|ion)?\s+(?:on|after|following)\s+([a-z0-9+\/ -]{3,40})/ig,
+      /(?:failed|failure of)\s+([a-z0-9+\/ -]{3,40})/ig
+    ];
+    const stopTokens = /\b(and|with|without|who|after|before|for|while|because|due|no prior|phase|trial)\b/i;
+
+    patterns.forEach(pattern => {
+      let match;
+      while ((match = pattern.exec(text)) !== null) {
+        let raw = normalizeWhitespace(match[1] || "");
+        if (!raw) {
+          continue;
+        }
+        raw = raw.split(/[,.;]/)[0];
+        const stop = raw.match(stopTokens);
+        if (stop && stop.index > 0) {
+          raw = raw.slice(0, stop.index);
+        }
+        const normalized = normalizeTherapyLabel(raw);
+        if (normalized && !therapies.includes(normalized)) {
+          therapies.push(normalized);
+        }
+      }
+    });
+
+    return therapies;
+  }
+
+  function detectSinceLastSystemicTherapyDays(text) {
+    return extractRelativeDays(text, [
+      /last\s+(?:systemic therapy|therapy|treatment|study drug|platinum|cisplatin|carboplatin|docetaxel|enzalutamide|abiraterone|apalutamide|darolutamide)[^.;,\n]{0,24}?(\d+)\s*(days?|d|weeks?|wks?|months?|mos?)\s+ago/i,
+      /(\d+)\s*(days?|d|weeks?|wks?|months?|mos?)\s+(?:since|after)\s+(?:last\s+)?(?:systemic therapy|therapy|treatment|study drug|platinum|cisplatin|carboplatin|docetaxel|enzalutamide|abiraterone|apalutamide|darolutamide)/i,
+      /stopped\s+(?:therapy|treatment|study drug)[^.;,\n]{0,20}?(\d+)\s*(days?|d|weeks?|wks?|months?|mos?)\s+ago/i
+    ]);
+  }
+
+  function detectSinceLastRadiationDays(text) {
+    return extractRelativeDays(text, [
+      /last\s+(?:radiation|radiotherapy|rt|xrt)[^.;,\n]{0,20}?(\d+)\s*(days?|d|weeks?|wks?|months?|mos?)\s+ago/i,
+      /(\d+)\s*(days?|d|weeks?|wks?|months?|mos?)\s+(?:since|after)\s+(?:last\s+)?(?:radiation|radiotherapy|rt|xrt)/i
+    ]);
+  }
+
+  function detectSinceLastSurgeryDays(text) {
+    return extractRelativeDays(text, [
+      /last\s+(?:surgery|prostatectomy|cystectomy|nephrectomy|orchiectomy|rplnd)[^.;,\n]{0,20}?(\d+)\s*(days?|d|weeks?|wks?|months?|mos?)\s+ago/i,
+      /(\d+)\s*(days?|d|weeks?|wks?|months?|mos?)\s+(?:since|after)\s+(?:last\s+)?(?:surgery|prostatectomy|cystectomy|nephrectomy|orchiectomy|rplnd)/i
+    ]);
+  }
+
+  function detectRecentImagingDays(text) {
+    return extractRelativeDays(text, [
+      /(?:psma pet|pet\/ct|pet ct|ct scan|mri|restaging imaging|imaging)[^.;,\n]{0,20}?(\d+)\s*(days?|d|weeks?|wks?|months?|mos?)\s+ago/i,
+      /(\d+)\s*(days?|d|weeks?|wks?|months?|mos?)\s+(?:since|after)\s+(?:psma pet|pet\/ct|pet ct|ct scan|mri|restaging imaging|imaging)/i
+    ]);
+  }
+
+  function detectPersistentMarkersAfterOrchiectomy(text) {
+    const markerToken = /(afp|beta[- ]?hcg|hcg|ldh|markers?)/i;
+    const persistenceToken = /(persist(?:ent|ently)|remain(?:s|ed)? elevated|elevated)/i;
+    if ((/after orchiectomy/i.test(text) && markerToken.test(text) && persistenceToken.test(text))
+      || /(persist(?:ent|ently)|remain(?:s|ed)? elevated).{0,24}(afp|beta[- ]?hcg|hcg|ldh|markers?)/i.test(text)) {
+      return "yes";
+    }
     return "";
   }
 
@@ -1055,6 +1189,38 @@
     if (parsed.clinicalAxes.markerStatus === "markers_elevated") addChip(parsed.chips, "Biomarker", "Markers elevated");
   }
 
+  function populateTemporalFacts(parsed, text) {
+    parsed.temporalFacts.sinceLastSystemicTherapyDays = detectSinceLastSystemicTherapyDays(text);
+    parsed.temporalFacts.sinceLastRadiationDays = detectSinceLastRadiationDays(text);
+    parsed.temporalFacts.sinceLastSurgeryDays = detectSinceLastSurgeryDays(text);
+    parsed.temporalFacts.recentImagingDays = detectRecentImagingDays(text);
+    parsed.temporalFacts.progressedAfterTherapies = detectProgressedAfterTherapies(text);
+    parsed.temporalFacts.persistentMarkersAfterOrchiectomy = detectPersistentMarkersAfterOrchiectomy(text);
+  }
+
+  function addTemporalChips(parsed) {
+    const temporal = parsed.temporalFacts || {};
+
+    (temporal.progressedAfterTherapies || []).forEach(therapy => {
+      addChip(parsed.chips, "Temporal", `Progressed after ${therapy}`);
+    });
+    if (Number.isFinite(temporal.sinceLastSystemicTherapyDays)) {
+      addChip(parsed.chips, "Temporal", `Last systemic therapy ${temporal.sinceLastSystemicTherapyDays}d ago`);
+    }
+    if (Number.isFinite(temporal.sinceLastRadiationDays)) {
+      addChip(parsed.chips, "Temporal", `Last radiation ${temporal.sinceLastRadiationDays}d ago`);
+    }
+    if (Number.isFinite(temporal.sinceLastSurgeryDays)) {
+      addChip(parsed.chips, "Temporal", `Last surgery ${temporal.sinceLastSurgeryDays}d ago`);
+    }
+    if (Number.isFinite(temporal.recentImagingDays)) {
+      addChip(parsed.chips, "Temporal", `Imaging ${temporal.recentImagingDays}d ago`);
+    }
+    if (temporal.persistentMarkersAfterOrchiectomy === "yes") {
+      addChip(parsed.chips, "Temporal", "Persistent markers after orchiectomy");
+    }
+  }
+
   function parse(query) {
     const rawQuery = normalizeWhitespace(query);
     const parsed = {
@@ -1066,6 +1232,7 @@
       diseaseLabel: "",
       diseaseSettingIds: [],
       clinicalAxes: createClinicalAxes(),
+      temporalFacts: createTemporalFacts(),
       treatmentPreferences: [],
       phasePreference: "",
       locationPreferences: [],
@@ -1099,11 +1266,13 @@
       parseTesticular(parsed, rawQuery);
     }
 
+    populateTemporalFacts(parsed, rawQuery);
     addChip(parsed.chips, "Cancer", parsed.cancerType);
     if (parsed.phasePreference) addChip(parsed.chips, "Preference", parsed.phasePreference);
     parsed.treatmentPreferences.forEach(pref => addChip(parsed.chips, "Preference", pref.replace(/_/g, " ")));
     parsed.locationPreferences.forEach(location => addChip(parsed.chips, "Location", location));
     parsed.notes.forEach(note => addChip(parsed.chips, "Note", note));
+    addTemporalChips(parsed);
 
     return parsed;
   }
