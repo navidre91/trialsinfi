@@ -126,6 +126,14 @@
     };
   }
 
+  function createScreeningFacts() {
+    return {
+      ecogStatus: "",
+      labState: "",
+      organFunctionState: ""
+    };
+  }
+
   function detectCancerType(text) {
     let bestType = "";
     let bestScore = 0;
@@ -453,6 +461,57 @@
       || /(persist(?:ent|ently)|remain(?:s|ed)? elevated).{0,24}(afp|beta[- ]?hcg|hcg|ldh|markers?)/i.test(text)) {
       return "yes";
     }
+    return "";
+  }
+
+  function detectEcogStatus(text) {
+    const explicitMatch = text.match(/\b(?:eastern cooperative oncology group|ecog|performance status|ps)\s*(?:of\s*)?([0-4])(?:\s*(?:-|to|or|\/)\s*([0-4]))?\b/i);
+    if (explicitMatch) {
+      const low = Number.parseInt(explicitMatch[1], 10);
+      const high = explicitMatch[2] ? Number.parseInt(explicitMatch[2], 10) : low;
+      const max = Number.isFinite(high) ? Math.max(low, high) : low;
+      if (max >= 3) return "ecog_3_4";
+      if (max === 2) return "ecog_2";
+      if (max === 1) return "ecog_1";
+      if (max === 0) return "ecog_0";
+    }
+
+    if (/bedbound|wheelchair[- ]bound|limited self[- ]care|poor performance status/i.test(text)) {
+      return "ecog_3_4";
+    }
+
+    return "";
+  }
+
+  function detectLabState(text) {
+    if (/\b(?:labs?|cbc|cmp|hematologic(?:al)? (?:function|profile)|bone marrow function)\b[^.]{0,24}\b(?:normal|wnl|within normal limits|adequate|acceptable)\b|normal (?:cbc|cmp|hemoglobin|platelets|anc)\b/i.test(text)) {
+      return "within_range";
+    }
+
+    if (/severe cytopenia|pancytopenia|transfusion[- ]dependent|anc\s*(?:<|below)\s*1000|platelets?\s*(?:<|below)\s*(?:75(?:,?000)?|75000)|hemoglobin\s*(?:<|below)\s*8\b/i.test(text)) {
+      return "markedly_abnormal";
+    }
+
+    if (/mild(?:ly)? abnormal labs?|mild anemia|mild thrombocytopenia|mild neutropenia|moderate thrombocytopenia|moderate anemia/i.test(text)) {
+      return "mildly_abnormal";
+    }
+
+    return "";
+  }
+
+  function detectOrganFunctionState(text) {
+    if (/adequate organ function|normal renal and hepatic function|renal function (?:normal|adequate)|hepatic function (?:normal|adequate)|lfts? (?:normal|wnl)|bilirubin normal|creatinine clearance\s*(?:>=|≥|>|above)\s*60|crcl\s*(?:>=|≥|>|above)\s*60|e?gfr\s*(?:>=|≥|>|above)\s*60/i.test(text)) {
+      return "adequate";
+    }
+
+    if (/dialysis|hemodialysis|end[- ]stage renal disease|esrd|severe renal impairment|severe hepatic dysfunction|bilirubin\s*(?:>=|≥|>|above)\s*3|creatinine clearance\s*(?:<=|≤|<|below)\s*30|crcl\s*(?:<=|≤|<|below)\s*30|e?gfr\s*(?:<=|≤|<|below)\s*30/i.test(text)) {
+      return "marked_impairment";
+    }
+
+    if (/mild renal impairment|moderate renal impairment|renal insufficiency|mild hepatic impairment|moderate hepatic impairment|mild transaminitis|bilirubin\s*(?:>=|≥|>|above)\s*1\.5/i.test(text)) {
+      return "mild_impairment";
+    }
+
     return "";
   }
 
@@ -1198,6 +1257,12 @@
     parsed.temporalFacts.persistentMarkersAfterOrchiectomy = detectPersistentMarkersAfterOrchiectomy(text);
   }
 
+  function populateScreeningFacts(parsed, text) {
+    parsed.screeningFacts.ecogStatus = detectEcogStatus(text);
+    parsed.screeningFacts.labState = detectLabState(text);
+    parsed.screeningFacts.organFunctionState = detectOrganFunctionState(text);
+  }
+
   function addTemporalChips(parsed) {
     const temporal = parsed.temporalFacts || {};
 
@@ -1221,6 +1286,23 @@
     }
   }
 
+  function addScreeningChips(parsed) {
+    const screening = parsed.screeningFacts || {};
+
+    if (screening.ecogStatus === "ecog_0") addChip(parsed.chips, "Screening", "ECOG 0");
+    if (screening.ecogStatus === "ecog_1") addChip(parsed.chips, "Screening", "ECOG 1");
+    if (screening.ecogStatus === "ecog_2") addChip(parsed.chips, "Screening", "ECOG 2");
+    if (screening.ecogStatus === "ecog_3_4") addChip(parsed.chips, "Screening", "ECOG 3-4");
+
+    if (screening.labState === "within_range") addChip(parsed.chips, "Screening", "Labs within range");
+    if (screening.labState === "mildly_abnormal") addChip(parsed.chips, "Screening", "Labs mildly abnormal");
+    if (screening.labState === "markedly_abnormal") addChip(parsed.chips, "Screening", "Labs markedly abnormal");
+
+    if (screening.organFunctionState === "adequate") addChip(parsed.chips, "Screening", "Organ function adequate");
+    if (screening.organFunctionState === "mild_impairment") addChip(parsed.chips, "Screening", "Mild organ impairment");
+    if (screening.organFunctionState === "marked_impairment") addChip(parsed.chips, "Screening", "Marked organ impairment");
+  }
+
   function parse(query) {
     const rawQuery = normalizeWhitespace(query);
     const parsed = {
@@ -1233,6 +1315,7 @@
       diseaseSettingIds: [],
       clinicalAxes: createClinicalAxes(),
       temporalFacts: createTemporalFacts(),
+      screeningFacts: createScreeningFacts(),
       treatmentPreferences: [],
       phasePreference: "",
       locationPreferences: [],
@@ -1267,12 +1350,14 @@
     }
 
     populateTemporalFacts(parsed, rawQuery);
+    populateScreeningFacts(parsed, rawQuery);
     addChip(parsed.chips, "Cancer", parsed.cancerType);
     if (parsed.phasePreference) addChip(parsed.chips, "Preference", parsed.phasePreference);
     parsed.treatmentPreferences.forEach(pref => addChip(parsed.chips, "Preference", pref.replace(/_/g, " ")));
     parsed.locationPreferences.forEach(location => addChip(parsed.chips, "Location", location));
     parsed.notes.forEach(note => addChip(parsed.chips, "Note", note));
     addTemporalChips(parsed);
+    addScreeningChips(parsed);
 
     return parsed;
   }

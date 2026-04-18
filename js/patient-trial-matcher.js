@@ -72,6 +72,14 @@
       title: "Confirm HER2 status",
       message: "Confirm HER2 IHC status before referring to HER2-directed urothelial trials."
     },
+    ecog_status: {
+      title: "Confirm ECOG performance status",
+      message: "Verify before referral: ECOG performance status."
+    },
+    lab_organ_function: {
+      title: "Confirm key laboratory and organ function criteria",
+      message: "Verify before referral: current renal, hepatic, and hematologic function."
+    },
     washout_window: {
       title: "Verify washout interval",
       message: "Recent systemic therapy may require a protocol-specific washout interval before referral."
@@ -313,6 +321,14 @@
     ].join(" ").toLowerCase();
   }
 
+  function buildTrialEligibilityText(trial) {
+    return [
+      ...(normalizeList(trial.eligibilityCriteria)),
+      trial.inclusionCriteria,
+      trial.exclusionCriteria
+    ].join(" ").toLowerCase();
+  }
+
   function confidenceScore(trial) {
     return CONFIDENCE_SCORES[(trial.classificationConfidence || "").toUpperCase()] || 0;
   }
@@ -455,6 +471,46 @@
     return label.toLowerCase() === "systemic therapy" ? "systemic therapy" : label;
   }
 
+  function resolveTrialEcogRequirement(text) {
+    if (!text) {
+      return null;
+    }
+
+    if (/(?:ecog|performance status|eastern cooperative oncology group|ps)[^.]{0,48}(?:0\s*(?:-|to|or|\/)\s*1|0,?\s*1|<=?\s*1|less than 2)/i.test(text)) {
+      return 1;
+    }
+
+    if (/(?:ecog|performance status|eastern cooperative oncology group|ps)[^.]{0,48}(?:0\s*(?:-|to|or|\/)\s*2|0,?\s*1,?\s*or?\s*2|<=?\s*2|less than 3)/i.test(text)) {
+      return 2;
+    }
+
+    return null;
+  }
+
+  function trialNeedsLabReview(text) {
+    return /(adequate (?:renal|hepatic|bone marrow|hematologic|organ) function|bone marrow function|hematologic(?:al)? function|anc\b|platelets?\b|hemoglobin\b|bilirubin\b|ast\b|alt\b|creatinine clearance|crcl\b|egfr\b|gfr\b|renal function|hepatic function)/i.test(text);
+  }
+
+  function trialNeedsWashoutReview(text) {
+    return /(washout|within\s+\d+\s*(?:day|days|week|weeks)\s+(?:prior|before)|recovered from .* prior therapy|prior (?:systemic )?therapy within|anti[- ]cancer therapy within|systemic therapy within)/i.test(text);
+  }
+
+  function screeningEcogMax(value) {
+    if (value === "ecog_0") return 0;
+    if (value === "ecog_1") return 1;
+    if (value === "ecog_2") return 2;
+    if (value === "ecog_3_4") return 4;
+    return null;
+  }
+
+  function resolveEcogFact(value) {
+    if (value === "ecog_0") return "ECOG 0";
+    if (value === "ecog_1") return "ECOG 1";
+    if (value === "ecog_2") return "ECOG 2";
+    if (value === "ecog_3_4") return "ECOG 3-4";
+    return "";
+  }
+
   function applyTemporalSignals(state) {
     const temporal = state.parsedQuery.temporalFacts || {};
 
@@ -475,6 +531,51 @@
     }
   }
 
+  function applyScreeningVerification(state) {
+    const eligibilityText = buildTrialEligibilityText(state.trial);
+    if (!eligibilityText) {
+      return;
+    }
+
+    const screening = state.parsedQuery.screeningFacts || {};
+    const ecogRequirement = resolveTrialEcogRequirement(eligibilityText);
+    const needsLabReview = trialNeedsLabReview(eligibilityText);
+    const needsWashoutReview = trialNeedsWashoutReview(eligibilityText);
+
+    if (ecogRequirement !== null) {
+      const ecogMax = screeningEcogMax(screening.ecogStatus);
+      if (ecogMax === null) {
+        addFlag(state.flags, "ecog_status");
+      } else if (ecogMax <= ecogRequirement) {
+        addResolvedFact(state.resolvedFacts, resolveEcogFact(screening.ecogStatus));
+      } else if (screening.ecogStatus === "ecog_2" && ecogRequirement === 1) {
+        addFlag(state.flags, "ecog_status");
+      } else {
+        state.excludes.push("ecog_status");
+      }
+    }
+
+    if (needsLabReview) {
+      const hasHelpfulScreeningData = Boolean(screening.labState || screening.organFunctionState);
+      if (!hasHelpfulScreeningData) {
+        addFlag(state.flags, "lab_organ_function");
+      } else if (screening.labState === "within_range" || screening.organFunctionState === "adequate") {
+        addResolvedFact(state.resolvedFacts, "baseline labs and organ function documented");
+      } else {
+        addFlag(state.flags, "lab_organ_function");
+      }
+    }
+
+    if (needsWashoutReview) {
+      const days = state.parsedQuery.temporalFacts?.sinceLastSystemicTherapyDays;
+      if (!Number.isFinite(days)) {
+        addFlag(state.flags, "washout_window");
+      } else if (days > 14) {
+        addResolvedFact(state.resolvedFacts, `washout ${days}d`);
+      }
+    }
+  }
+
   function baseMatchState(trial, parsedQuery) {
     const resolvedFacts = [];
     const flags = [];
@@ -492,6 +593,7 @@
       excludes
     };
     applyTemporalSignals(state);
+    applyScreeningVerification(state);
     return state;
   }
 

@@ -22,6 +22,9 @@ function buildTrial(overrides = {}) {
     sourceTags: {},
     conditions: [],
     interventions: [],
+    eligibilityCriteria: [],
+    inclusionCriteria: '',
+    exclusionCriteria: '',
     ...overrides
   };
 }
@@ -115,7 +118,24 @@ function buildProstateTrials() {
     interventions: ['docetaxel', 'darolutamide']
   });
 
-  return [radioligandTrial, parpTrial, classifierTrial, tripletTrial];
+  const screeningTrial = buildTrial({
+    id: 'screening-gated',
+    title: 'mCRPC Trial With Standard Screening Gates',
+    description: 'Metastatic castration-resistant prostate cancer study.',
+    cancerType: 'Prostate',
+    diseaseSettingPrimaryId: 'crpc_metastatic_postARPI',
+    diseaseSettingAllIds: ['crpc_metastatic_postARPI', 'crpc_general'],
+    clinicalAxes: {
+      castrationStatus: 'castration_resistant',
+      metastaticStatus: 'metastatic',
+      priorArpi: 'yes'
+    },
+    conditions: ['prostate cancer'],
+    inclusionCriteria: 'Eastern Cooperative Oncology Group (ECOG) Performance Status 0 or 1. Adequate renal, liver, and bone marrow function.',
+    exclusionCriteria: 'Systemic anti-cancer therapy within 2 weeks of Day 1.'
+  });
+
+  return [radioligandTrial, parpTrial, classifierTrial, tripletTrial, screeningTrial];
 }
 
 function buildBladderTrials() {
@@ -264,11 +284,14 @@ function buildTesticularTrials() {
 function testProstate() {
   const trials = buildProstateTrials();
   let parsed = PatientQueryParser.parse(
-    'Male, 65. mCRPC. Progressed on enzalutamide. Last systemic therapy 10 days ago. PSMA PET 21 days ago.'
+    'Male, 65. mCRPC. Progressed on enzalutamide. Last systemic therapy 10 days ago. PSMA PET 21 days ago. ECOG 1. Labs normal. Adequate organ function.'
   );
   assert.deepEqual(parsed.temporalFacts.progressedAfterTherapies, ['enzalutamide']);
   assert.equal(parsed.temporalFacts.sinceLastSystemicTherapyDays, 10);
   assert.equal(parsed.temporalFacts.recentImagingDays, 21);
+  assert.equal(parsed.screeningFacts.ecogStatus, 'ecog_1');
+  assert.equal(parsed.screeningFacts.labState, 'within_range');
+  assert.equal(parsed.screeningFacts.organFunctionState, 'adequate');
 
   let result = runQuery(
     trials,
@@ -316,6 +339,25 @@ function testProstate() {
   );
   assert.equal(findEntry(result, 'triplet').match.badge, 'Possible match');
   assert.deepEqual(flagCodes(findEntry(result, 'triplet')), ['adt_history']);
+
+  result = runQuery(
+    trials,
+    'Male, 65. mCRPC. Progressed on enzalutamide.'
+  );
+  assert.equal(findEntry(result, 'screening-gated').match.badge, 'Possible match');
+  assert.deepEqual(flagCodes(findEntry(result, 'screening-gated')), ['ecog_status', 'lab_organ_function', 'washout_window']);
+
+  result = runQuery(
+    trials,
+    'Male, 65. mCRPC. Progressed on enzalutamide. ECOG 1. Labs normal. Adequate organ function. Last systemic therapy 21 days ago.'
+  );
+  assert.equal(findEntry(result, 'screening-gated').match.badge, 'Strong match');
+
+  result = runQuery(
+    trials,
+    'Male, 65. mCRPC. Progressed on enzalutamide. ECOG 3. Labs normal. Adequate organ function. Last systemic therapy 21 days ago.'
+  );
+  assert.equal(findEntry(result, 'screening-gated'), undefined, 'Explicit ECOG 3 should exclude a trial requiring ECOG 0-1.');
 
   result = runQuery(
     trials,
