@@ -749,14 +749,17 @@
   }
 
   function detectPrimarySite(text) {
-    if (/mediastinal|extragonadal/i.test(text)) {
+    if (/mediastinal|primary mediastinal/i.test(text)) {
       return "mediastinal";
     }
     if (/intracranial|pineal|suprasellar/i.test(text)) {
       return "intracranial";
     }
     if (/retroperitoneal primary|retroperitoneal germ cell/i.test(text)) {
-      return "retroperitoneal";
+      return "retroperitoneal_primary";
+    }
+    if (/extragonadal|non[- ]gonadal/i.test(text)) {
+      return "extragonadal";
     }
     if (/\btesticular\b|\btestis\b/i.test(text)) {
       return "testicular";
@@ -765,10 +768,10 @@
   }
 
   function detectPriorChemoLines(text) {
-    if (/third[- ]line|2 prior lines|two prior lines|heavily pretreated|multiple prior lines/i.test(text)) {
+    if (/third[- ]line|2 prior lines|two prior lines|>= ?2 prior lines|heavily pretreated|multiple prior lines|after (?:tip|veip|vip|gemox|gemoxp|ti-?ce)|post[- ](?:tip|veip|vip|gemox|gemoxp|ti-?ce)|after second[- ]line|post[- ]second[- ]line|after hdct|after high[- ]dose chemotherapy/i.test(text)) {
       return "2+";
     }
-    if (/after bep|after ep|after first[- ]line|second[- ]line|1 prior line|one prior line|salvage/i.test(text)) {
+    if (/after bep|after ep|after first[- ]line|post[- ]first[- ]line|second[- ]line|1 prior line|one prior line|salvage|relapsed after cisplatin|after cisplatin[- ]based/i.test(text)) {
       return "1";
     }
     if (/no prior chemotherapy|chemo[- ]naive|treatment[- ]naive/i.test(text)) {
@@ -784,18 +787,30 @@
     if (/no prior hdct|no prior high[- ]dose chemotherapy|hdct[- ]naive/i.test(text)) {
       return "no";
     }
-    if (/prior hdct|after hdct|after high[- ]dose chemotherapy|ti-?ce|stem cell rescue/i.test(text)) {
+    if (/prior hdct|after hdct|after high[- ]dose chemotherapy|ti-?ce|stem cell rescue|high[- ]dose carboplatin|high[- ]dose etoposide/i.test(text)) {
       return "yes";
     }
     return "";
   }
 
   function detectMarkerStatus(text) {
-    if (/markers normal|normal markers|afp normal|beta[- ]?hcg normal|ldh normal/i.test(text)) {
-      return "markers_normal";
+    if (/multiple.*markers.*elevated|AFP.*and.*(?:beta[- ]?hcg|hcg).*elevated|(?:beta[- ]?hcg|hcg).*(?:and ).*AFP.*elevated|afp.*hcg.*elevated|elevated.*AFP.*hCG/i.test(text)) {
+      return "multiple_elevated";
     }
-    if (/elevated markers|rising markers|persistently elevated afp|persistently elevated hcg|afp elevated|beta[- ]?hcg elevated|ldh elevated/i.test(text)) {
+    if (/persistently elevated afp|afp elevated|afp remains elevated|afp rising/i.test(text)) {
+      return "afp_elevated";
+    }
+    if (/persistently elevated (?:beta[- ]?hcg|hcg)|(?:beta[- ]?hcg|hcg) elevated|(?:beta[- ]?hcg|hcg) remains elevated|(?:beta[- ]?hcg|hcg) rising/i.test(text)) {
+      return "hcg_elevated";
+    }
+    if (/persistently elevated ldh|ldh elevated|ldh remains elevated|ldh rising/i.test(text)) {
+      return "ldh_elevated";
+    }
+    if (/elevated markers|rising markers|serum tumor markers elevated/i.test(text)) {
       return "markers_elevated";
+    }
+    if (/markers normal|normal markers|afp normal|beta[- ]?hcg normal|ldh normal|normalized markers|marker negative/i.test(text)) {
+      return "markers_normal";
     }
     return "";
   }
@@ -1189,18 +1204,60 @@
     parsed.clinicalAxes.priorHdct = detectPriorHdct(text);
     parsed.clinicalAxes.markerStatus = detectMarkerStatus(text);
     parsed.clinicalAxes.stage1RiskFactors = detectStage1RiskFactors(text);
+    const persistentMarkersAfterOrchiectomy = detectPersistentMarkersAfterOrchiectomy(text);
     if (/prior rplnd|post[- ]rplnd|after rplnd/i.test(text)) {
       parsed.clinicalAxes.rplndStatus = "prior_rplnd";
+    }
+
+    if (!parsed.clinicalAxes.markerStatus && persistentMarkersAfterOrchiectomy === "yes") {
+      if (/afp/i.test(text)) {
+        parsed.clinicalAxes.markerStatus = "afp_elevated";
+      } else if (/beta[- ]?hcg|\bhcg\b/i.test(text)) {
+        parsed.clinicalAxes.markerStatus = "hcg_elevated";
+      } else if (/\bldh\b/i.test(text)) {
+        parsed.clinicalAxes.markerStatus = "ldh_elevated";
+      } else {
+        parsed.clinicalAxes.markerStatus = "markers_elevated";
+      }
+    }
+
+    if (parsed.clinicalAxes.histology === "pure_seminoma" && ["afp_elevated", "multiple_elevated"].includes(parsed.clinicalAxes.markerStatus)) {
+      parsed.clinicalAxes.histology = "nsgct";
+      parsed.notes.push("AFP elevation treated as NSGCT");
+    }
+
+    if (!parsed.clinicalAxes.clinicalStage && persistentMarkersAfterOrchiectomy === "yes" && (parsed.clinicalAxes.histology === "nsgct" || parsed.clinicalAxes.histology === "mixed_gct")) {
+      parsed.clinicalAxes.clinicalStage = "stage_is";
+    }
+
+    if (!parsed.clinicalAxes.igcccgRisk && parsed.clinicalAxes.primarySite === "mediastinal" && (parsed.clinicalAxes.histology === "nsgct" || parsed.clinicalAxes.histology === "mixed_gct")) {
+      parsed.clinicalAxes.igcccgRisk = "poor";
     }
 
     const histology = parsed.clinicalAxes.histology;
     const stage = parsed.clinicalAxes.clinicalStage;
     const lines = parsed.clinicalAxes.priorChemoLines;
+    const postFirstLineManagement = (
+      /(post[- ]first[- ]line|after first[- ]line chemotherapy|post[- ]chemotherapy|post[- ]chemo|pc[- ]rplnd|post[- ]chemotherapy rplnd|residual mass after chemotherapy|residual mass post[- ]chemo|complete response after chemotherapy)/i.test(text)
+      || ((/after bep|after ep/i.test(text)) && /(residual mass|post[- ]chemotherapy|post[- ]chemo|pc[- ]rplnd)/i.test(text))
+    ) && !/recurrent|relapsed|refractory|salvage|third[- ]line|2 prior lines|two prior lines|after tip|after veip|after vip|after ti-?ce|after hdct/i.test(text);
 
     if (parsed.clinicalAxes.primarySite && parsed.clinicalAxes.primarySite !== "testicular") {
       parsed.diseaseGroup = "extragonadal";
       parsed.diseaseLabel = "Extragonadal GCT";
       pushDiseaseIds(parsed.diseaseSettingIds, ["extragonadal_gct"]);
+    } else if (postFirstLineManagement) {
+      parsed.diseaseGroup = "post_first_line";
+      if (histology === "pure_seminoma") {
+        parsed.diseaseLabel = "Seminoma — post first-line management";
+        pushDiseaseIds(parsed.diseaseSettingIds, ["seminoma_post_first_line", "gct_advanced_general"]);
+      } else if (histology === "nsgct" || histology === "mixed_gct") {
+        parsed.diseaseLabel = "NSGCT — post first-line management";
+        pushDiseaseIds(parsed.diseaseSettingIds, ["nsgct_post_first_line", "gct_advanced_general"]);
+      } else {
+        parsed.diseaseLabel = "GCT — post first-line management";
+        pushDiseaseIds(parsed.diseaseSettingIds, ["gct_advanced_general"]);
+      }
     } else if (/recurrent|relapsed|refractory|salvage|after bep|after ep|after first[- ]line|second[- ]line|third[- ]line|ti-?ce|hdct/i.test(text) || lines === "1" || lines === "2+" || parsed.clinicalAxes.priorHdct === "yes") {
       parsed.diseaseGroup = "recurrent";
       if (histology === "pure_seminoma") {
@@ -1281,13 +1338,17 @@
     if (parsed.diseaseLabel) addChip(parsed.chips, "Disease", parsed.diseaseLabel);
     if (parsed.clinicalAxes.histology) addChip(parsed.chips, "Disease", parsed.clinicalAxes.histology === "pure_seminoma" ? "Seminoma" : parsed.clinicalAxes.histology === "nsgct" ? "NSGCT" : "Mixed GCT");
     if (parsed.clinicalAxes.igcccgRisk) addChip(parsed.chips, "Risk", `IGCCCG ${parsed.clinicalAxes.igcccgRisk}`);
-    if (parsed.clinicalAxes.primarySite && parsed.clinicalAxes.primarySite !== "testicular") addChip(parsed.chips, "Disease", `${parsed.clinicalAxes.primarySite} primary`);
+    if (parsed.clinicalAxes.primarySite && parsed.clinicalAxes.primarySite !== "testicular") addChip(parsed.chips, "Disease", parsed.clinicalAxes.primarySite === "extragonadal" ? "Extragonadal primary" : `${parsed.clinicalAxes.primarySite.replace(/_/g, " ")} primary`);
     if (parsed.clinicalAxes.priorChemoLines === "0") addChip(parsed.chips, "Treatment", "Chemo-naive");
     if (parsed.clinicalAxes.priorChemoLines === "1") addChip(parsed.chips, "Treatment", "One prior line");
     if (parsed.clinicalAxes.priorChemoLines === "2+") addChip(parsed.chips, "Treatment", "Multiple prior lines");
     if (parsed.clinicalAxes.priorHdct === "yes") addChip(parsed.chips, "Treatment", "Prior HDCT");
     if (parsed.clinicalAxes.markerStatus === "markers_normal") addChip(parsed.chips, "Biomarker", "Markers normal");
     if (parsed.clinicalAxes.markerStatus === "markers_elevated") addChip(parsed.chips, "Biomarker", "Markers elevated");
+    if (parsed.clinicalAxes.markerStatus === "afp_elevated") addChip(parsed.chips, "Biomarker", "AFP elevated");
+    if (parsed.clinicalAxes.markerStatus === "hcg_elevated") addChip(parsed.chips, "Biomarker", "beta-hCG elevated");
+    if (parsed.clinicalAxes.markerStatus === "ldh_elevated") addChip(parsed.chips, "Biomarker", "LDH elevated");
+    if (parsed.clinicalAxes.markerStatus === "multiple_elevated") addChip(parsed.chips, "Biomarker", "Multiple markers elevated");
   }
 
   function populateTemporalFacts(parsed, text) {

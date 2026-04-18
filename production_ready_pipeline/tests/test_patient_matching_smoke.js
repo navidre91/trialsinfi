@@ -319,7 +319,54 @@ function buildTesticularTrials() {
     conditions: ['nonseminomatous germ cell tumor']
   });
 
-  return [seminomaTrial, recurrentTrial];
+  const stageIsTrial = buildTrial({
+    id: 'nsgct-stage-is',
+    title: 'NSGCT Stage IS Trial',
+    description: 'First-line treatment study for NSGCT with persistently elevated AFP after orchiectomy.',
+    cancerType: 'Testicular',
+    diseaseSettingPrimaryId: 'nsgct_stage_is',
+    diseaseSettingAllIds: ['nsgct_stage_is', 'gct_advanced_general'],
+    clinicalAxes: {
+      histology: 'nsgct',
+      clinicalStage: 'stage_is',
+      markerStatus: 'afp_elevated',
+      priorChemoLines: '0'
+    },
+    conditions: ['nonseminomatous germ cell tumor']
+  });
+
+  const postFirstLineTrial = buildTrial({
+    id: 'nsgct-post1l',
+    title: 'Post-Chemotherapy NSGCT Management Trial',
+    description: 'Study for NSGCT residual-mass management after first-line BEP.',
+    cancerType: 'Testicular',
+    diseaseSettingPrimaryId: 'nsgct_post_first_line',
+    diseaseSettingAllIds: ['nsgct_post_first_line', 'gct_advanced_general'],
+    clinicalAxes: {
+      histology: 'nsgct',
+      priorChemoLines: '1',
+      markerStatus: 'markers_normal'
+    },
+    conditions: ['nonseminomatous germ cell tumor']
+  });
+
+  const mediastinalTrial = buildTrial({
+    id: 'mediastinal-poor',
+    title: 'Primary Mediastinal NSGCT Trial',
+    description: 'Study for primary mediastinal NSGCT poor-risk disease.',
+    cancerType: 'Testicular',
+    diseaseSettingPrimaryId: 'gct_advanced_general',
+    diseaseSettingAllIds: ['extragonadal_gct', 'gct_advanced_general'],
+    clinicalAxes: {
+      histology: 'nsgct',
+      primarySite: 'mediastinal',
+      igcccgRisk: 'poor',
+      priorChemoLines: '0'
+    },
+    conditions: ['mediastinal germ cell tumor']
+  });
+
+  return [seminomaTrial, recurrentTrial, stageIsTrial, postFirstLineTrial, mediastinalTrial];
 }
 
 function testProstate() {
@@ -522,10 +569,28 @@ function testKidney() {
 
 function testTesticular() {
   const trials = buildTesticularTrials();
-  const parsed = PatientQueryParser.parse(
+  let parsed = PatientQueryParser.parse(
     'Relapsed NSGCT after first-line BEP. AFP remains elevated after orchiectomy.'
   );
   assert.equal(parsed.temporalFacts.persistentMarkersAfterOrchiectomy, 'yes');
+  assert.equal(parsed.clinicalAxes.markerStatus, 'afp_elevated');
+
+  parsed = PatientQueryParser.parse(
+    'Pure seminoma with AFP elevated after orchiectomy.'
+  );
+  assert.equal(parsed.clinicalAxes.histology, 'nsgct');
+
+  parsed = PatientQueryParser.parse(
+    'Primary mediastinal NSGCT, advanced disease.'
+  );
+  assert.equal(parsed.clinicalAxes.primarySite, 'mediastinal');
+  assert.equal(parsed.clinicalAxes.igcccgRisk, 'poor');
+
+  parsed = PatientQueryParser.parse(
+    'NSGCT after first-line BEP with residual mass after chemotherapy, markers normal.'
+  );
+  assert.equal(parsed.diseaseGroup, 'post_first_line');
+  assert.ok(parsed.diseaseSettingIds.includes('nsgct_post_first_line'));
 
   let result = runQuery(
     trials,
@@ -552,6 +617,40 @@ function testTesticular() {
   );
   assert.equal(findEntry(result, 'nsgct-2l').match.badge, 'Possible match');
   assert.deepEqual(flagCodes(findEntry(result, 'nsgct-2l')), ['hdct_history']);
+
+  result = runQuery(
+    trials,
+    'NSGCT with AFP elevated after orchiectomy and no prior chemotherapy.'
+  );
+  assert.equal(findEntry(result, 'nsgct-stage-is').match.badge, 'Strong match');
+  assert.equal(findEntry(result, 'seminoma-stage1'), undefined);
+
+  result = runQuery(
+    trials,
+    'NSGCT after first-line BEP with residual mass after chemotherapy, markers normal.'
+  );
+  assert.equal(findEntry(result, 'nsgct-post1l').match.badge, 'Strong match');
+  assert.equal(findEntry(result, 'nsgct-2l'), undefined);
+
+  result = runQuery(
+    trials,
+    'Primary mediastinal NSGCT, advanced disease, no prior chemotherapy.'
+  );
+  assert.equal(findEntry(result, 'mediastinal-poor').match.badge, 'Strong match');
+
+  result = runQuery(
+    trials,
+    'Primary mediastinal NSGCT, advanced disease.'
+  );
+  assert.equal(findEntry(result, 'mediastinal-poor').match.badge, 'Possible match');
+  assert.deepEqual(flagCodes(findEntry(result, 'mediastinal-poor')), ['chemo_lines']);
+
+  result = runQuery(
+    trials,
+    'Extragonadal NSGCT, advanced disease.'
+  );
+  assert.equal(findEntry(result, 'mediastinal-poor').match.badge, 'Possible match');
+  assert.deepEqual(flagCodes(findEntry(result, 'mediastinal-poor')), ['chemo_lines', 'igcccg_risk', 'primary_site']);
 }
 
 function main() {

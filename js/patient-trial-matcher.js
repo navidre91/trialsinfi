@@ -800,6 +800,60 @@
     return "";
   }
 
+  function resolveTesticularPathway(trial) {
+    const ids = getTrialDiseaseIds(trial);
+    if (ids.some(id => ["seminoma_post_first_line", "nsgct_post_first_line"].includes(id))) {
+      return "post_first_line";
+    }
+    if (ids.some(id => ["seminoma_recurrent_2l", "nsgct_recurrent_2l"].includes(id))) {
+      return "recurrent_2l";
+    }
+    if (ids.some(id => ["seminoma_3l_plus", "nsgct_3l_plus"].includes(id))) {
+      return "recurrent_3l_plus";
+    }
+    if (ids.includes("nsgct_stage_is")) {
+      return "stage_is";
+    }
+    if (ids.some(id => ["seminoma_stage1", "nsgct_stage1", "gct_stage1_general"].includes(id))) {
+      return "stage1";
+    }
+    return "";
+  }
+
+  function testicularPathwayCompatible(trial, parsedQuery) {
+    const trialPathway = resolveTesticularPathway(trial);
+    const queryGroup = normalizeWhitespace(parsedQuery.diseaseGroup);
+    const queryLines = canonicalToken(parsedQuery.clinicalAxes?.priorChemoLines);
+    const queryHdct = canonicalToken(parsedQuery.clinicalAxes?.priorHdct);
+
+    if (!trialPathway || !queryGroup) {
+      return true;
+    }
+
+    if (queryGroup === "post_first_line") {
+      return !["recurrent_2l", "recurrent_3l_plus"].includes(trialPathway);
+    }
+
+    if (queryGroup === "recurrent") {
+      if (trialPathway === "post_first_line") {
+        return false;
+      }
+      if (trialPathway === "recurrent_2l" && (queryLines === "2+" || queryHdct === "yes")) {
+        return false;
+      }
+      if (trialPathway === "recurrent_3l_plus" && queryLines !== "2+" && queryHdct !== "yes") {
+        return false;
+      }
+      return true;
+    }
+
+    if (["stage_is", "stage1"].includes(queryGroup)) {
+      return !["post_first_line", "recurrent_2l", "recurrent_3l_plus"].includes(trialPathway);
+    }
+
+    return true;
+  }
+
   function histologyGroup(value) {
     const token = canonicalToken(value);
     if (!token) return "";
@@ -946,11 +1000,62 @@
     if (!trialToken || !queryToken) {
       return true;
     }
+    if (queryToken === "extragonadal" && trialToken !== "testicular") return true;
+    if (trialToken === "extragonadal" && queryToken !== "testicular") return true;
     if (trialToken === queryToken) {
       return true;
     }
     if (trialToken === "testicular" && queryToken === "testis") return true;
     return false;
+  }
+
+  function primarySiteMatchStatus(trialValue, queryValue) {
+    const trialToken = canonicalToken(trialValue);
+    const queryToken = canonicalToken(queryValue);
+    if (!trialToken || !queryToken) {
+      return "match";
+    }
+    if (trialToken === queryToken || (trialToken === "testicular" && queryToken === "testis")) {
+      return "match";
+    }
+    if ((queryToken === "extragonadal" && trialToken !== "testicular") || (trialToken === "extragonadal" && queryToken !== "testicular")) {
+      return "flag";
+    }
+    return "exclude";
+  }
+
+  function markerStatusMatchStatus(trialValue, queryValue) {
+    const trialToken = canonicalToken(trialValue);
+    const queryToken = canonicalToken(queryValue);
+    if (!trialToken || !queryToken) {
+      return "match";
+    }
+    if (trialToken === queryToken) {
+      return "match";
+    }
+    const elevatedTokens = ["markers_elevated", "afp_elevated", "hcg_elevated", "ldh_elevated", "multiple_elevated"];
+    if (trialToken === "markers_elevated" && elevatedTokens.includes(queryToken) && queryToken !== "markers_normal") {
+      return "match";
+    }
+    if (queryToken === "markers_elevated" && ["afp_elevated", "hcg_elevated", "ldh_elevated"].includes(trialToken)) {
+      return "flag";
+    }
+    if (trialToken === "afp_elevated" && ["afp_elevated", "multiple_elevated"].includes(queryToken)) {
+      return "match";
+    }
+    if (trialToken === "hcg_elevated" && ["hcg_elevated", "multiple_elevated"].includes(queryToken)) {
+      return "match";
+    }
+    if (trialToken === "ldh_elevated" && ["ldh_elevated", "multiple_elevated"].includes(queryToken)) {
+      return "match";
+    }
+    if (queryToken === "multiple_elevated" && ["afp_elevated", "hcg_elevated", "ldh_elevated"].includes(trialToken)) {
+      return "match";
+    }
+    if (trialToken === "multiple_elevated" && ["afp_elevated", "hcg_elevated", "ldh_elevated", "markers_elevated"].includes(queryToken)) {
+      return "flag";
+    }
+    return "exclude";
   }
 
   function applyRequirementFlag(state, requirement, queryValue, flagCode, factLabel) {
@@ -991,6 +1096,17 @@
     if (group === "seminoma") return "seminoma";
     if (group === "nsgct") return "NSGCT";
     return "";
+  }
+
+  function resolveMarkerStatusFact(value) {
+    const token = canonicalToken(value);
+    if (token === "markers_normal") return "markers normal";
+    if (token === "markers_elevated") return "markers elevated";
+    if (token === "afp_elevated") return "AFP elevated";
+    if (token === "hcg_elevated") return "beta-hCG elevated";
+    if (token === "ldh_elevated") return "LDH elevated";
+    if (token === "multiple_elevated") return "multiple markers elevated";
+    return normalizeWhitespace(value).replace(/_/g, " ");
   }
 
   function matchProstateTrial(trial, parsedQuery) {
@@ -1319,6 +1435,11 @@
     const trialAxes = state.trialAxes;
     const queryAxes = state.queryAxes;
 
+    if (!testicularPathwayCompatible(trial, parsedQuery)) {
+      state.excludes.push("chemo_lines");
+      return finalizeMatch(state);
+    }
+
     if (isMeaningfulAxisValue(trialAxes.histology)) {
       if (queryAxes.histology) {
         if (!histologyMatches(trialAxes.histology, queryAxes.histology)) {
@@ -1357,10 +1478,19 @@
 
     if (isMeaningfulAxisValue(trialAxes.primarySite)) {
       if (queryAxes.primarySite) {
-        if (!primarySiteMatches(trialAxes.primarySite, queryAxes.primarySite)) {
+        const primarySiteStatus = primarySiteMatchStatus(trialAxes.primarySite, queryAxes.primarySite);
+        if (primarySiteStatus === "exclude") {
           state.excludes.push("primary_site");
-        } else if (canonicalToken(queryAxes.primarySite) !== "testicular") {
-          addResolvedFact(state.resolvedFacts, `${normalizeWhitespace(queryAxes.primarySite)} primary`);
+        } else {
+          if (canonicalToken(queryAxes.primarySite) !== "testicular") {
+            const label = canonicalToken(queryAxes.primarySite) === "extragonadal"
+              ? "extragonadal primary"
+              : `${normalizeWhitespace(queryAxes.primarySite).replace(/_/g, " ")} primary`;
+            addResolvedFact(state.resolvedFacts, label);
+          }
+          if (primarySiteStatus === "flag") {
+            addFlag(state.flags, "primary_site");
+          }
         }
       } else {
         addFlag(state.flags, "primary_site");
@@ -1390,10 +1520,14 @@
 
     if (isMeaningfulAxisValue(trialAxes.markerStatus)) {
       if (queryAxes.markerStatus) {
-        if (canonicalToken(trialAxes.markerStatus) !== canonicalToken(queryAxes.markerStatus)) {
+        const markerStatus = markerStatusMatchStatus(trialAxes.markerStatus, queryAxes.markerStatus);
+        if (markerStatus === "exclude") {
           state.excludes.push("marker_status");
         } else {
-          addResolvedFact(state.resolvedFacts, normalizeWhitespace(queryAxes.markerStatus).replace(/_/g, " "));
+          addResolvedFact(state.resolvedFacts, resolveMarkerStatusFact(queryAxes.markerStatus));
+          if (markerStatus === "flag") {
+            addFlag(state.flags, "marker_status");
+          }
         }
       } else {
         addFlag(state.flags, "marker_status");
