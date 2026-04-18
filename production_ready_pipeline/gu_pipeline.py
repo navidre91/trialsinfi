@@ -61,11 +61,14 @@ def _classify_records(study_records: list[dict], site_rows: list[dict]) -> None:
         record["Classification evidence"] = " | ".join(classification.classification_evidence)
         record["BCG status"] = classification.bcg_status
         record["Cisplatin status"] = classification.cisplatin_status
+        record["CIS / papillary pattern"] = classification.cis_papillary_pattern
         record["Castration status"] = classification.castration_status
         record["Metastatic status"] = classification.metastatic_status
         record["Disease volume"] = classification.disease_volume
         record["Prior ARPI"] = classification.prior_arpi
         record["Prior docetaxel"] = classification.prior_docetaxel
+        record["FGFR3 status"] = classification.fgfr3_status
+        record["HER2 status"] = classification.her2_status
         record["HRR biomarker"] = classification.biomarker_hrr
         record["PSMA status"] = classification.psma_status
         record["Genomic classifier"] = classification.genomic_classifier

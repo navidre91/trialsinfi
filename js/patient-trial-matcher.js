@@ -56,9 +56,21 @@
       title: "Confirm BCG history",
       message: "Confirm whether the patient is BCG-unresponsive, BCG-intolerant, or BCG-naive before referring to NMIBC trials."
     },
+    cis_papillary_pattern: {
+      title: "Confirm CIS / papillary pattern",
+      message: "Confirm whether the bladder cancer is CIS-only, papillary-only, or mixed CIS plus papillary disease."
+    },
     cisplatin_eligibility: {
       title: "Confirm cisplatin eligibility",
       message: "Confirm renal function, hearing, neuropathy, and performance status to determine cisplatin eligibility."
+    },
+    fgfr3_status: {
+      title: "Confirm FGFR3 alteration status",
+      message: "Confirm whether a susceptible FGFR3 alteration is present before referring to FGFR3-directed urothelial trials."
+    },
+    her2_status: {
+      title: "Confirm HER2 status",
+      message: "Confirm HER2 IHC status before referring to HER2-directed urothelial trials."
     },
     systemic_line: {
       title: "Confirm prior systemic therapy line",
@@ -522,6 +534,84 @@
     return true;
   }
 
+  function bladderCisPapillaryMatches(trialValue, queryValue) {
+    const trialToken = canonicalToken(trialValue);
+    const queryToken = canonicalToken(queryValue);
+    if (!trialToken || !queryToken) {
+      return true;
+    }
+    if (trialToken === queryToken) {
+      return true;
+    }
+    if (trialToken === "cis_plus_papillary") {
+      return ["cis_plus_papillary", "cis_only", "papillary_only"].includes(queryToken);
+    }
+    return false;
+  }
+
+  function bladderFgfr3Matches(trialValue, queryValue) {
+    const trialToken = canonicalToken(trialValue);
+    const queryToken = canonicalToken(queryValue);
+    if (!trialToken) {
+      return true;
+    }
+    if (trialToken === "susceptible_alteration") {
+      return queryToken === "susceptible_alteration";
+    }
+    if (trialToken === "wild_type") {
+      return queryToken === "wild_type";
+    }
+    return true;
+  }
+
+  function bladderHer2Matches(trialValue, queryValue) {
+    const trialToken = canonicalToken(trialValue);
+    const queryToken = canonicalToken(queryValue);
+    if (!trialToken) {
+      return true;
+    }
+    if (trialToken === "ihc_3_plus") {
+      return queryToken === "ihc_3_plus";
+    }
+    if (trialToken === "ihc_2_plus") {
+      return ["ihc_2_plus", "ihc_3_plus"].includes(queryToken);
+    }
+    if (trialToken === "positive") {
+      return ["ihc_2_plus", "ihc_3_plus", "positive"].includes(queryToken);
+    }
+    if (trialToken === "negative_or_low") {
+      return queryToken === "negative_or_low";
+    }
+    return true;
+  }
+
+  function deriveBladderTrialAxes(trial) {
+    const trialAxes = { ...(trial.clinicalAxes || {}) };
+    const text = buildTrialSearchText(trial);
+
+    if (!isMeaningfulAxisValue(trialAxes.fgfr3Status) && /(fgfr3|erdafitinib|rogaratinib|infigratinib|pemigatinib|futibatinib)/i.test(text)) {
+      trialAxes.fgfr3Status = "susceptible_alteration";
+    }
+
+    if (!isMeaningfulAxisValue(trialAxes.her2Status) && /(her2|erbb2|trastuzumab deruxtecan|t-dxd|disitamab|zanidatamab)/i.test(text)) {
+      trialAxes.her2Status = "ihc_3_plus";
+    }
+
+    if (!isMeaningfulAxisValue(trialAxes.cisPapillaryPattern)) {
+      const hasCis = /carcinoma in situ|\bcis\b/i.test(text);
+      const hasPapillary = /papillary|high[- ]grade ta|high[- ]grade t1/i.test(text);
+      if (hasCis && hasPapillary) {
+        trialAxes.cisPapillaryPattern = "cis_plus_papillary";
+      } else if (hasCis) {
+        trialAxes.cisPapillaryPattern = "cis_only";
+      } else if (hasPapillary) {
+        trialAxes.cisPapillaryPattern = "papillary_only";
+      }
+    }
+
+    return trialAxes;
+  }
+
   function resolveBladderLineRequirement(trial) {
     const ids = getTrialDiseaseIds(trial);
     if (ids.includes("metastatic_2l_plus")) return "1_plus";
@@ -783,8 +873,9 @@
 
   function matchBladderTrial(trial, parsedQuery) {
     const state = baseMatchState(trial, parsedQuery);
-    const trialAxes = state.trialAxes;
+    const trialAxes = deriveBladderTrialAxes(trial);
     const queryAxes = state.queryAxes;
+    state.trialAxes = trialAxes;
 
     if (isMeaningfulAxisValue(trialAxes.bcgStatus)) {
       if (queryAxes.bcgStatus) {
@@ -795,6 +886,22 @@
         }
       } else {
         addFlag(state.flags, "bcg_status");
+      }
+    }
+
+    if (isMeaningfulAxisValue(trialAxes.cisPapillaryPattern)) {
+      if (queryAxes.cisPapillaryPattern) {
+        if (!bladderCisPapillaryMatches(trialAxes.cisPapillaryPattern, queryAxes.cisPapillaryPattern)) {
+          state.excludes.push("cis_papillary_pattern");
+        } else if (queryAxes.cisPapillaryPattern === "cis_only") {
+          addResolvedFact(state.resolvedFacts, "CIS-only disease");
+        } else if (queryAxes.cisPapillaryPattern === "papillary_only") {
+          addResolvedFact(state.resolvedFacts, "papillary-only disease");
+        } else {
+          addResolvedFact(state.resolvedFacts, "CIS + papillary pattern");
+        }
+      } else {
+        addFlag(state.flags, "cis_papillary_pattern");
       }
     }
 
@@ -810,6 +917,34 @@
       }
     }
 
+    if (isMeaningfulAxisValue(trialAxes.fgfr3Status)) {
+      if (queryAxes.fgfr3Status) {
+        if (!bladderFgfr3Matches(trialAxes.fgfr3Status, queryAxes.fgfr3Status)) {
+          state.excludes.push("fgfr3_status");
+        } else {
+          addResolvedFact(state.resolvedFacts, queryAxes.fgfr3Status === "susceptible_alteration" ? "FGFR3-altered" : "FGFR3 wild-type");
+        }
+      } else {
+        addFlag(state.flags, "fgfr3_status");
+      }
+    }
+
+    if (isMeaningfulAxisValue(trialAxes.her2Status)) {
+      if (queryAxes.her2Status) {
+        if (!bladderHer2Matches(trialAxes.her2Status, queryAxes.her2Status)) {
+          state.excludes.push("her2_status");
+        } else if (queryAxes.her2Status === "ihc_3_plus") {
+          addResolvedFact(state.resolvedFacts, "HER2 IHC 3+");
+        } else if (queryAxes.her2Status === "ihc_2_plus") {
+          addResolvedFact(state.resolvedFacts, "HER2 IHC 2+");
+        } else {
+          addResolvedFact(state.resolvedFacts, "HER2 status confirmed");
+        }
+      } else {
+        addFlag(state.flags, "her2_status");
+      }
+    }
+
     const lineRequirement = resolveBladderLineRequirement(trial);
     applyRequirementFlag(
       state,
@@ -818,6 +953,18 @@
       "systemic_line",
       lineRequirement === "0" ? "treatment-naive" : lineRequirement === "1_plus" ? "previously treated" : ""
     );
+
+    if (isMeaningfulAxisValue(trialAxes.priorIo)) {
+      if (queryAxes.priorIo) {
+        if (canonicalToken(trialAxes.priorIo) !== canonicalToken(queryAxes.priorIo)) {
+          state.excludes.push("io_history");
+        } else {
+          addResolvedFact(state.resolvedFacts, queryAxes.priorIo === "no" ? "IO-naive" : "post-IO");
+        }
+      } else {
+        addFlag(state.flags, "io_history");
+      }
+    }
 
     return finalizeMatch(state);
   }

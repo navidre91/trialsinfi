@@ -28,11 +28,14 @@ class TrialClassification:
     classification_evidence: list[str] = field(default_factory=list)
     bcg_status: str = "Not applicable"
     cisplatin_status: str = "Not specified"
+    cis_papillary_pattern: str = "Not applicable"
     castration_status: str = "Not applicable"
     metastatic_status: str = "Not applicable"
     disease_volume: str = "Not applicable"
     prior_arpi: str = "Not applicable"
     prior_docetaxel: str = "Not applicable"
+    fgfr3_status: str = "Not applicable"
+    her2_status: str = "Not applicable"
     biomarker_hrr: str = "Not applicable"
     psma_status: str = "Not applicable"
     genomic_classifier: str = "Not applicable"
@@ -115,6 +118,38 @@ def _classify_cisplatin_status(text: str) -> str:
         if _matches_any(text, patterns)[0]:
             return status
     return "Not specified"
+
+
+def _classify_cis_papillary_pattern(text: str) -> str:
+    has_cis = bool(re.search(r"carcinoma.in.situ|\bCIS\b", text, re.I))
+    has_papillary = bool(re.search(r"papillary|high.grade.*Ta|high.grade.*T1|Ta/T1", text, re.I))
+    if has_cis and has_papillary:
+        return "cis_plus_papillary"
+    if has_cis:
+        return "cis_only"
+    if has_papillary:
+        return "papillary_only"
+    return "Not applicable"
+
+
+def _classify_fgfr3_status(text: str) -> str:
+    if re.search(r"FGFR3.*(alter|mutat|fusion|susceptible)|erdafitinib|rogaratinib|infigratinib|pemigatinib|futibatinib", text, re.I):
+        return "susceptible_alteration"
+    if re.search(r"FGFR3.*(wild.type|negative)|no FGFR3 alteration", text, re.I):
+        return "wild_type"
+    return "Not applicable"
+
+
+def _classify_her2_status(text: str) -> str:
+    if re.search(r"HER2.*(IHC\s*)?3\+|ERBB2.*(3\+|high|positive)|trastuzumab.deruxtecan|disitamab|zanidatamab", text, re.I):
+        return "ihc_3_plus"
+    if re.search(r"HER2.*(IHC\s*)?2\+|ERBB2.*2\+", text, re.I):
+        return "ihc_2_plus"
+    if re.search(r"HER2.*equivocal|ERBB2.*equivocal", text, re.I):
+        return "equivocal"
+    if re.search(r"HER2.*(0|1\+|negative|low)|ERBB2.*(negative|low)", text, re.I):
+        return "negative_or_low"
+    return "Not applicable"
 
 
 _SYSTEMIC_MODALITIES = {"IMMUNOTHERAPY", "TARGETED", "CHEMOTHERAPY", "ADC"}
@@ -254,6 +289,9 @@ def classify_trial(
         result.nccn_date = _BLADDER_TAX.get("nccn_date", "")
         result.bcg_status = _classify_bcg_status(disease_text)
         result.cisplatin_status = _classify_cisplatin_status(disease_text)
+        result.cis_papillary_pattern = _classify_cis_papillary_pattern(disease_text)
+        result.fgfr3_status = _classify_fgfr3_status(_make_text_blob(disease_text, modality_text))
+        result.her2_status = _classify_her2_status(_make_text_blob(disease_text, modality_text))
 
     elif cancer_type == "Prostate":
         matched_categories, evidence = _classify_categories(_PROSTATE_TAX, disease_text)

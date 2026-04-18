@@ -40,11 +40,14 @@ def _sample_records() -> tuple[list[dict], list[dict]]:
             "Classification evidence": "mCRPC | BRCA2 | post-enzalutamide",
             "BCG status": "Not applicable",
             "Cisplatin status": "Not specified",
+            "CIS / papillary pattern": "Not applicable",
             "Castration status": "castration_resistant",
             "Metastatic status": "metastatic",
             "Disease volume": "unknown",
             "Prior ARPI": "yes",
             "Prior docetaxel": "no",
+            "FGFR3 status": "Not applicable",
+            "HER2 status": "Not applicable",
             "HRR biomarker": "positive",
             "PSMA status": "required",
             "Genomic classifier": "Not applicable",
@@ -160,6 +163,7 @@ def test_exports() -> None:
         check(first_trial.get("diseaseSettingAllIds") == ["crpc_metastatic_postARPI", "crpc_general"], "Website catalog preserves disease-setting ids")
         check(first_trial.get("classificationEvidence") == ["mCRPC", "BRCA2", "post-enzalutamide"], "Website catalog preserves classification evidence")
         check(first_trial.get("clinicalAxes", {}).get("priorArpi") == "yes", "Website catalog preserves clinical axes")
+        check(first_trial.get("clinicalAxes", {}).get("fgfr3Status") is None, "Website catalog omits empty bladder biomarker axes")
         check(first_trial.get("sourceTags", {}).get("diseaseSettingPrimary") == "NCCN-inferred", "Website catalog emits source tags")
 
         invalid_catalog_path = tmpdir_path / "website_trials_invalid_email.json"

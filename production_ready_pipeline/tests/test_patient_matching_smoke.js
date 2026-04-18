@@ -127,7 +127,8 @@ function buildBladderTrials() {
     diseaseSettingPrimaryId: 'nmibc_bcg_unresponsive',
     diseaseSettingAllIds: ['nmibc_bcg_unresponsive', 'nmibc_general'],
     clinicalAxes: {
-      bcgStatus: 'BCG-Unresponsive'
+      bcgStatus: 'BCG-Unresponsive',
+      cisPapillaryPattern: 'cis_only'
     },
     conditions: ['bladder cancer'],
     interventions: ['intravesical therapy']
@@ -157,7 +158,35 @@ function buildBladderTrials() {
     conditions: ['urothelial carcinoma']
   });
 
-  return [nmibcTrial, metastatic1LTrial, metastatic2LTrial];
+  const fgfr3Trial = buildTrial({
+    id: 'muc-fgfr3',
+    title: 'Erdafitinib for FGFR3-Altered Metastatic Urothelial Cancer',
+    description: 'Targeted therapy for post-platinum metastatic urothelial carcinoma with susceptible FGFR3 alteration.',
+    cancerType: 'Bladder',
+    diseaseSettingPrimaryId: 'metastatic_2l_plus',
+    diseaseSettingAllIds: ['metastatic_2l_plus', 'metastatic_general'],
+    clinicalAxes: {
+      fgfr3Status: 'susceptible_alteration'
+    },
+    conditions: ['urothelial carcinoma'],
+    interventions: ['erdafitinib']
+  });
+
+  const her2Trial = buildTrial({
+    id: 'muc-her2',
+    title: 'HER2-Directed ADC for Later-Line Metastatic Urothelial Cancer',
+    description: 'Trastuzumab deruxtecan for later-line metastatic urothelial carcinoma with HER2 IHC 3+ disease.',
+    cancerType: 'Bladder',
+    diseaseSettingPrimaryId: 'metastatic_2l_plus',
+    diseaseSettingAllIds: ['metastatic_2l_plus', 'metastatic_general'],
+    clinicalAxes: {
+      her2Status: 'ihc_3_plus'
+    },
+    conditions: ['urothelial carcinoma'],
+    interventions: ['trastuzumab deruxtecan']
+  });
+
+  return [nmibcTrial, metastatic1LTrial, metastatic2LTrial, fgfr3Trial, her2Trial];
 }
 
 function buildKidneyTrials() {
@@ -293,6 +322,12 @@ function testBladder() {
 
   result = runQuery(
     trials,
+    'Bladder cancer, BCG-unresponsive NMIBC with papillary-only recurrence after adequate BCG.'
+  );
+  assert.equal(findEntry(result, 'nmibc-bcg'), undefined, 'CIS-only NMIBC cohort should exclude papillary-only disease.');
+
+  result = runQuery(
+    trials,
     'Metastatic urothelial carcinoma, first-line.'
   );
   assert.equal(findEntry(result, 'muc-1l-cis-ineligible').match.badge, 'Possible match');
@@ -304,6 +339,25 @@ function testBladder() {
   );
   assert.equal(findEntry(result, 'muc-1l-cis-ineligible').match.badge, 'Strong match');
   assert.equal(findEntry(result, 'muc-2l'), undefined, 'First-line metastatic query should exclude 2L bladder trials.');
+
+  result = runQuery(
+    trials,
+    'Metastatic urothelial carcinoma after prior platinum. FGFR3 mutation.'
+  );
+  assert.equal(findEntry(result, 'muc-fgfr3').match.badge, 'Strong match');
+
+  result = runQuery(
+    trials,
+    'Metastatic urothelial carcinoma after prior platinum.'
+  );
+  assert.equal(findEntry(result, 'muc-fgfr3').match.badge, 'Possible match');
+  assert.deepEqual(flagCodes(findEntry(result, 'muc-fgfr3')), ['fgfr3_status']);
+
+  result = runQuery(
+    trials,
+    'Metastatic urothelial carcinoma after prior platinum. HER2 IHC 3+.'
+  );
+  assert.equal(findEntry(result, 'muc-her2').match.badge, 'Strong match');
 }
 
 function testKidney() {

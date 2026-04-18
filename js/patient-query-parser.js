@@ -81,11 +81,14 @@
     return {
       bcgStatus: "",
       cisplatinStatus: "",
+      cisPapillaryPattern: "",
       castrationStatus: "",
       metastaticStatus: "",
       diseaseVolume: "",
       priorArpi: "",
       priorDocetaxel: "",
+      fgfr3Status: "",
+      her2Status: "",
       biomarkerHrr: "",
       biomarkerLabel: "",
       psmaStatus: "",
@@ -342,6 +345,48 @@
     return "";
   }
 
+  function detectCisPapillaryPattern(text) {
+    const hasCis = /carcinoma in situ|\bcis\b/i.test(text);
+    const hasPapillary = /papillary|high[- ]grade ta|high[- ]grade t1|hg ta|hg t1/i.test(text);
+
+    if (hasCis && hasPapillary) {
+      return "cis_plus_papillary";
+    }
+    if (hasCis) {
+      return "cis_only";
+    }
+    if (hasPapillary) {
+      return "papillary_only";
+    }
+    return "";
+  }
+
+  function detectFgfr3Status(text) {
+    if (/fgfr3.{0,24}(susceptible alteration|mutation|mutated|fusion|altered|positive)|erdafitinib candidate|fgfr inhibitor candidate/i.test(text)) {
+      return "susceptible_alteration";
+    }
+    if (/fgfr3.{0,24}(wild[- ]type|negative)|no fgfr3 alteration|without fgfr3 alteration/i.test(text)) {
+      return "wild_type";
+    }
+    return "";
+  }
+
+  function detectHer2Status(text) {
+    if (/\bher2\b.{0,12}(ihc\s*)?3\+|\berbb2\b.{0,24}(3\+|high|positive)|her2 overexpress/i.test(text)) {
+      return "ihc_3_plus";
+    }
+    if (/\bher2\b.{0,12}(ihc\s*)?2\+|\berbb2\b.{0,24}2\+/i.test(text)) {
+      return "ihc_2_plus";
+    }
+    if (/\bher2\b.{0,16}(equivocal)|\berbb2\b.{0,16}(equivocal)/i.test(text)) {
+      return "equivocal";
+    }
+    if (/\bher2\b.{0,12}(0|1\+|negative|low)|\berbb2\b.{0,24}(negative|low)|her2 low/i.test(text)) {
+      return "negative_or_low";
+    }
+    return "";
+  }
+
   function detectKidneyHistology(text) {
     if (/clear[- ]cell|ccrcc/i.test(text)) {
       return "clear_cell";
@@ -381,7 +426,7 @@
     if (/third[- ]line|3rd[- ]line|heavily pretreated|multiple prior lines|two prior lines|2 prior lines|>= ?2 prior lines/i.test(text)) {
       return "2+";
     }
-    if (/second[- ]line|2nd[- ]line|one prior line|1 prior line|after one prior line|after first[- ]line|post[- ]platinum|post[- ]io|previously treated/i.test(text)) {
+    if (/second[- ]line|2nd[- ]line|one prior line|1 prior line|after one prior line|after first[- ]line|post[- ]platinum|prior platinum|after platinum|post[- ]io|previously treated/i.test(text)) {
       return "1";
     }
     if (/treatment[- ]naive|systemic[- ]naive|no prior systemic therapy|untreated metastatic/i.test(text)) {
@@ -698,7 +743,11 @@
   function parseBladder(parsed, text) {
     parsed.clinicalAxes.bcgStatus = detectBcgStatus(text);
     parsed.clinicalAxes.cisplatinStatus = detectCisplatinStatus(text);
+    parsed.clinicalAxes.cisPapillaryPattern = detectCisPapillaryPattern(text);
+    parsed.clinicalAxes.fgfr3Status = detectFgfr3Status(text);
+    parsed.clinicalAxes.her2Status = detectHer2Status(text);
     parsed.clinicalAxes.priorSystemicLines = detectPriorSystemicLines(text);
+    parsed.clinicalAxes.priorIo = detectPriorIo(text);
 
     if (/\bnmibc\b|non[- ]muscle[- ]invasive|carcinoma in situ|high[- ]grade t1|intravesical/i.test(text)) {
       parsed.diseaseGroup = "nmibc";
@@ -771,8 +820,16 @@
     if (parsed.diseaseLabel) addChip(parsed.chips, "Disease", parsed.diseaseLabel);
     if (parsed.clinicalAxes.bcgStatus) addChip(parsed.chips, "Treatment", parsed.clinicalAxes.bcgStatus);
     if (parsed.clinicalAxes.cisplatinStatus) addChip(parsed.chips, "Treatment", parsed.clinicalAxes.cisplatinStatus);
+    if (parsed.clinicalAxes.cisPapillaryPattern === "cis_only") addChip(parsed.chips, "Disease", "CIS only");
+    if (parsed.clinicalAxes.cisPapillaryPattern === "papillary_only") addChip(parsed.chips, "Disease", "Papillary only");
+    if (parsed.clinicalAxes.cisPapillaryPattern === "cis_plus_papillary") addChip(parsed.chips, "Disease", "CIS + papillary");
+    if (parsed.clinicalAxes.fgfr3Status === "susceptible_alteration") addChip(parsed.chips, "Biomarker", "FGFR3 altered");
+    if (parsed.clinicalAxes.her2Status === "ihc_3_plus") addChip(parsed.chips, "Biomarker", "HER2 IHC 3+");
+    if (parsed.clinicalAxes.her2Status === "ihc_2_plus") addChip(parsed.chips, "Biomarker", "HER2 IHC 2+");
     if (parsed.clinicalAxes.priorSystemicLines === "0") addChip(parsed.chips, "Treatment", "Treatment-naive");
     if (parsed.clinicalAxes.priorSystemicLines === "1") addChip(parsed.chips, "Treatment", "Previously treated");
+    if (parsed.clinicalAxes.priorIo === "no") addChip(parsed.chips, "Treatment", "IO-naive");
+    if (parsed.clinicalAxes.priorIo === "yes") addChip(parsed.chips, "Treatment", "Prior IO");
   }
 
   function parseKidney(parsed, text) {

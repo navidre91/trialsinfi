@@ -33,6 +33,7 @@ def test_bladder() -> None:
     check(result.classification_confidence in ("HIGH", "MEDIUM"), f"BCG-unresponsive NMIBC confidence={result.classification_confidence}")
     check("BCG" in result.disease_setting_primary or "NMIBC" in result.disease_setting_primary, f"BCG NMIBC primary={result.disease_setting_primary!r}")
     check(result.bcg_status == "BCG-Unresponsive", f"bcg_status={result.bcg_status!r}")
+    check(result.cis_papillary_pattern == "cis_plus_papillary", f"cis_papillary_pattern={result.cis_papillary_pattern!r}")
 
     result = classify_trial(
         cancer_type="Bladder/Urothelial",
@@ -43,6 +44,26 @@ def test_bladder() -> None:
     )
     check(result.classification_confidence in ("HIGH", "MEDIUM"), f"MIBC confidence={result.classification_confidence}")
     check(result.cisplatin_status == "Cisplatin-Eligible", f"cisplatin_status={result.cisplatin_status!r}")
+
+    result = classify_trial(
+        cancer_type="Bladder/Urothelial",
+        title="Erdafitinib for FGFR3-Altered Metastatic Urothelial Carcinoma",
+        eligibility_incl="Metastatic urothelial carcinoma with susceptible FGFR3 mutation or fusion after platinum therapy",
+        conditions="metastatic urothelial carcinoma bladder cancer",
+        interventions="erdafitinib targeted therapy",
+        brief_summary="FGFR3-selected metastatic urothelial trial",
+    )
+    check(result.fgfr3_status == "susceptible_alteration", f"fgfr3_status={result.fgfr3_status!r}")
+
+    result = classify_trial(
+        cancer_type="Bladder/Urothelial",
+        title="Trastuzumab Deruxtecan for HER2 IHC 3+ Metastatic Urothelial Carcinoma",
+        eligibility_incl="Later-line metastatic urothelial carcinoma with HER2 IHC 3+ disease",
+        conditions="metastatic urothelial carcinoma bladder cancer",
+        interventions="trastuzumab deruxtecan",
+        brief_summary="HER2-directed ADC trial in metastatic urothelial carcinoma",
+    )
+    check(result.her2_status == "ihc_3_plus", f"her2_status={result.her2_status!r}")
 
 
 def test_prostate() -> None:

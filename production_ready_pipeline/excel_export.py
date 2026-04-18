@@ -60,6 +60,7 @@ def save_flat_csv(study_records: list[dict], out_path: Path) -> int:
         "NCT ID", "Study title", "Phase", "Status", "Cancer type",
         "Disease setting (primary)", "Disease setting (all)",
         "Classification confidence", "BCG status", "Cisplatin status",
+        "CIS / papillary pattern", "FGFR3 status", "HER2 status",
         "Treatment modality", "Is combination", "Delivery",
         "NCCN taxonomy version", "Conditions", "Lead sponsor",
         "Additional sponsors", "Information provided by", "Intervention(s)",
