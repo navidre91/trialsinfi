@@ -232,7 +232,7 @@ function buildKidneyTrials() {
   const papillaryTrial = buildTrial({
     id: 'papillary-met',
     title: 'MET-Directed Papillary RCC Trial',
-    description: 'Targeted therapy for metastatic papillary RCC with MET alteration.',
+    description: 'Targeted therapy for metastatic papillary type 2 RCC with MET alteration.',
     cancerType: 'Kidney',
     diseaseSettingPrimaryId: 'metastatic_ncrcc_papillary',
     diseaseSettingAllIds: ['metastatic_ncrcc_papillary', 'metastatic_ncrcc_general'],
@@ -244,7 +244,48 @@ function buildKidneyTrials() {
     conditions: ['papillary renal cell carcinoma']
   });
 
-  return [ccRccTrial, papillaryTrial];
+  const chromophobeTrial = buildTrial({
+    id: 'chromophobe-met',
+    title: 'Chromophobe RCC Study',
+    description: 'Systemic study for metastatic chromophobe RCC.',
+    cancerType: 'Kidney',
+    diseaseSettingPrimaryId: 'metastatic_ncrcc_chromophobe',
+    diseaseSettingAllIds: ['metastatic_ncrcc_chromophobe', 'metastatic_ncrcc_general'],
+    clinicalAxes: {
+      histology: 'chromophobe',
+      priorSystemicLines: '0'
+    },
+    conditions: ['chromophobe renal cell carcinoma']
+  });
+
+  const medullaryTrial = buildTrial({
+    id: 'medullary-met',
+    title: 'Renal Medullary Carcinoma Trial',
+    description: 'Study for renal medullary carcinoma and SMARCB1-deficient kidney cancer.',
+    cancerType: 'Kidney',
+    diseaseSettingPrimaryId: 'metastatic_ncrcc_collecting_duct',
+    diseaseSettingAllIds: ['metastatic_ncrcc_collecting_duct', 'metastatic_ncrcc_general'],
+    clinicalAxes: {
+      histology: 'medullary',
+      priorSystemicLines: '0'
+    },
+    conditions: ['renal medullary carcinoma']
+  });
+
+  const nccrccBasketTrial = buildTrial({
+    id: 'nccrcc-basket',
+    title: 'Non-Clear-Cell RCC Basket Trial',
+    description: 'Basket study for metastatic non-clear-cell RCC of any subtype.',
+    cancerType: 'Kidney',
+    diseaseSettingPrimaryId: 'metastatic_ncrcc_general',
+    diseaseSettingAllIds: ['metastatic_ncrcc_general'],
+    clinicalAxes: {
+      priorSystemicLines: '0'
+    },
+    conditions: ['non-clear-cell renal cell carcinoma']
+  });
+
+  return [ccRccTrial, papillaryTrial, chromophobeTrial, medullaryTrial, nccrccBasketTrial];
 }
 
 function buildTesticularTrials() {
@@ -417,6 +458,15 @@ function testBladder() {
 
 function testKidney() {
   const trials = buildKidneyTrials();
+  let parsed = PatientQueryParser.parse(
+    'Metastatic renal medullary carcinoma, treatment-naive.'
+  );
+  assert.equal(parsed.clinicalAxes.histology, 'medullary');
+
+  parsed = PatientQueryParser.parse(
+    'Metastatic non-clear-cell RCC, treatment-naive.'
+  );
+  assert.equal(parsed.clinicalAxes.histology, 'non_clear_cell');
 
   let result = runQuery(
     trials,
@@ -424,6 +474,7 @@ function testKidney() {
   );
   assert.equal(findEntry(result, 'ccrcc-1l').match.badge, 'Strong match');
   assert.equal(findEntry(result, 'papillary-met'), undefined);
+  assert.equal(findEntry(result, 'chromophobe-met'), undefined);
 
   result = runQuery(
     trials,
@@ -434,9 +485,39 @@ function testKidney() {
 
   result = runQuery(
     trials,
-    'Metastatic papillary RCC, MET mutation, treatment-naive.'
+    'Metastatic papillary type 2 RCC, MET mutation, treatment-naive.'
   );
   assert.equal(findEntry(result, 'papillary-met').match.badge, 'Strong match');
+
+  result = runQuery(
+    trials,
+    'Metastatic papillary RCC, MET mutation, treatment-naive.'
+  );
+  assert.equal(findEntry(result, 'papillary-met').match.badge, 'Possible match');
+  assert.deepEqual(flagCodes(findEntry(result, 'papillary-met')), ['histology']);
+
+  result = runQuery(
+    trials,
+    'Metastatic chromophobe RCC, treatment-naive.'
+  );
+  assert.equal(findEntry(result, 'chromophobe-met').match.badge, 'Strong match');
+  assert.equal(findEntry(result, 'papillary-met'), undefined);
+  assert.equal(findEntry(result, 'nccrcc-basket').match.badge, 'Strong match');
+
+  result = runQuery(
+    trials,
+    'Metastatic non-clear-cell RCC, treatment-naive.'
+  );
+  assert.equal(findEntry(result, 'nccrcc-basket').match.badge, 'Strong match');
+  assert.equal(findEntry(result, 'chromophobe-met').match.badge, 'Possible match');
+  assert.deepEqual(flagCodes(findEntry(result, 'chromophobe-met')), ['histology']);
+
+  result = runQuery(
+    trials,
+    'Metastatic renal medullary carcinoma, treatment-naive.'
+  );
+  assert.equal(findEntry(result, 'medullary-met').match.badge, 'Strong match');
+  assert.equal(findEntry(result, 'chromophobe-met'), undefined);
 }
 
 function testTesticular() {

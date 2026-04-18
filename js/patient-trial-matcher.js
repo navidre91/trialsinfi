@@ -828,6 +828,85 @@
     return false;
   }
 
+  function deriveKidneyTrialAxes(trial) {
+    const trialAxes = { ...(trial.clinicalAxes || {}) };
+    const text = `${buildTrialSearchText(trial)} ${buildTrialEligibilityText(trial)}`;
+
+    if (!isMeaningfulAxisValue(trialAxes.histology)) {
+      if (/unclassified/i.test(text)) {
+        trialAxes.histology = "unclassified";
+      } else if (/non[- ]clear[- ]cell|nccrcc/i.test(text)) {
+        trialAxes.histology = "non_clear_cell";
+      } else if (/clear[- ]cell|ccrcc/i.test(text)) {
+        trialAxes.histology = "clear_cell";
+      } else if (/papillary.{0,20}(type[\s-]*1|type i)|type[\s-]*1.{0,20}papillary|met[- ]driven papillary|hereditary papillary/i.test(text)) {
+        trialAxes.histology = "papillary_type1";
+      } else if (/papillary.{0,20}(type[\s-]*2|type ii)|type[\s-]*2.{0,20}papillary|hlrcc|fh[- ]deficient/i.test(text)) {
+        trialAxes.histology = "papillary_type2";
+      } else if (/papillary|\bprcc\b/i.test(text)) {
+        trialAxes.histology = "papillary_unspecified";
+      } else if (/chromophobe/i.test(text)) {
+        trialAxes.histology = "chromophobe";
+      } else if (/renal medullary|medullary carcinoma|medullary rcc|smarcb1|ini1[- ]deficient|sickle cell trait/i.test(text)) {
+        trialAxes.histology = "medullary";
+      } else if (/collecting duct/i.test(text)) {
+        trialAxes.histology = "collecting_duct";
+      } else if (/tfe3|tfeb|xp11|mit family|translocation/i.test(text)) {
+        trialAxes.histology = "tfe3_tfeb_translocation";
+      }
+    }
+
+    return trialAxes;
+  }
+
+  function kidneyHistologyInfo(value) {
+    const token = canonicalToken(value);
+    if (!token) {
+      return { superfamily: "", family: "", specific: "", generic: false };
+    }
+    if (token.includes("unclassified")) return { superfamily: "nccrcc", family: "nccrcc", specific: "unclassified", generic: true };
+    if (token.includes("non_clear") || token.includes("nccrcc")) return { superfamily: "nccrcc", family: "nccrcc", specific: "non_clear_cell", generic: true };
+    if (token.includes("clear_cell")) return { superfamily: "clear_cell", family: "clear_cell", specific: "clear_cell", generic: false };
+    if (token.includes("papillary_type1")) return { superfamily: "nccrcc", family: "papillary", specific: "papillary_type1", generic: false };
+    if (token.includes("papillary_type2")) return { superfamily: "nccrcc", family: "papillary", specific: "papillary_type2", generic: false };
+    if (token.includes("papillary_unspecified") || token === "papillary") return { superfamily: "nccrcc", family: "papillary", specific: "papillary_unspecified", generic: true };
+    if (token.includes("chromophobe")) return { superfamily: "nccrcc", family: "chromophobe", specific: "chromophobe", generic: false };
+    if (token.includes("collecting_duct")) return { superfamily: "nccrcc", family: "collecting_duct", specific: "collecting_duct", generic: false };
+    if (token.includes("medullary")) return { superfamily: "nccrcc", family: "medullary", specific: "medullary", generic: false };
+    if (token.includes("tfe3") || token.includes("tfeb") || token.includes("translocation")) return { superfamily: "nccrcc", family: "translocation", specific: "tfe3_tfeb_translocation", generic: false };
+    return { superfamily: token, family: token, specific: token, generic: false };
+  }
+
+  function kidneyHistologyMatchStatus(trialValue, queryValue) {
+    const trialInfo = kidneyHistologyInfo(trialValue);
+    const queryInfo = kidneyHistologyInfo(queryValue);
+    if (!trialInfo.superfamily || !queryInfo.superfamily) {
+      return "match";
+    }
+    if (trialInfo.specific === queryInfo.specific) {
+      return "match";
+    }
+    if (trialInfo.superfamily !== queryInfo.superfamily) {
+      return "exclude";
+    }
+    if (trialInfo.family === queryInfo.family) {
+      if (trialInfo.generic && !queryInfo.generic) {
+        return "match";
+      }
+      if (!trialInfo.generic && queryInfo.generic) {
+        return "flag";
+      }
+      return "exclude";
+    }
+    if (trialInfo.generic) {
+      return "match";
+    }
+    if (queryInfo.generic) {
+      return "flag";
+    }
+    return "exclude";
+  }
+
   function imdcRiskMatches(trialValue, queryValue) {
     const trialToken = canonicalToken(trialValue);
     const queryToken = canonicalToken(queryValue);
@@ -892,14 +971,19 @@
   }
 
   function resolveKidneyHistologyFact(value) {
-    const group = histologyGroup(value);
-    if (!group) return "";
-    if (group === "clear_cell") return "clear-cell histology";
-    if (group === "papillary") return "papillary histology";
-    if (group === "chromophobe") return "chromophobe histology";
-    if (group === "collecting_duct") return "collecting-duct histology";
-    if (group === "translocation") return "translocation histology";
-    return group.replace(/_/g, " ");
+    const info = kidneyHistologyInfo(value);
+    if (!info.superfamily) return "";
+    if (info.specific === "clear_cell") return "clear-cell histology";
+    if (info.specific === "papillary_type1") return "papillary type 1 histology";
+    if (info.specific === "papillary_type2") return "papillary type 2 / FH-deficient histology";
+    if (info.family === "papillary") return "papillary histology";
+    if (info.specific === "chromophobe") return "chromophobe histology";
+    if (info.specific === "collecting_duct") return "collecting-duct histology";
+    if (info.specific === "medullary") return "renal medullary carcinoma histology";
+    if (info.specific === "tfe3_tfeb_translocation") return "translocation histology";
+    if (info.specific === "unclassified") return "unclassified RCC histology";
+    if (info.specific === "non_clear_cell") return "non-clear-cell histology";
+    return info.specific.replace(/_/g, " ");
   }
 
   function resolveTesticularHistologyFact(value) {
@@ -1116,13 +1200,18 @@
 
   function matchKidneyTrial(trial, parsedQuery) {
     const state = baseMatchState(trial, parsedQuery);
-    const trialAxes = state.trialAxes;
+    const trialAxes = deriveKidneyTrialAxes(trial);
     const queryAxes = state.queryAxes;
+    state.trialAxes = trialAxes;
 
     if (isMeaningfulAxisValue(trialAxes.histology)) {
       if (queryAxes.histology) {
-        if (!histologyMatches(trialAxes.histology, queryAxes.histology)) {
+        const histologyStatus = kidneyHistologyMatchStatus(trialAxes.histology, queryAxes.histology);
+        if (histologyStatus === "exclude") {
           state.excludes.push("histology");
+        } else if (histologyStatus === "flag") {
+          addResolvedFact(state.resolvedFacts, resolveKidneyHistologyFact(queryAxes.histology));
+          addFlag(state.flags, "histology");
         } else {
           addResolvedFact(state.resolvedFacts, resolveKidneyHistologyFact(queryAxes.histology));
         }

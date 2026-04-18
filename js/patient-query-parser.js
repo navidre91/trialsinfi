@@ -35,7 +35,7 @@
     ],
     Kidney: [
       { pattern: /\bkidney\b|renal cell carcinoma|\brcc\b/i, score: 4 },
-      { pattern: /clear cell|papillary|chromophobe|collecting duct|tfe3|tfeb|vhl|imdc|nephrectomy/i, score: 4 },
+      { pattern: /clear cell|papillary|chromophobe|collecting duct|medullary|tfe3|tfeb|translocation|non[- ]clear cell|nccrcc|hlrcc|fh[- ]deficient|vhl|imdc|nephrectomy/i, score: 4 },
       { pattern: /sarcomatoid|cabozantinib|lenvatinib|axitinib|belzutifan/i, score: 2 }
     ],
     Testicular: [
@@ -581,20 +581,35 @@
   }
 
   function detectKidneyHistology(text) {
+    if (/unclassified/i.test(text)) {
+      return "unclassified";
+    }
+    if (/non[- ]clear[- ]cell|nccrcc/i.test(text)) {
+      return "non_clear_cell";
+    }
     if (/clear[- ]cell|ccrcc/i.test(text)) {
       return "clear_cell";
     }
-    if (/papillary/i.test(text)) {
-      return "papillary";
+    if (/papillary.{0,20}(type[\s-]*1|type i)|type[\s-]*1.{0,20}papillary|met[- ]driven papillary|hereditary papillary/i.test(text)) {
+      return "papillary_type1";
+    }
+    if (/papillary.{0,20}(type[\s-]*2|type ii)|type[\s-]*2.{0,20}papillary|hlrcc|fh[- ]deficient/i.test(text)) {
+      return "papillary_type2";
+    }
+    if (/papillary|\bprcc\b/i.test(text)) {
+      return "papillary_unspecified";
     }
     if (/chromophobe/i.test(text)) {
       return "chromophobe";
     }
+    if (/renal medullary|medullary carcinoma|medullary rcc|smarcb1|ini1[- ]deficient|sickle cell trait/i.test(text)) {
+      return "medullary";
+    }
     if (/collecting duct/i.test(text)) {
       return "collecting_duct";
     }
-    if (/tfe3|tfeb|translocation/i.test(text)) {
-      return "translocation";
+    if (/tfe3|tfeb|xp11|mit family|translocation/i.test(text)) {
+      return "tfe3_tfeb_translocation";
     }
     return "";
   }
@@ -1077,18 +1092,36 @@
           parsed.diseaseLabel = "Metastatic ccRCC";
           pushDiseaseIds(parsed.diseaseSettingIds, ["metastatic_ccrcc_favorable_1l", "metastatic_ccrcc_int_poor_1l", "metastatic_ccrcc_1l_all_risk", "metastatic_ccrcc_2l_io_naive", "metastatic_ccrcc_2l_io_experienced", "metastatic_ccrcc_3l_plus", "metastatic_ccrcc_general"]);
         }
-      } else if (histology === "papillary") {
-        parsed.diseaseLabel = "Metastatic papillary RCC";
+      } else if (["papillary_type1", "papillary_type2", "papillary_unspecified"].includes(histology)) {
+        if (histology === "papillary_type1") {
+          parsed.diseaseLabel = "Metastatic papillary RCC — type 1";
+        } else if (histology === "papillary_type2") {
+          parsed.diseaseLabel = "Metastatic papillary RCC — type 2 / FH-deficient";
+        } else {
+          parsed.diseaseLabel = "Metastatic papillary RCC";
+        }
         pushDiseaseIds(parsed.diseaseSettingIds, ["metastatic_ncrcc_papillary", "metastatic_ncrcc_general"]);
       } else if (histology === "chromophobe") {
         parsed.diseaseLabel = "Metastatic chromophobe RCC";
         pushDiseaseIds(parsed.diseaseSettingIds, ["metastatic_ncrcc_chromophobe", "metastatic_ncrcc_general"]);
-      } else if (histology === "collecting_duct") {
-        parsed.diseaseLabel = "Metastatic collecting duct RCC";
+      } else if (histology === "collecting_duct" || histology === "medullary") {
+        parsed.diseaseLabel = histology === "medullary" ? "Metastatic renal medullary carcinoma" : "Metastatic collecting duct RCC";
         pushDiseaseIds(parsed.diseaseSettingIds, ["metastatic_ncrcc_collecting_duct", "metastatic_ncrcc_general"]);
-      } else if (histology === "translocation") {
+      } else if (histology === "tfe3_tfeb_translocation") {
         parsed.diseaseLabel = "Metastatic translocation RCC";
         pushDiseaseIds(parsed.diseaseSettingIds, ["metastatic_ncrcc_tfe3_tfeb", "metastatic_ncrcc_general"]);
+      } else if (histology === "unclassified") {
+        parsed.diseaseLabel = "Metastatic unclassified RCC";
+        pushDiseaseIds(parsed.diseaseSettingIds, ["metastatic_ncrcc_general"]);
+      } else if (histology === "non_clear_cell") {
+        parsed.diseaseLabel = "Metastatic non-clear-cell RCC";
+        pushDiseaseIds(parsed.diseaseSettingIds, [
+          "metastatic_ncrcc_papillary",
+          "metastatic_ncrcc_chromophobe",
+          "metastatic_ncrcc_collecting_duct",
+          "metastatic_ncrcc_tfe3_tfeb",
+          "metastatic_ncrcc_general"
+        ]);
       } else {
         parsed.diseaseLabel = "Metastatic RCC";
         pushDiseaseIds(parsed.diseaseSettingIds, [
@@ -1126,7 +1159,16 @@
     finalizeDiseaseSettingIds(parsed);
 
     if (parsed.diseaseLabel) addChip(parsed.chips, "Disease", parsed.diseaseLabel);
-    if (parsed.clinicalAxes.histology) addChip(parsed.chips, "Disease", parsed.clinicalAxes.histology.replace(/_/g, " "));
+    if (parsed.clinicalAxes.histology === "papillary_type1") addChip(parsed.chips, "Disease", "Papillary type 1");
+    if (parsed.clinicalAxes.histology === "papillary_type2") addChip(parsed.chips, "Disease", "Papillary type 2 / FH-deficient");
+    if (parsed.clinicalAxes.histology === "papillary_unspecified") addChip(parsed.chips, "Disease", "Papillary RCC");
+    if (parsed.clinicalAxes.histology === "chromophobe") addChip(parsed.chips, "Disease", "Chromophobe");
+    if (parsed.clinicalAxes.histology === "collecting_duct") addChip(parsed.chips, "Disease", "Collecting duct");
+    if (parsed.clinicalAxes.histology === "medullary") addChip(parsed.chips, "Disease", "Renal medullary");
+    if (parsed.clinicalAxes.histology === "tfe3_tfeb_translocation") addChip(parsed.chips, "Disease", "Translocation RCC");
+    if (parsed.clinicalAxes.histology === "non_clear_cell") addChip(parsed.chips, "Disease", "Non-clear-cell RCC");
+    if (parsed.clinicalAxes.histology === "unclassified") addChip(parsed.chips, "Disease", "Unclassified RCC");
+    if (parsed.clinicalAxes.histology === "clear_cell") addChip(parsed.chips, "Disease", "Clear-cell RCC");
     if (parsed.clinicalAxes.imdcRisk) addChip(parsed.chips, "Risk", `IMDC ${parsed.clinicalAxes.imdcRisk.replace(/_/g, "/")}`);
     if (parsed.clinicalAxes.priorIo === "no") addChip(parsed.chips, "Treatment", "IO-naive");
     if (parsed.clinicalAxes.priorIo === "yes") addChip(parsed.chips, "Treatment", "Prior IO");
