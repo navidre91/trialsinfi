@@ -158,19 +158,28 @@ class ClinicalTrialsApp {
     const cancerTypes = Utils.getDisplayCancerTypes(trial);
     const detailUrl = this.buildDetailUrl(trial.id, Boolean(matchContext));
     const sourceTags = matchContext ? (matchContext.sourceTagSummary || []) : [];
+    const cardToneClass = matchContext
+      ? (matchContext.badgeTone === 'strong' ? 'trial-card--match-strong trial-card--patient-search' : 'trial-card--match-possible trial-card--patient-search')
+      : `trial-card--${statusConfig.className}`;
+    const siteChipLabel = `${siteCount || 1} ${siteCount === 1 ? 'site' : 'sites'}`;
     const badgeHTML = matchContext
-      ? `<div style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700; background: ${matchContext.badgeTone === 'strong' ? '#dcfce7' : '#fef3c7'}; color: ${matchContext.badgeTone === 'strong' ? '#166534' : '#92400e'};">${Utils.sanitizeHTML(matchContext.badge)}</div>`
+      ? `<span class="trial-match-pill trial-match-pill--${matchContext.badgeTone === 'strong' ? 'strong' : 'possible'}">${Utils.sanitizeHTML(matchContext.badge)}</span>`
       : '';
     const reasonHTML = matchContext?.reasonText
-      ? `<div style="margin-top: 0.85rem; padding: 0.75rem; border-radius: 12px; background: #f8fafc; color: var(--text-primary); font-size: 0.925rem; line-height: 1.45;"><strong>Reason:</strong> ${Utils.sanitizeHTML(matchContext.reasonText)}</div>`
+      ? `
+        <section class="trial-match-reason trial-match-reason--${matchContext.badgeTone === 'strong' ? 'strong' : 'possible'}">
+          <span class="trial-match-reason-label">Why it matched</span>
+          <p>${Utils.sanitizeHTML(matchContext.reasonText)}</p>
+        </section>
+      `
       : '';
     const flagsHTML = matchContext?.flags?.length
       ? `
-        <div style="margin-top: 0.85rem;">
+        <div class="trial-flag-list">
           ${matchContext.flags.map(flag => `
-            <div style="padding: 0.7rem 0.8rem; border: 1px solid #fde68a; background: #fffbeb; border-radius: 12px; margin-top: 0.45rem;">
-              <div style="font-size: 0.82rem; font-weight: 700; color: #92400e; margin-bottom: 0.2rem;">${Utils.sanitizeHTML(flag.title)}</div>
-              <div style="font-size: 0.84rem; color: #78350f; line-height: 1.45;">${Utils.sanitizeHTML(flag.message)}</div>
+            <div class="trial-flag-card">
+              <div class="trial-flag-title">${Utils.sanitizeHTML(flag.title)}</div>
+              <div class="trial-flag-message">${Utils.sanitizeHTML(flag.message)}</div>
             </div>
           `).join('')}
         </div>
@@ -178,62 +187,87 @@ class ClinicalTrialsApp {
       : '';
     const sourceTagsHTML = sourceTags.length > 0
       ? `
-        <div style="display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.85rem;">
+        <div class="trial-source-tags">
           ${sourceTags.map(tag => `
-            <span style="display: inline-flex; align-items: center; padding: 0.25rem 0.55rem; border-radius: 999px; border: 1px solid var(--border-color); color: var(--text-secondary); font-size: 0.72rem; font-weight: 600;">${Utils.sanitizeHTML(tag)}</span>
+            <span class="trial-source-tag">${Utils.sanitizeHTML(tag)}</span>
           `).join('')}
         </div>
       `
       : '';
+    const icon = (name) => {
+      const icons = {
+        sites: '<svg class="trial-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6-4.35-6-10a6 6 0 1 1 12 0c0 5.65-6 10-6 10Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="11" r="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>',
+        disease: '<svg class="trial-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h16M4 14.5h10M8 4v16M16 4v6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        pi: '<svg class="trial-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5.5 19.5c1.5-3.1 4-4.7 6.5-4.7s5 1.6 6.5 4.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+        treatment: '<svg class="trial-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4h6M10 4v5l-4.8 8.1A3 3 0 0 0 7.8 21h8.4a3 3 0 0 0 2.6-3.9L14 9V4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.8 15h6.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>'
+      };
+      return icons[name] || '';
+    };
+    const detailItems = [
+      {
+        key: 'sites',
+        label: 'Sites',
+        value: institutionLabel,
+        subvalue: cancerTypes,
+        icon: icon('sites')
+      },
+      {
+        key: 'disease',
+        label: 'Disease setting',
+        value: diseaseSetting,
+        subvalue: '',
+        icon: icon('disease')
+      },
+      {
+        key: 'pi',
+        label: 'Lead PI',
+        value: piName,
+        subvalue: '',
+        icon: icon('pi')
+      },
+      {
+        key: 'treatment',
+        label: 'Treatment',
+        value: treatmentModality,
+        subvalue: classificationConfidence,
+        icon: icon('treatment')
+      }
+    ];
+    const detailGridHTML = detailItems.map(item => `
+      <div class="trial-detail-card trial-detail-card--${item.key}">
+        <div class="trial-detail-icon">${item.icon}</div>
+        <div class="trial-detail-content">
+          <span class="trial-detail-label">${Utils.sanitizeHTML(item.label)}</span>
+          <div class="trial-detail-value">${Utils.sanitizeHTML(item.value)}</div>
+          ${item.subvalue ? `<div class="trial-detail-subvalue">${Utils.sanitizeHTML(item.subvalue)}</div>` : ''}
+        </div>
+      </div>
+    `).join('');
     
     const cardHTML = `
-      <div class="trial-card" data-trial-id="${trial.id}" onclick="window.clinicalTrialsApp.viewTrialDetail('${trial.id}', ${matchContext ? 'true' : 'false'})">
-        <div class="trial-card-header">
-          <h3 class="trial-title">${Utils.sanitizeHTML(trial.title)}</h3>
-          <span class="trial-status ${statusConfig.className}">${statusConfig.label}</span>
+      <div class="trial-card ${cardToneClass}" data-trial-id="${trial.id}" onclick="window.clinicalTrialsApp.viewTrialDetail('${trial.id}', ${matchContext ? 'true' : 'false'})">
+        <div class="trial-card-topline">
+          <div class="trial-card-chips">
+            <span class="trial-meta-chip">${Utils.sanitizeHTML(phaseLabel)}</span>
+            <span class="trial-meta-chip">${Utils.sanitizeHTML(siteChipLabel)}</span>
+          </div>
+          <div class="trial-card-topline-right">
+            ${badgeHTML}
+            <span class="trial-status ${statusConfig.className}">${statusConfig.label}</span>
+          </div>
         </div>
 
-        ${badgeHTML}
-        
-        <p class="trial-description">
-          ${Utils.sanitizeHTML(Utils.truncateText(trial.description, 150))}
-        </p>
+        <div class="trial-card-header">
+          <div class="trial-title-wrap">
+            <h3 class="trial-title">${Utils.sanitizeHTML(trial.title)}</h3>
+            <p class="trial-description">
+              ${Utils.sanitizeHTML(Utils.truncateText(trial.description, 150))}
+            </p>
+          </div>
+        </div>
         
         <div class="trial-details">
-          <div class="trial-detail-item">
-            <span class="trial-detail-icon">🏥</span>
-            <div class="trial-detail-content">
-              <span class="trial-detail-label">Sites</span>
-              <div class="trial-detail-value trial-location">
-                ${Utils.sanitizeHTML(institutionLabel)}<br>
-                <small>${Utils.sanitizeHTML(cancerTypes)}</small>
-              </div>
-            </div>
-          </div>
-          
-          <div class="trial-detail-item">
-            <span class="trial-detail-icon">🧭</span>
-            <div class="trial-detail-content">
-              <span class="trial-detail-label">Disease Setting</span>
-              <div class="trial-detail-value">${Utils.sanitizeHTML(diseaseSetting)}</div>
-            </div>
-          </div>
-          
-          <div class="trial-detail-item">
-            <span class="trial-detail-icon">👩‍⚕️</span>
-            <div class="trial-detail-content">
-              <span class="trial-detail-label">PI Name</span>
-              <div class="trial-detail-value">${Utils.sanitizeHTML(piName)}</div>
-            </div>
-          </div>
-
-          <div class="trial-detail-item">
-            <span class="trial-detail-icon">🔬</span>
-            <div class="trial-detail-content">
-              <span class="trial-detail-label">Treatment / Confidence</span>
-              <div class="trial-detail-value">${Utils.sanitizeHTML(treatmentModality)}<br><small>${Utils.sanitizeHTML(classificationConfidence)}</small></div>
-            </div>
-          </div>
+          ${detailGridHTML}
         </div>
 
         ${reasonHTML}
@@ -242,12 +276,14 @@ class ClinicalTrialsApp {
         
         <div class="trial-card-footer">
           <div class="trial-dates">
-            <strong>Phase:</strong> ${Utils.sanitizeHTML(phaseLabel)} | 
-            <strong>Synced:</strong> ${Utils.formatDate(websiteUpdate)}
+            <span class="trial-date-item">
+              <span class="trial-date-label">Synced</span>
+              <span class="trial-date-value">${Utils.sanitizeHTML(Utils.formatDate(websiteUpdate))}</span>
+            </span>
           </div>
-          <div style="display: flex; align-items: center; gap: 0.5rem;">
-            ${contactEmail ? `<a href="mailto:${Utils.sanitizeHTML(contactEmail)}" class="trial-view-btn" style="background: transparent; color: var(--primary-color); border: 1px solid var(--border-color);" onclick="event.stopPropagation();">Email PI</a>` : ''}
-            ${trial.ctGovUrl ? `<a href="${Utils.sanitizeHTML(trial.ctGovUrl)}" target="_blank" rel="noopener noreferrer" class="trial-view-btn" style="background: transparent; color: var(--primary-color); border: 1px solid var(--border-color);" onclick="event.stopPropagation();">CT.gov</a>` : ''}
+          <div class="trial-card-actions">
+            ${contactEmail ? `<a href="mailto:${Utils.sanitizeHTML(contactEmail)}" class="trial-view-btn trial-view-btn--ghost" onclick="event.stopPropagation();">Email PI</a>` : ''}
+            ${trial.ctGovUrl ? `<a href="${Utils.sanitizeHTML(trial.ctGovUrl)}" target="_blank" rel="noopener noreferrer" class="trial-view-btn trial-view-btn--ghost" onclick="event.stopPropagation();">CT.gov</a>` : ''}
             <a href="${detailUrl}" class="trial-view-btn" onclick="event.stopPropagation();">
               View Details
             </a>
