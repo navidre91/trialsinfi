@@ -230,7 +230,7 @@
 .trial-details {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.75rem;
+  gap: 0.65rem;
 }
 
 .trial-card-extras {
@@ -241,17 +241,17 @@
 .trial-detail-card {
   display: flex;
   align-items: flex-start;
-  gap: 0.8rem;
+  gap: 0.72rem;
   font-size: 0.875rem;
-  padding: 0.9rem 0.95rem;
+  padding: 0.78rem 0.82rem;
   border-radius: 16px;
   border: 1px solid rgba(226, 232, 240, 0.95);
   background: linear-gradient(180deg, #f9fbff 0%, #f7fafe 100%);
 }
 
 .trial-detail-icon {
-  width: 2.2rem;
-  height: 2.2rem;
+  width: 2rem;
+  height: 2rem;
   border-radius: 14px;
   background: #ffffff;
   border: 1px solid rgba(148, 163, 184, 0.2);
@@ -285,15 +285,15 @@
 .trial-detail-value {
   color: var(--text-primary);
   line-height: 1.35;
-  font-size: 0.9rem;
+  font-size: 0.86rem;
   font-weight: 600;
 }
 
 .trial-detail-subvalue {
   color: var(--text-secondary);
   line-height: 1.4;
-  font-size: 0.78rem;
-  margin-top: 0.2rem;
+  font-size: 0.75rem;
+  margin-top: 0.16rem;
 }
 
 .trial-location {
@@ -465,42 +465,9 @@
   letter-spacing: 0.02em;
 }
 
-@media (min-width: 960px) {
-  .trial-card {
-    display: grid;
-    grid-template-columns: minmax(0, 1.45fr) minmax(19rem, 0.95fr);
-    grid-template-areas:
-      "topline topline"
-      "header details"
-      "extras details"
-      "footer footer";
-    column-gap: 1.05rem;
-    row-gap: 0.9rem;
-    align-items: start;
-  }
-
-  .trial-card-topline {
-    grid-area: topline;
-    margin-bottom: 0;
-  }
-
-  .trial-card-header {
-    grid-area: header;
-    margin-bottom: 0;
-  }
-
+@media (min-width: 1100px) {
   .trial-details {
-    grid-area: details;
-    align-self: start;
-  }
-
-  .trial-card-extras {
-    grid-area: extras;
-  }
-
-  .trial-card-footer {
-    grid-area: footer;
-    margin-top: 0.1rem;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
