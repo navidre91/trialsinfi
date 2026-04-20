@@ -243,6 +243,15 @@ class ClinicalTrialsApp {
         </div>
       </div>
     `).join('');
+    const extrasHTML = (reasonHTML || flagsHTML || sourceTagsHTML)
+      ? `
+        <div class="trial-card-extras">
+          ${reasonHTML}
+          ${flagsHTML}
+          ${sourceTagsHTML}
+        </div>
+      `
+      : '';
     
     const cardHTML = `
       <div class="trial-card ${cardToneClass}" data-trial-id="${trial.id}" onclick="window.clinicalTrialsApp.viewTrialDetail('${trial.id}', ${matchContext ? 'true' : 'false'})">
@@ -270,9 +279,7 @@ class ClinicalTrialsApp {
           ${detailGridHTML}
         </div>
 
-        ${reasonHTML}
-        ${flagsHTML}
-        ${sourceTagsHTML}
+        ${extrasHTML}
         
         <div class="trial-card-footer">
           <div class="trial-dates">
