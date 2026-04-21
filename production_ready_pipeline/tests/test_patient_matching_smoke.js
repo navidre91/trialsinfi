@@ -523,6 +523,42 @@ function testProstate() {
     'Male, 65. mCRPC. Progressed on ADT and enzalutamide.'
   );
   assert.equal(findEntry(result, 'post-triplet-sequence'), undefined, 'Exact sequence trial should exclude when required docetaxel progression is missing.');
+
+  const degradedGeneralTrial = buildTrial({
+    id: 'degraded-general',
+    title: 'Generic mCRPC Trial After Enzalutamide',
+    description: 'Study for metastatic castration-resistant prostate cancer after enzalutamide.',
+    cancerType: 'Prostate',
+    diseaseSettingPrimary: 'CRPC — General / Unspecified Stage',
+    diseaseSettingPrimaryId: '',
+    diseaseSettingAllIds: [],
+    clinicalAxes: null,
+    conditions: ['prostate cancer'],
+    inclusionCriteria: 'Participants must have progressed on enzalutamide.'
+  });
+  const degradedGeneralResult = PatientTrialMatcher.matchSingleTrial(
+    degradedGeneralTrial,
+    PatientQueryParser.parse('mCRPC. Progressed on enzalutamide.')
+  );
+  assert.equal(degradedGeneralResult.included, true, 'General CRPC fallback labels should still match advanced CRPC queries.');
+
+  const degradedLocalizedTrial = buildTrial({
+    id: 'degraded-localized',
+    title: 'ILLUSION Localized Prostate SBRT Trial',
+    description: 'This study evaluates stereotactic body radiotherapy for prostate cancer that has not spread to other parts of the body (localized).',
+    cancerType: 'Prostate',
+    diseaseSettingPrimary: 'CRPC — Metastatic, Post-ARPI (mCRPC 2L+)',
+    diseaseSettingPrimaryId: '',
+    diseaseSettingAllIds: [],
+    clinicalAxes: null,
+    conditions: ['prostate cancer'],
+    inclusionCriteria: 'Histologically confirmed, clinically localized adenocarcinoma of the prostate with no evidence of metastatic disease.'
+  });
+  const degradedLocalizedResult = PatientTrialMatcher.matchSingleTrial(
+    degradedLocalizedTrial,
+    PatientQueryParser.parse('mCRPC. Progressed on enzalutamide.')
+  );
+  assert.equal(degradedLocalizedResult.included, false, 'Localized prostate trials should be excluded from advanced prostate queries even when structured fields are missing.');
 }
 
 function testBladder() {

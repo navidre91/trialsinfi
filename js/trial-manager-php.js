@@ -4,7 +4,7 @@
  */
 class TrialManager {
   constructor() {
-    this.catalogVersion = '20260420-therapy-sequence-data';
+    this.catalogVersion = '20260421-fallback-repair';
     this.trials = [];
     this.filteredTrials = [];
     this.currentPage = 1;

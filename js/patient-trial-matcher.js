@@ -251,6 +251,8 @@
           } else {
             ids.push("crpc_metastatic_preARPI", "crpc_metastatic_postARPI", "crpc_general");
           }
+        } else {
+          ids.push("crpc_general");
         }
       }
       if (/mcspc|hormone[- ]sensitive/.test(haystack)) {
@@ -767,8 +769,12 @@
 
   function isObviouslyLocalizedProstateTrial(trial) {
     const text = `${buildTrialSearchText(trial)} ${buildTrialEligibilityText(trial)}`;
-    const localizedSignals = /(radical prostatectomy|undergoing radical prostatectomy|scheduled to undergo rp|active surveillance|localized prostate cancer|pre-?prostatectomy|before prostatectomy)/i;
+    const definitiveLocalizedSignals = /(clinically localized|has not spread to other parts of the body|no evidence of metastatic disease|localized adenocarcinoma)/i;
+    const localizedSignals = /(radical prostatectomy|undergoing radical prostatectomy|scheduled to undergo rp|active surveillance|localized prostate cancer|stereotactic body radiation therapy|stereotactic body radiotherapy|\bsbrt\b)/i;
     const advancedSignals = /(mcrpc|nmcrpc|mcspc|metastatic|castration[- ]resistant|castration[- ]sensitive|psma|docetaxel|cabazitaxel|enzalutamide|abiraterone|apalutamide|darolutamide|radioligand|parp)/i;
+    if (definitiveLocalizedSignals.test(text)) {
+      return true;
+    }
     return localizedSignals.test(text) && !advancedSignals.test(text);
   }
 
