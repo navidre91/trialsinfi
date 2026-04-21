@@ -4,12 +4,14 @@
  */
 class TrialManager {
   constructor() {
+    this.catalogVersion = '20260420-therapy-sequence-data';
     this.trials = [];
     this.filteredTrials = [];
     this.currentPage = 1;
     this.trialsPerPage = 12;
     this.dataLoaded = false;
-    this.apiUrl = 'api/trials.php';
+    this.apiUrl = `api/trials.php?v=${this.catalogVersion}`;
+    this.fallbackCatalogUrl = `data/trials.json?v=${this.catalogVersion}`;
     this.authUrl = 'api/auth.php';
     this.csrfToken = '';
     this.catalogMetadata = {};
@@ -25,9 +27,12 @@ class TrialManager {
 
   async requestJson(url, options = {}) {
     const fetchOptions = {
+      cache: 'no-store',
       credentials: 'same-origin',
       headers: {
         'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache',
         ...(options.headers || {})
       },
       ...options
@@ -77,8 +82,13 @@ class TrialManager {
       console.error('Error loading trials from server:', error);
 
       try {
-        const fallbackResponse = await fetch('data/trials.json', {
-          credentials: 'same-origin'
+        const fallbackResponse = await fetch(this.fallbackCatalogUrl, {
+          cache: 'no-store',
+          credentials: 'same-origin',
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          }
         });
 
         if (fallbackResponse.ok) {

@@ -178,6 +178,9 @@ try {
     $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
     if ($method === 'GET') {
+        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+        header('Pragma: no-cache');
+        header('Expires: 0');
         $trials = cts_load_trials_catalog();
         $metadata = cts_load_trials_metadata();
         cts_json_response([
