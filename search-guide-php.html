@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Guide - Clinical Trials SoCal</title>
+    <meta name="description" content="Guide for writing effective patient search queries for Clinical Trials SoCal.">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="icon" type="image/x-icon" href="assets/favicon/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/apple-touch-icon.png">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">
+                    <a href="index-php.html">Clinical Trials SoCal</a>
+                </h1>
+                <nav class="nav">
+                    <ul class="nav-list">
+                        <li><a href="index-php.html" class="nav-link">Search Trials</a></li>
+                        <li><a href="index-php.html?view=browse" class="nav-link">Trial Overview</a></li>
+                        <li><a href="about-php.html" class="nav-link">About</a></li>
+                        <li><a href="physician-community-php.html" class="nav-link">Physician Community</a></li>
+                        <li><a href="admin-login-php.html" class="nav-link">Admin Login</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <section class="hero" style="margin-bottom: 2rem;">
+                <div class="hero-content" style="max-width: 900px; margin: 0 auto;">
+                    <div style="display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.4rem 0.8rem; border-radius: 999px; background: #ffffff; border: 1px solid var(--border-color); color: var(--primary-color); font-size: 0.82rem; font-weight: 700; box-shadow: var(--shadow-sm); margin-bottom: 1rem;">
+                        <span>Search Guide</span>
+                    </div>
+                    <h2 class="hero-title" style="max-width: 900px; margin-left: auto; margin-right: auto;">How To Write Better Trial Search Queries</h2>
+                    <p class="hero-description" style="max-width: 760px;">
+                        The search works best when you describe the disease setting, exact prior therapies, progression history, biomarkers, and any known screening facts. This page shows the wording patterns that produce the best results.
+                    </p>
+                    <div style="margin-top: 1.25rem;">
+                        <a href="index-php.html" class="btn btn-primary">Back to Search Trials</a>
+                    </div>
+                </div>
+            </section>
+
+            <section style="display: grid; gap: 1.25rem; margin-bottom: 2rem;">
+                <div style="background: linear-gradient(135deg, #f8fafc 0%, #eef6ff 100%); border: 1px solid var(--border-color); border-radius: 18px; padding: 1.35rem 1.5rem; box-shadow: var(--shadow-sm);">
+                    <h3 style="margin: 0 0 0.65rem; font-size: 1.18rem;">The Core Idea</h3>
+                    <p style="margin: 0; color: var(--text-secondary); max-width: 64rem;">
+                        This is a structured matching tool, not a chatbot. It is designed to find trials that fit the patient’s disease state and prior-treatment context, then show what still needs verification. The better the query captures therapy sequence, the better the results.
+                    </p>
+                </div>
+
+                <div style="display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+                    <article style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 18px; padding: 1.35rem; box-shadow: var(--shadow-sm);">
+                        <h3 style="margin: 0 0 0.6rem; font-size: 1.05rem;">Best Query Structure</h3>
+                        <p style="margin: 0 0 0.8rem; color: var(--text-secondary);">
+                            Use this order when possible:
+                        </p>
+                        <div style="padding: 0.9rem 1rem; border-radius: 14px; background: #0f172a; color: #e2e8f0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92rem; line-height: 1.65;">
+                            [Cancer] + [Disease state] + [Progressed on] + [Other prior therapies] + [Biomarkers] + [Screening facts]
+                        </div>
+                    </article>
+
+                    <article style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 18px; padding: 1.35rem; box-shadow: var(--shadow-sm);">
+                        <h3 style="margin: 0 0 0.6rem; font-size: 1.05rem;">Most Important Distinction</h3>
+                        <ul style="padding-left: 1.1rem; color: var(--text-secondary);">
+                            <li><strong style="color: var(--text-primary);">Received docetaxel</strong> is not the same as <strong style="color: var(--text-primary);">progressed on docetaxel</strong>.</li>
+                            <li><strong style="color: var(--text-primary);">Post-ARPI</strong> is not the same as <strong style="color: var(--text-primary);">progressed on enzalutamide</strong>.</li>
+                            <li>Use exact agent names whenever you know them.</li>
+                        </ul>
+                    </article>
+                </div>
+            </section>
+
+            <section style="display: grid; gap: 1rem; margin-bottom: 2rem;">
+                <div style="display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+                    <article style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 18px; padding: 1.4rem; box-shadow: var(--shadow-sm);">
+                        <h3 style="margin: 0 0 0.75rem; font-size: 1.05rem;">Write It Like This</h3>
+                        <div style="display: grid; gap: 0.75rem;">
+                            <div style="padding: 0.85rem 1rem; border-radius: 14px; background: #f8fafc; border: 1px solid #dbeafe;">
+                                <strong style="display: block; margin-bottom: 0.25rem; color: var(--text-primary);">Good</strong>
+                                <span style="color: var(--text-secondary);">mCRPC. Progressed on enzalutamide. No prior docetaxel. BRCA2+. PSMA-positive PET.</span>
+                            </div>
+                            <div style="padding: 0.85rem 1rem; border-radius: 14px; background: #fef2f2; border: 1px solid #fecaca;">
+                                <strong style="display: block; margin-bottom: 0.25rem; color: var(--text-primary);">Weak</strong>
+                                <span style="color: var(--text-secondary);">Advanced prostate cancer after treatment.</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 18px; padding: 1.4rem; box-shadow: var(--shadow-sm);">
+                        <h3 style="margin: 0 0 0.75rem; font-size: 1.05rem;">Helpful Phrases</h3>
+                        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                            <span style="padding: 0.4rem 0.7rem; border-radius: 999px; background: #eff6ff; color: #1d4ed8; font-size: 0.82rem; font-weight: 600;">progressed on enzalutamide</span>
+                            <span style="padding: 0.4rem 0.7rem; border-radius: 999px; background: #eff6ff; color: #1d4ed8; font-size: 0.82rem; font-weight: 600;">received docetaxel</span>
+                            <span style="padding: 0.4rem 0.7rem; border-radius: 999px; background: #eff6ff; color: #1d4ed8; font-size: 0.82rem; font-weight: 600;">no prior cabazitaxel</span>
+                            <span style="padding: 0.4rem 0.7rem; border-radius: 999px; background: #eff6ff; color: #1d4ed8; font-size: 0.82rem; font-weight: 600;">PSMA-positive PET</span>
+                            <span style="padding: 0.4rem 0.7rem; border-radius: 999px; background: #eff6ff; color: #1d4ed8; font-size: 0.82rem; font-weight: 600;">FGFR3 mutation</span>
+                            <span style="padding: 0.4rem 0.7rem; border-radius: 999px; background: #eff6ff; color: #1d4ed8; font-size: 0.82rem; font-weight: 600;">ECOG 1</span>
+                            <span style="padding: 0.4rem 0.7rem; border-radius: 999px; background: #eff6ff; color: #1d4ed8; font-size: 0.82rem; font-weight: 600;">labs normal</span>
+                            <span style="padding: 0.4rem 0.7rem; border-radius: 999px; background: #eff6ff; color: #1d4ed8; font-size: 0.82rem; font-weight: 600;">last systemic therapy 21 days ago</span>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <section style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 20px; padding: 1.5rem; box-shadow: var(--shadow-sm); margin-bottom: 2rem;">
+                <h3 style="margin: 0 0 1rem; font-size: 1.2rem;">Prostate Examples</h3>
+                <div style="display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+                    <article style="padding: 1rem; border-radius: 16px; background: #f8fafc; border: 1px solid var(--border-color);">
+                        <strong style="display: block; margin-bottom: 0.45rem;">Broad post-ARPI</strong>
+                        <div style="padding: 0.85rem 1rem; border-radius: 14px; background: #0f172a; color: #e2e8f0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9rem;">mCRPC. Progressed on enzalutamide.</div>
+                    </article>
+                    <article style="padding: 1rem; border-radius: 16px; background: #f8fafc; border: 1px solid var(--border-color);">
+                        <strong style="display: block; margin-bottom: 0.45rem;">Exact later-line sequence</strong>
+                        <div style="padding: 0.85rem 1rem; border-radius: 14px; background: #0f172a; color: #e2e8f0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9rem;">mCRPC. Progressed on ADT and enzalutamide and docetaxel.</div>
+                    </article>
+                    <article style="padding: 1rem; border-radius: 16px; background: #f8fafc; border: 1px solid var(--border-color);">
+                        <strong style="display: block; margin-bottom: 0.45rem;">Received but did not progress</strong>
+                        <div style="padding: 0.85rem 1rem; border-radius: 14px; background: #0f172a; color: #e2e8f0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9rem;">mCRPC. Received docetaxel. Progressed on enzalutamide.</div>
+                    </article>
+                    <article style="padding: 1rem; border-radius: 16px; background: #f8fafc; border: 1px solid var(--border-color);">
+                        <strong style="display: block; margin-bottom: 0.45rem;">Current therapy, not progression</strong>
+                        <div style="padding: 0.85rem 1rem; border-radius: 14px; background: #0f172a; color: #e2e8f0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9rem;">mCRPC. Currently on enzalutamide.</div>
+                    </article>
+                </div>
+            </section>
+
+            <section style="display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); margin-bottom: 2rem;">
+                <article style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 20px; padding: 1.4rem; box-shadow: var(--shadow-sm);">
+                    <h3 style="margin: 0 0 0.8rem; font-size: 1.08rem;">Bladder</h3>
+                    <ul style="padding-left: 1.1rem; color: var(--text-secondary);">
+                        <li><code>BCG-unresponsive NMIBC with CIS</code></li>
+                        <li><code>BCG-unresponsive NMIBC with papillary-only recurrence</code></li>
+                        <li><code>Metastatic urothelial carcinoma after prior platinum. FGFR3 mutation.</code></li>
+                    </ul>
+                </article>
+                <article style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 20px; padding: 1.4rem; box-shadow: var(--shadow-sm);">
+                    <h3 style="margin: 0 0 0.8rem; font-size: 1.08rem;">Kidney</h3>
+                    <ul style="padding-left: 1.1rem; color: var(--text-secondary);">
+                        <li><code>Metastatic clear-cell RCC after prior IO.</code></li>
+                        <li><code>Metastatic papillary type 2 RCC. MET alteration.</code></li>
+                        <li><code>Metastatic chromophobe RCC.</code></li>
+                    </ul>
+                </article>
+                <article style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 20px; padding: 1.4rem; box-shadow: var(--shadow-sm);">
+                    <h3 style="margin: 0 0 0.8rem; font-size: 1.08rem;">Testicular</h3>
+                    <ul style="padding-left: 1.1rem; color: var(--text-secondary);">
+                        <li><code>NSGCT with AFP elevated after orchiectomy and no prior chemotherapy</code></li>
+                        <li><code>NSGCT after first-line BEP with residual mass after chemotherapy, markers normal</code></li>
+                        <li><code>Primary mediastinal NSGCT, advanced disease, no prior chemotherapy</code></li>
+                    </ul>
+                </article>
+            </section>
+
+            <section style="display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); margin-bottom: 2rem;">
+                <article style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 20px; padding: 1.4rem; box-shadow: var(--shadow-sm);">
+                    <h3 style="margin: 0 0 0.75rem; font-size: 1.08rem;">What Strong vs Possible Usually Means</h3>
+                    <ul style="padding-left: 1.1rem; color: var(--text-secondary);">
+                        <li><strong style="color: var(--text-primary);">Strong match</strong>: disease state and prior-therapy pattern fit well.</li>
+                        <li><strong style="color: var(--text-primary);">Possible match</strong>: the trial may still fit, but one or more facts need confirmation.</li>
+                        <li>Typical confirmation items: therapy sequence, biomarkers, PSMA imaging, ECOG, organ function, or washout timing.</li>
+                    </ul>
+                </article>
+                <article style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 20px; padding: 1.4rem; box-shadow: var(--shadow-sm);">
+                    <h3 style="margin: 0 0 0.75rem; font-size: 1.08rem;">Practical Tips</h3>
+                    <ul style="padding-left: 1.1rem; color: var(--text-secondary);">
+                        <li>Put the disease setting near the beginning of the query.</li>
+                        <li>Use exact drug names if you know them.</li>
+                        <li>Use <code>progressed on</code> only when progression is known.</li>
+                        <li>Use <code>received</code> if exposure is known but progression is not.</li>
+                        <li>Add <code>no prior</code> when a prohibited therapy matters.</li>
+                    </ul>
+                </article>
+            </section>
+
+            <section style="background: linear-gradient(135deg, #f8fafc 0%, #eef6ff 100%); border: 1px solid var(--border-color); border-radius: 20px; padding: 1.4rem 1.5rem; box-shadow: var(--shadow-sm); margin-bottom: 2rem;">
+                <h3 style="margin: 0 0 0.55rem; font-size: 1.1rem;">Current Limitation</h3>
+                <p style="margin: 0; color: var(--text-secondary); max-width: 64rem;">
+                    The search is a structured matching tool, not a final eligibility engine. It is meant to help narrow the right trials and show what still needs confirmation. Final protocol review and discussion with the trial team are still required.
+                </p>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <img src="assets/favicon/apple-touch-icon.png" alt="" class="footer-icon" aria-hidden="true">
+                <p class="footer-text">
+                    &copy; 2026 Genitourinary Cancer Clinical Trials in Southern California
+                </p>
+                <p class="footer-disclaimer">
+                    Always discuss clinical trial options with your healthcare provider to understand which study may be right for you.
+                </p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
