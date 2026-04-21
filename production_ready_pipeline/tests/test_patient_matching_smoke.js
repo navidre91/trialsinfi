@@ -168,6 +168,90 @@ function buildProstateTrials() {
     inclusionCriteria: 'Participants must have progressed on enzalutamide.'
   });
 
+  const classPostArpiTrial = buildTrial({
+    id: 'post-arpi-class',
+    title: 'Class-Level Post-ARPI mCRPC Trial',
+    description: 'Study for metastatic castration-resistant prostate cancer after progression on any ARPI.',
+    cancerType: 'Prostate',
+    diseaseSettingPrimaryId: 'crpc_metastatic_postARPI',
+    diseaseSettingAllIds: ['crpc_metastatic_postARPI', 'crpc_general'],
+    clinicalAxes: {
+      castrationStatus: 'castration_resistant',
+      metastaticStatus: 'metastatic',
+      priorArpi: 'yes'
+    },
+    conditions: ['prostate cancer'],
+    inclusionCriteria: 'Participants must have progressed on a prior ARPI.'
+  });
+
+  const exactAbiTrial = buildTrial({
+    id: 'post-abiraterone-exact',
+    title: 'Exact Post-Abiraterone mCRPC Trial',
+    description: 'Study for metastatic castration-resistant prostate cancer after abiraterone progression.',
+    cancerType: 'Prostate',
+    diseaseSettingPrimaryId: 'crpc_metastatic_postARPI',
+    diseaseSettingAllIds: ['crpc_metastatic_postARPI', 'crpc_general'],
+    clinicalAxes: {
+      castrationStatus: 'castration_resistant',
+      metastaticStatus: 'metastatic',
+      priorArpi: 'yes'
+    },
+    conditions: ['prostate cancer'],
+    inclusionCriteria: 'Participants must have progressed on abiraterone.'
+  });
+
+  const postEnzaDocetaxelTrial = buildTrial({
+    id: 'post-enza-docetaxel',
+    title: 'mCRPC Trial After Enzalutamide and Docetaxel',
+    description: 'Study for metastatic castration-resistant prostate cancer after progression on enzalutamide and docetaxel.',
+    cancerType: 'Prostate',
+    diseaseSettingPrimaryId: 'crpc_metastatic_postARPI',
+    diseaseSettingAllIds: ['crpc_metastatic_postARPI', 'crpc_general'],
+    clinicalAxes: {
+      castrationStatus: 'castration_resistant',
+      metastaticStatus: 'metastatic',
+      priorArpi: 'yes',
+      priorDocetaxel: 'yes'
+    },
+    conditions: ['prostate cancer'],
+    inclusionCriteria: 'Participants must have progressed on enzalutamide and docetaxel.'
+  });
+
+  const postEnzaDocetaxelAllowedTrial = buildTrial({
+    id: 'post-enza-docetaxel-allowed',
+    title: 'mCRPC Trial After Enzalutamide',
+    description: 'Study for metastatic castration-resistant prostate cancer after enzalutamide progression.',
+    cancerType: 'Prostate',
+    diseaseSettingPrimaryId: 'crpc_metastatic_postARPI',
+    diseaseSettingAllIds: ['crpc_metastatic_postARPI', 'crpc_general'],
+    clinicalAxes: {
+      castrationStatus: 'castration_resistant',
+      metastaticStatus: 'metastatic',
+      priorArpi: 'yes',
+      priorDocetaxel: 'unknown'
+    },
+    conditions: ['prostate cancer'],
+    inclusionCriteria: 'Participants must have progressed on enzalutamide. May have received prior docetaxel.'
+  });
+
+  const noCabazitaxelTrial = buildTrial({
+    id: 'post-enza-docetaxel-no-cabazitaxel',
+    title: 'mCRPC Trial After Enzalutamide and Docetaxel',
+    description: 'Study for metastatic castration-resistant prostate cancer after defined prior therapy progression.',
+    cancerType: 'Prostate',
+    diseaseSettingPrimaryId: 'crpc_metastatic_postARPI',
+    diseaseSettingAllIds: ['crpc_metastatic_postARPI', 'crpc_general'],
+    clinicalAxes: {
+      castrationStatus: 'castration_resistant',
+      metastaticStatus: 'metastatic',
+      priorArpi: 'yes',
+      priorDocetaxel: 'yes'
+    },
+    conditions: ['prostate cancer'],
+    inclusionCriteria: 'Participants must have progressed on enzalutamide and docetaxel.',
+    exclusionCriteria: 'No prior cabazitaxel.'
+  });
+
   const generalCrpcTrial = buildTrial({
     id: 'general-crpc',
     title: 'General mCRPC Trial',
@@ -199,7 +283,22 @@ function buildProstateTrials() {
     inclusionCriteria: 'Participants must be scheduled to undergo radical prostatectomy in the next 4 weeks.'
   });
 
-  return [radioligandTrial, parpTrial, classifierTrial, tripletTrial, screeningTrial, exactSequenceTrial, genericPostArpiTrial, generalCrpcTrial, misclassifiedLocalizedTrial];
+  return [
+    radioligandTrial,
+    parpTrial,
+    classifierTrial,
+    tripletTrial,
+    screeningTrial,
+    exactSequenceTrial,
+    genericPostArpiTrial,
+    classPostArpiTrial,
+    exactAbiTrial,
+    postEnzaDocetaxelTrial,
+    postEnzaDocetaxelAllowedTrial,
+    noCabazitaxelTrial,
+    generalCrpcTrial,
+    misclassifiedLocalizedTrial
+  ];
 }
 
 function buildBladderTrials() {
@@ -451,14 +550,26 @@ function testProstate() {
   assert.deepEqual(parsed.temporalFacts.progressedAfterTherapies, ['adt', 'enzalutamide', 'docetaxel']);
   assert.deepEqual(parsed.therapyHistory.progressedOnTherapies, ['adt', 'enzalutamide', 'docetaxel']);
 
+  parsed = PatientQueryParser.parse(
+    'Male, 65. mCRPC. Received docetaxel. Progressed on enzalutamide.'
+  );
+  assert.deepEqual(parsed.therapyHistory.progressedOnTherapies, ['enzalutamide']);
+  assert.deepEqual([...parsed.therapyHistory.receivedTherapies].sort(), ['docetaxel', 'enzalutamide']);
+
+  parsed = PatientQueryParser.parse(
+    'Male, 65. mCRPC. Currently on enzalutamide.'
+  );
+  assert.deepEqual(parsed.therapyHistory.progressedOnTherapies, []);
+  assert.deepEqual(parsed.therapyHistory.receivedTherapies, ['enzalutamide']);
+
   let result = runQuery(
     trials,
     'Male, 65. mCRPC. Progressed on enzalutamide. BRCA2+. PSMA-positive PET. No prior docetaxel.'
   );
   assert.deepEqual(
     result.strongMatches.map(entry => entry.trial.id).sort(),
-    ['parp', 'post-arpi-generic', 'radioligand'],
-    'Full biomarker-complete mCRPC query should strongly match radioligand, PARP, and generic post-ARPI trials.'
+    ['parp', 'post-arpi-class', 'post-arpi-generic', 'post-enza-docetaxel-allowed', 'radioligand'],
+    'Full biomarker-complete mCRPC query should strongly match radioligand, PARP, and the ARPI-directed later-line cohorts that do not prohibit prior docetaxel.'
   );
 
   result = runQuery(
@@ -505,8 +616,48 @@ function testProstate() {
   assert.equal(findEntry(result, 'screening-gated').match.badge, 'Possible match');
   assert.deepEqual(flagCodes(findEntry(result, 'screening-gated')), ['ecog_status', 'lab_organ_function', 'washout_window']);
   assert.equal(findEntry(result, 'post-arpi-generic').match.badge, 'Strong match');
+  assert.equal(findEntry(result, 'post-arpi-class').match.badge, 'Strong match');
+  assert.equal(findEntry(result, 'post-abiraterone-exact'), undefined);
   assert.equal(findEntry(result, 'general-crpc').match.badge, 'Possible match');
   assert.deepEqual(flagCodes(findEntry(result, 'general-crpc')), ['therapy_sequence']);
+
+  result = runQuery(
+    trials,
+    'Male, 65. mCRPC. Progressed on abiraterone.'
+  );
+  assert.equal(findEntry(result, 'post-abiraterone-exact').match.badge, 'Strong match');
+  assert.equal(findEntry(result, 'post-arpi-class').match.badge, 'Strong match');
+  assert.equal(findEntry(result, 'post-arpi-generic'), undefined, 'Exact enzalutamide-only trials should not strongly match abiraterone progression queries.');
+
+  result = runQuery(
+    trials,
+    'Male, 65. mCRPC. Received docetaxel. Progressed on enzalutamide.'
+  );
+  assert.equal(findEntry(result, 'post-enza-docetaxel').match.badge, 'Possible match');
+  assert.deepEqual(flagCodes(findEntry(result, 'post-enza-docetaxel')), ['therapy_sequence']);
+  assert.equal(findEntry(result, 'post-enza-docetaxel-allowed').match.badge, 'Strong match');
+
+  result = runQuery(
+    trials,
+    'Male, 65. mCRPC. Progressed on enzalutamide and docetaxel.'
+  );
+  assert.equal(findEntry(result, 'post-enza-docetaxel').match.badge, 'Strong match');
+  assert.equal(findEntry(result, 'post-enza-docetaxel-no-cabazitaxel').match.badge, 'Strong match');
+
+  result = runQuery(
+    trials,
+    'Male, 65. mCRPC. Progressed on enzalutamide and docetaxel and cabazitaxel.'
+  );
+  assert.equal(findEntry(result, 'post-enza-docetaxel').match.badge, 'Possible match');
+  assert.deepEqual(flagCodes(findEntry(result, 'post-enza-docetaxel')), ['therapy_sequence']);
+  assert.equal(findEntry(result, 'post-enza-docetaxel-no-cabazitaxel'), undefined, 'Trials excluding prior cabazitaxel should not match patients who already received it.');
+
+  result = runQuery(
+    trials,
+    'Male, 65. mCRPC. Currently on enzalutamide.'
+  );
+  assert.equal(findEntry(result, 'post-arpi-generic').match.badge, 'Possible match');
+  assert.deepEqual(flagCodes(findEntry(result, 'post-arpi-generic')), ['therapy_sequence']);
 
   result = runQuery(
     trials,
