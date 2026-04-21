@@ -4,14 +4,15 @@
  */
 class TrialManager {
   constructor() {
-    this.catalogVersion = '20260421-therapy-strict';
+    this.catalogVersion = '20260421-catalog-repair';
+    this.catalogRequestNonce = `${this.catalogVersion}-${Date.now()}`;
     this.trials = [];
     this.filteredTrials = [];
     this.currentPage = 1;
     this.trialsPerPage = 12;
     this.dataLoaded = false;
-    this.apiUrl = `api/trials.php?v=${this.catalogVersion}`;
-    this.fallbackCatalogUrl = `data/trials.json?v=${this.catalogVersion}`;
+    this.apiUrl = `api/trials.php?v=${this.catalogRequestNonce}`;
+    this.fallbackCatalogUrl = `data/trials.json?v=${this.catalogRequestNonce}`;
     this.authUrl = 'api/auth.php';
     this.csrfToken = '';
     this.catalogMetadata = {};
@@ -58,6 +59,116 @@ class TrialManager {
     return Utils.normalizeTrialForSave(trial);
   }
 
+  getStructuredCoverage(trials) {
+    if (!Array.isArray(trials) || trials.length === 0) {
+      return 0;
+    }
+
+    const withStructuredData = trials.filter(trial => {
+      const primaryId = (trial?.diseaseSettingPrimaryId || '').toString().trim();
+      const allIds = Array.isArray(trial?.diseaseSettingAllIds) ? trial.diseaseSettingAllIds.filter(Boolean) : [];
+      const clinicalAxes = trial?.clinicalAxes && typeof trial.clinicalAxes === 'object'
+        ? Object.keys(trial.clinicalAxes).filter(key => {
+          const value = trial.clinicalAxes[key];
+          return value !== null && value !== undefined && String(value).trim() !== '';
+        })
+        : [];
+
+      return Boolean(primaryId || allIds.length || clinicalAxes.length);
+    }).length;
+
+    return withStructuredData / trials.length;
+  }
+
+  mergeStructuredFields(baseTrials, repairTrials) {
+    const repairById = new Map((repairTrials || []).map(trial => [trial.id, trial]));
+
+    return (baseTrials || []).map(trial => {
+      const repaired = repairById.get(trial.id);
+      if (!repaired) {
+        return trial;
+      }
+
+      const merged = { ...trial };
+
+      if (!merged.diseaseSettingPrimaryId && repaired.diseaseSettingPrimaryId) {
+        merged.diseaseSettingPrimaryId = repaired.diseaseSettingPrimaryId;
+      }
+
+      if ((!Array.isArray(merged.diseaseSettingAllIds) || merged.diseaseSettingAllIds.length === 0) && Array.isArray(repaired.diseaseSettingAllIds) && repaired.diseaseSettingAllIds.length > 0) {
+        merged.diseaseSettingAllIds = [...repaired.diseaseSettingAllIds];
+      }
+
+      if ((!merged.clinicalAxes || Object.keys(merged.clinicalAxes).length === 0) && repaired.clinicalAxes && Object.keys(repaired.clinicalAxes).length > 0) {
+        merged.clinicalAxes = { ...repaired.clinicalAxes };
+      }
+
+      if ((!merged.sourceTags || Object.keys(merged.sourceTags).length === 0) && repaired.sourceTags && Object.keys(repaired.sourceTags).length > 0) {
+        merged.sourceTags = { ...repaired.sourceTags };
+      }
+
+      return merged;
+    });
+  }
+
+  async fetchCatalogPayload(url, options = {}) {
+    const response = await fetch(url, {
+      cache: 'reload',
+      credentials: 'same-origin',
+      headers: {
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache',
+        ...(options.headers || {})
+      },
+      ...options
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error ${response.status}`);
+    }
+
+    return response.json();
+  }
+
+  async attemptStructuredRepair(currentTrials, metadata = {}) {
+    const currentCoverage = this.getStructuredCoverage(currentTrials);
+    if (currentCoverage >= 0.8 || !Array.isArray(currentTrials) || currentTrials.length === 0) {
+      return { trials: currentTrials, metadata };
+    }
+
+    const repairNonce = `${this.catalogVersion}-repair-${Date.now()}`;
+    const repairSources = [
+      { url: `api/trials.php?v=${repairNonce}`, parser: data => ({ trials: (data.trials || []).map(trial => this.normalizeTrialRecord(trial)), metadata: data.metadata || {} }) },
+      { url: `data/trials.json?v=${repairNonce}`, parser: data => ({ trials: (data.trials || []).map(trial => this.normalizeTrialRecord(trial)), metadata: data.metadata || {} }) }
+    ];
+
+    let bestTrials = currentTrials;
+    let bestMetadata = metadata;
+    let bestCoverage = currentCoverage;
+
+    for (const source of repairSources) {
+      try {
+        const payload = await this.fetchCatalogPayload(source.url);
+        const parsed = source.parser(payload);
+        const mergedTrials = this.mergeStructuredFields(currentTrials, parsed.trials);
+        const mergedCoverage = this.getStructuredCoverage(mergedTrials);
+
+        if (mergedCoverage > bestCoverage) {
+          bestTrials = mergedTrials;
+          bestMetadata = Object.keys(parsed.metadata || {}).length > 0 ? parsed.metadata : bestMetadata;
+          bestCoverage = mergedCoverage;
+        }
+      } catch (error) {
+        console.warn('Structured catalog repair attempt failed:', source.url, error);
+      }
+    }
+
+    return {
+      trials: bestTrials,
+      metadata: bestMetadata
+    };
+  }
+
   getLocationLabel(trial) {
     const institutions = Utils.getTrialInstitutions(trial);
     if (institutions.length > 1) {
@@ -73,8 +184,10 @@ class TrialManager {
         headers: {}
       });
 
-      this.trials = (data.trials || []).map(trial => this.normalizeTrialRecord(trial));
-      this.catalogMetadata = data.metadata || {};
+      const initialTrials = (data.trials || []).map(trial => this.normalizeTrialRecord(trial));
+      const repaired = await this.attemptStructuredRepair(initialTrials, data.metadata || {});
+      this.trials = repaired.trials;
+      this.catalogMetadata = repaired.metadata || {};
       this.filteredTrials = [...this.trials];
       this.dataLoaded = true;
       return this.trials;
@@ -93,8 +206,10 @@ class TrialManager {
 
         if (fallbackResponse.ok) {
           const fallbackData = await fallbackResponse.json();
-          this.trials = (fallbackData.trials || []).map(trial => this.normalizeTrialRecord(trial));
-          this.catalogMetadata = fallbackData.metadata || {};
+          const initialTrials = (fallbackData.trials || []).map(trial => this.normalizeTrialRecord(trial));
+          const repaired = await this.attemptStructuredRepair(initialTrials, fallbackData.metadata || {});
+          this.trials = repaired.trials;
+          this.catalogMetadata = repaired.metadata || {};
           this.filteredTrials = [...this.trials];
           this.dataLoaded = true;
           return this.trials;
