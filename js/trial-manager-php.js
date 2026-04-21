@@ -4,7 +4,7 @@
  */
 class TrialManager {
   constructor() {
-    this.catalogVersion = '20260421-catalog-repair';
+    this.catalogVersion = '20260421-catalog-repair2';
     this.catalogRequestNonce = `${this.catalogVersion}-${Date.now()}`;
     this.trials = [];
     this.filteredTrials = [];
@@ -132,7 +132,7 @@ class TrialManager {
 
   async attemptStructuredRepair(currentTrials, metadata = {}) {
     const currentCoverage = this.getStructuredCoverage(currentTrials);
-    if (currentCoverage >= 0.8 || !Array.isArray(currentTrials) || currentTrials.length === 0) {
+    if (currentCoverage >= 0.9999 || !Array.isArray(currentTrials) || currentTrials.length === 0) {
       return { trials: currentTrials, metadata };
     }
 
