@@ -4,7 +4,7 @@
  */
 class TrialManager {
   constructor() {
-    this.catalogVersion = '20260421-catalog-repair3';
+    this.catalogVersion = '20260421-utils-fix';
     this.catalogRequestNonce = `${this.catalogVersion}-${Date.now()}`;
     this.trials = [];
     this.filteredTrials = [];
