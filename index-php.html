@@ -22,8 +22,8 @@
                 </h1>
                 <nav class="nav">
                     <ul class="nav-list">
-                        <li><a href="index-php.html" class="nav-link active" data-app-view-target="browse">Browse Trials</a></li>
-                        <li><a href="index-php.html?view=patient-search" class="nav-link" data-app-view-target="patient-search">Patient Search</a></li>
+                        <li><a href="index-php.html" class="nav-link active" data-app-view-target="patient-search">Search Trials</a></li>
+                        <li><a href="index-php.html?view=browse" class="nav-link" data-app-view-target="browse">Trial Overview</a></li>
                         <li><a href="about-php.html" class="nav-link">About</a></li>
                         <li><a href="physician-community-php.html" class="nav-link">Physician Community</a></li>
                         <li><a href="admin-login-php.html" class="nav-link">Admin Login</a></li>
@@ -48,7 +48,7 @@
             <section id="patientSearchPanel" class="patient-search-panel" style="background: linear-gradient(135deg, #f8fafc 0%, #eef6ff 100%); border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 1.5rem; margin-bottom: 1.5rem;" hidden>
                 <div style="display: flex; justify-content: space-between; gap: 1rem; align-items: flex-start; flex-wrap: wrap; margin-bottom: 0.75rem;">
                     <div>
-                        <h3 style="margin: 0 0 0.25rem; font-size: 1.25rem;">Patient Search</h3>
+                        <h3 style="margin: 0 0 0.25rem; font-size: 1.25rem;">Search Trials</h3>
                         <p style="margin: 0; color: var(--text-secondary); line-height: 1.5;">Deterministic matching for prostate, bladder, kidney, and testicular cancers. Incomplete queries should surface more verification flags, not fewer trials.</p>
                     </div>
                     <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0.75rem; background: #ffffff; border: 1px solid var(--border-color); border-radius: 999px; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary);">
@@ -61,8 +61,8 @@
                 <textarea id="patientQueryInput" rows="4" style="width: 100%; resize: vertical; border: 1px solid var(--border-color); border-radius: 14px; padding: 0.9rem 1rem; font: inherit; line-height: 1.5; background: #ffffff;" placeholder="Examples: mCRPC after enzalutamide with PSMA-positive PET; BCG-unresponsive NMIBC after adequate BCG; metastatic clear-cell RCC, IMDC intermediate risk, prior nephrectomy; seminoma stage I after orchiectomy."></textarea>
 
                 <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; margin-top: 0.9rem;">
-                    <button id="runPatientSearch" class="btn btn-primary" type="button">Run Patient Search</button>
-                    <button id="clearPatientSearch" class="btn btn-outline" type="button">Clear Patient Search</button>
+                    <button id="runPatientSearch" class="btn btn-primary" type="button">Run Search</button>
+                    <button id="clearPatientSearch" class="btn btn-outline" type="button">Clear Search</button>
                     <div id="patientSearchStatus" style="color: var(--text-secondary); font-size: 0.875rem;"></div>
                 </div>
 

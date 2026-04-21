@@ -7,7 +7,7 @@ class ClinicalTrialsApp {
     this.searchFilter = null;
     this.currentPage = 'index';
     this.isLoading = false;
-    this.activeView = 'browse';
+    this.activeView = 'patient-search';
     this.patientSearchState = {
       active: false,
       rawQuery: '',
@@ -320,7 +320,7 @@ class ClinicalTrialsApp {
 
   getInitialView() {
     const url = new URL(window.location.href);
-    return url.searchParams.get('view') === 'patient-search' ? 'patient-search' : 'browse';
+    return url.searchParams.get('view') === 'browse' ? 'browse' : 'patient-search';
   }
 
   setupViewTabs() {
@@ -397,8 +397,8 @@ class ClinicalTrialsApp {
 
   updateViewUrl() {
     const url = new URL(window.location.href);
-    if (this.activeView === 'patient-search') {
-      url.searchParams.set('view', 'patient-search');
+    if (this.activeView === 'browse') {
+      url.searchParams.set('view', 'browse');
     } else {
       url.searchParams.delete('view');
     }
@@ -532,7 +532,7 @@ class ClinicalTrialsApp {
 
     if (status) {
       const cancerLabel = parsedQuery?.cancerType ? `${parsedQuery.cancerType.toLowerCase()} matching` : 'patient matching';
-      status.textContent = `${cancerLabel.charAt(0).toUpperCase()}${cancerLabel.slice(1)} is active. Catalog filters are hidden until you clear the patient search.`;
+      status.textContent = `${cancerLabel.charAt(0).toUpperCase()}${cancerLabel.slice(1)} is active. Catalog filters are hidden until you clear the search.`;
     }
 
     this.renderPatientQueryChips(parsedQuery);
@@ -665,8 +665,8 @@ class ClinicalTrialsApp {
 
     const emptyState = Utils.createElementFromHTML(`
       <section class="patient-search-empty">
-        <h3>Patient search is separate from the catalog now</h3>
-        <p>Describe a prostate, bladder, kidney, or testicular patient in plain language to generate protocol-style strong and possible matches. The browse tab still shows the full trial catalog with normal filters.</p>
+        <h3>Search trials separately from the catalog overview</h3>
+        <p>Describe a prostate, bladder, kidney, or testicular patient in plain language to generate protocol-style strong and possible matches. The Trial overview tab still shows the full trial catalog with normal filters.</p>
         <div class="patient-search-empty-note">Deterministic multi-cancer matching</div>
       </section>
     `);
