@@ -135,7 +135,55 @@ function buildProstateTrials() {
     exclusionCriteria: 'Systemic anti-cancer therapy within 2 weeks of Day 1.'
   });
 
-  return [radioligandTrial, parpTrial, classifierTrial, tripletTrial, screeningTrial];
+  const exactSequenceTrial = buildTrial({
+    id: 'post-triplet-sequence',
+    title: 'mCRPC Trial After ADT, Enzalutamide, and Docetaxel',
+    description: 'Later-line study for metastatic castration-resistant prostate cancer after defined prior therapy progression.',
+    cancerType: 'Prostate',
+    diseaseSettingPrimaryId: 'crpc_metastatic_postARPI',
+    diseaseSettingAllIds: ['crpc_metastatic_postARPI', 'crpc_general'],
+    clinicalAxes: {
+      castrationStatus: 'castration_resistant',
+      metastaticStatus: 'metastatic',
+      priorArpi: 'yes',
+      priorDocetaxel: 'yes'
+    },
+    conditions: ['prostate cancer'],
+    inclusionCriteria: 'Participants must have progressed on ADT, enzalutamide, and docetaxel.'
+  });
+
+  const genericPostArpiTrial = buildTrial({
+    id: 'post-arpi-generic',
+    title: 'Generic Post-ARPI mCRPC Trial',
+    description: 'Study for metastatic castration-resistant prostate cancer after enzalutamide.',
+    cancerType: 'Prostate',
+    diseaseSettingPrimaryId: 'crpc_metastatic_postARPI',
+    diseaseSettingAllIds: ['crpc_metastatic_postARPI', 'crpc_general'],
+    clinicalAxes: {
+      castrationStatus: 'castration_resistant',
+      metastaticStatus: 'metastatic',
+      priorArpi: 'yes'
+    },
+    conditions: ['prostate cancer'],
+    inclusionCriteria: 'Participants must have progressed on enzalutamide.'
+  });
+
+  const misclassifiedLocalizedTrial = buildTrial({
+    id: 'misclassified-localized',
+    title: 'Localized Prostatectomy Trial',
+    description: 'Study for men undergoing radical prostatectomy after biopsy-proven localized prostate cancer.',
+    cancerType: 'Prostate',
+    diseaseSettingPrimaryId: 'crpc_metastatic_postARPI',
+    diseaseSettingAllIds: ['crpc_metastatic_postARPI', 'crpc_general'],
+    clinicalAxes: {
+      castrationStatus: 'unknown',
+      metastaticStatus: 'unknown'
+    },
+    conditions: ['prostate cancer'],
+    inclusionCriteria: 'Participants must be scheduled to undergo radical prostatectomy in the next 4 weeks.'
+  });
+
+  return [radioligandTrial, parpTrial, classifierTrial, tripletTrial, screeningTrial, exactSequenceTrial, genericPostArpiTrial, misclassifiedLocalizedTrial];
 }
 
 function buildBladderTrials() {
@@ -381,14 +429,20 @@ function testProstate() {
   assert.equal(parsed.screeningFacts.labState, 'within_range');
   assert.equal(parsed.screeningFacts.organFunctionState, 'adequate');
 
+  parsed = PatientQueryParser.parse(
+    'Male, 65. mCRPC. Progressed on ADT and enzalutamide and docetaxel.'
+  );
+  assert.deepEqual(parsed.temporalFacts.progressedAfterTherapies, ['adt', 'enzalutamide', 'docetaxel']);
+  assert.deepEqual(parsed.therapyHistory.progressedOnTherapies, ['adt', 'enzalutamide', 'docetaxel']);
+
   let result = runQuery(
     trials,
     'Male, 65. mCRPC. Progressed on enzalutamide. BRCA2+. PSMA-positive PET. No prior docetaxel.'
   );
   assert.deepEqual(
     result.strongMatches.map(entry => entry.trial.id).sort(),
-    ['parp', 'radioligand'],
-    'Full biomarker-complete mCRPC query should strongly match radioligand and PARP trials.'
+    ['parp', 'post-arpi-generic', 'radioligand'],
+    'Full biomarker-complete mCRPC query should strongly match radioligand, PARP, and generic post-ARPI trials.'
   );
 
   result = runQuery(
@@ -452,6 +506,23 @@ function testProstate() {
     'Male, 65. mCRPC.'
   );
   assert.ok(result.possibleMatches.length >= 2, 'Broad mCRPC query should still surface possible matches.');
+  assert.equal(findEntry(result, 'misclassified-localized'), undefined, 'Localized prostatectomy studies should not surface for advanced prostate queries.');
+
+  result = runQuery(
+    trials,
+    'Male, 65. mCRPC. Progressed on ADT and enzalutamide and docetaxel.'
+  );
+  assert.equal(findEntry(result, 'post-triplet-sequence').match.badge, 'Strong match');
+  assert.equal(findEntry(result, 'post-arpi-generic').match.badge, 'Possible match');
+  assert.deepEqual(flagCodes(findEntry(result, 'post-arpi-generic')), ['therapy_sequence']);
+  assert.equal(findEntry(result, 'radioligand'), undefined, 'Docetaxel-treated patient should not match a docetaxel-naive radioligand cohort.');
+  assert.equal(findEntry(result, 'parp'), undefined, 'Docetaxel-treated patient should not match a docetaxel-naive PARP cohort.');
+
+  result = runQuery(
+    trials,
+    'Male, 65. mCRPC. Progressed on ADT and enzalutamide.'
+  );
+  assert.equal(findEntry(result, 'post-triplet-sequence'), undefined, 'Exact sequence trial should exclude when required docetaxel progression is missing.');
 }
 
 function testBladder() {

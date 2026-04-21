@@ -84,6 +84,10 @@
       title: "Verify washout interval",
       message: "Recent systemic therapy may require a protocol-specific washout interval before referral."
     },
+    therapy_sequence: {
+      title: "Confirm prior therapy sequence",
+      message: "Clarify which exact therapies the patient received, progressed on, or must be excluded from before referral."
+    },
     recent_imaging: {
       title: "Verify imaging recency",
       message: "Confirm required staging or biomarker imaging was performed recently enough for trial screening."
@@ -471,6 +475,256 @@
     return label.toLowerCase() === "systemic therapy" ? "systemic therapy" : label;
   }
 
+  const PROSTATE_THERAPY_ENTRIES = [
+    { key: "adt", pattern: /\badt\b|androgen deprivation|lhrh|gnrh|leuprolide|goserelin|degarelix|relugolix/i, classKey: "adt", significant: false },
+    { key: "enzalutamide", pattern: /enzalutamide/i, classKey: "arpi", significant: true },
+    { key: "abiraterone", pattern: /abiraterone/i, classKey: "arpi", significant: true },
+    { key: "apalutamide", pattern: /apalutamide/i, classKey: "arpi", significant: true },
+    { key: "darolutamide", pattern: /darolutamide/i, classKey: "arpi", significant: true },
+    { key: "arpi", pattern: /arpi|androgen receptor pathway inhibitor|novel hormonal/i, classKey: "arpi", significant: true },
+    { key: "docetaxel", pattern: /docetaxel/i, classKey: "taxane", significant: true },
+    { key: "cabazitaxel", pattern: /cabazitaxel/i, classKey: "taxane", significant: true },
+    { key: "taxane", pattern: /taxane/i, classKey: "taxane", significant: true },
+    { key: "olaparib", pattern: /olaparib/i, classKey: "parp", significant: true },
+    { key: "rucaparib", pattern: /rucaparib/i, classKey: "parp", significant: true },
+    { key: "niraparib", pattern: /niraparib/i, classKey: "parp", significant: true },
+    { key: "talazoparib", pattern: /talazoparib/i, classKey: "parp", significant: true },
+    { key: "parp", pattern: /parp/i, classKey: "parp", significant: true },
+    { key: "radioligand", pattern: /radioligand|177lu|lutetium|psma-617|lu-psma/i, classKey: "radioligand", significant: true }
+  ];
+
+  function isTherapyClass(value) {
+    return ["adt", "arpi", "taxane", "parp", "radioligand"].includes(canonicalToken(value));
+  }
+
+  function prostateTherapyEntry(value) {
+    const token = canonicalToken(value);
+    return PROSTATE_THERAPY_ENTRIES.find(entry => entry.key === token) || null;
+  }
+
+  function prostateTherapyClass(value) {
+    const entry = prostateTherapyEntry(value);
+    return entry ? entry.classKey : "";
+  }
+
+  function isSignificantProstateTherapy(value) {
+    const entry = prostateTherapyEntry(value);
+    return entry ? entry.significant !== false : canonicalToken(value) !== "adt";
+  }
+
+  function therapySatisfiesRequirement(therapy, requirement) {
+    const therapyToken = canonicalToken(therapy);
+    const requirementToken = canonicalToken(requirement);
+    if (!therapyToken || !requirementToken) {
+      return false;
+    }
+    if (therapyToken === requirementToken) {
+      return true;
+    }
+    if (!isTherapyClass(requirementToken)) {
+      return false;
+    }
+    return prostateTherapyClass(therapyToken) === requirementToken;
+  }
+
+  function extractProstateTherapies(text) {
+    const matches = [];
+    PROSTATE_THERAPY_ENTRIES.forEach(entry => {
+      if (entry.pattern.test(text)) {
+        addResolvedFact(matches, entry.key);
+      }
+    });
+
+    const hasExactArpi = matches.some(value => ["enzalutamide", "abiraterone", "apalutamide", "darolutamide"].includes(value));
+    const hasExactTaxane = matches.some(value => ["docetaxel", "cabazitaxel"].includes(value));
+    const hasExactParp = matches.some(value => ["olaparib", "rucaparib", "niraparib", "talazoparib"].includes(value));
+    return matches.filter(value => {
+      if (value === "arpi" && hasExactArpi) return false;
+      if (value === "taxane" && hasExactTaxane) return false;
+      if (value === "parp" && hasExactParp) return false;
+      return true;
+    });
+  }
+
+  function buildQueryTherapyProfile(parsedQuery) {
+    const profile = {
+      received: new Set(),
+      progressed: new Set()
+    };
+    const history = parsedQuery.therapyHistory || {};
+
+    normalizeList(history.receivedTherapies).forEach(therapy => profile.received.add(canonicalToken(therapy)));
+    normalizeList(history.progressedOnTherapies).forEach(therapy => {
+      const token = canonicalToken(therapy);
+      profile.progressed.add(token);
+      profile.received.add(token);
+    });
+
+    normalizeList(parsedQuery.temporalFacts?.progressedAfterTherapies).forEach(therapy => {
+      const token = canonicalToken(therapy);
+      profile.progressed.add(token);
+      profile.received.add(token);
+    });
+
+    if (parsedQuery.clinicalAxes?.priorArpi === "yes" && !Array.from(profile.received).some(therapy => prostateTherapyClass(therapy) === "arpi")) {
+      profile.received.add("arpi");
+    }
+
+    if (parsedQuery.clinicalAxes?.priorDocetaxel === "yes") {
+      profile.received.add("docetaxel");
+    }
+
+    return profile;
+  }
+
+  function queryHasReceivedTherapy(queryProfile, requirement) {
+    return Array.from(queryProfile.received).some(therapy => therapySatisfiesRequirement(therapy, requirement));
+  }
+
+  function queryHasProgressedOnTherapy(queryProfile, requirement) {
+    return Array.from(queryProfile.progressed).some(therapy => therapySatisfiesRequirement(therapy, requirement));
+  }
+
+  function deriveProstateTrialTherapyProfile(trial) {
+    const profile = {
+      requiredReceivedAll: [],
+      requiredProgressionAll: [],
+      prohibitedPriorTherapies: [],
+      allowedPriorTherapies: []
+    };
+    const text = `${buildTrialSearchText(trial)} ${buildTrialEligibilityText(trial)}`;
+    const segments = text.split(/[.;\n]+/).map(segment => normalizeWhitespace(segment)).filter(Boolean);
+
+    segments.forEach(segment => {
+      const therapies = extractProstateTherapies(segment);
+      if (therapies.length === 0) {
+        return;
+      }
+
+      if (/(?:no prior|without prior|naive to|not previously treated with|exclude(?:s|d)? prior|taxane-naive|arpi-naive|chemo-naive|chemotherapy-naive)/i.test(segment)) {
+        therapies.forEach(therapy => addResolvedFact(profile.prohibitedPriorTherapies, therapy));
+        return;
+      }
+
+      if (/(?:with or without prior|prior .* allowed|allowed prior|may have received|can have received)/i.test(segment)) {
+        therapies.forEach(therapy => addResolvedFact(profile.allowedPriorTherapies, therapy));
+        return;
+      }
+
+      if (/(?:progress(?:ed|ion)? on|after progressing on|following progression on|failed|failure of)/i.test(segment)) {
+        therapies.forEach(therapy => {
+          addResolvedFact(profile.requiredProgressionAll, therapy);
+          addResolvedFact(profile.requiredReceivedAll, therapy);
+        });
+        return;
+      }
+
+      if (/(?:after|post[- ]|following|must have received|required prior|previously treated with|prior exposure to|received prior)/i.test(segment)) {
+        therapies.forEach(therapy => addResolvedFact(profile.requiredReceivedAll, therapy));
+      }
+    });
+
+    return profile;
+  }
+
+  function trialAccountsForTherapy(trialAxes, profile, therapy) {
+    const therapyToken = canonicalToken(therapy);
+    if (!therapyToken || !isSignificantProstateTherapy(therapyToken)) {
+      return true;
+    }
+
+    const exactLists = [
+      profile.requiredReceivedAll,
+      profile.requiredProgressionAll,
+      profile.prohibitedPriorTherapies,
+      profile.allowedPriorTherapies
+    ];
+
+    if (exactLists.some(list => list.some(requirement => therapySatisfiesRequirement(therapyToken, requirement) || therapySatisfiesRequirement(requirement, therapyToken)))) {
+      return true;
+    }
+
+    if (prostateTherapyClass(therapyToken) === "arpi" && isMeaningfulAxisValue(trialAxes.priorArpi)) {
+      return true;
+    }
+
+    if ((therapyToken === "docetaxel" || prostateTherapyClass(therapyToken) === "taxane") && isMeaningfulAxisValue(trialAxes.priorDocetaxel)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  function applyProstateTherapyProfile(state) {
+    const profile = deriveProstateTrialTherapyProfile(state.trial);
+    const queryProfile = buildQueryTherapyProfile(state.parsedQuery);
+    const hasTherapyDetail = queryProfile.received.size > 0 || queryProfile.progressed.size > 0;
+
+    profile.prohibitedPriorTherapies.forEach(therapy => {
+      if (!hasTherapyDetail) {
+        addFlag(state.flags, therapy === "arpi" ? "prior_arpi" : therapy === "docetaxel" || therapy === "taxane" ? "chemotherapy_history" : "therapy_sequence");
+        return;
+      }
+
+      if (queryHasReceivedTherapy(queryProfile, therapy)) {
+        state.excludes.push(therapy === "arpi" ? "prior_arpi" : therapy === "docetaxel" || therapy === "taxane" ? "chemotherapy_history" : "therapy_sequence");
+      }
+    });
+
+    profile.requiredProgressionAll.forEach(therapy => {
+      if (!hasTherapyDetail) {
+        addFlag(state.flags, therapy === "arpi" ? "prior_arpi" : therapy === "docetaxel" || therapy === "taxane" ? "chemotherapy_history" : "therapy_sequence");
+        return;
+      }
+
+      if (queryHasProgressedOnTherapy(queryProfile, therapy)) {
+        addResolvedFact(state.resolvedFacts, `progressed after ${humanizeTherapyLabel(therapy)}`);
+        return;
+      }
+
+      if (queryHasReceivedTherapy(queryProfile, therapy)) {
+        addFlag(state.flags, "therapy_sequence");
+        return;
+      }
+
+      state.excludes.push("therapy_sequence");
+    });
+
+    profile.requiredReceivedAll.forEach(therapy => {
+      if (profile.requiredProgressionAll.includes(therapy)) {
+        return;
+      }
+
+      if (!hasTherapyDetail) {
+        addFlag(state.flags, therapy === "arpi" ? "prior_arpi" : therapy === "docetaxel" || therapy === "taxane" ? "chemotherapy_history" : "therapy_sequence");
+        return;
+      }
+
+      if (queryHasReceivedTherapy(queryProfile, therapy)) {
+        if (therapy === "docetaxel" || therapy === "taxane") {
+          addResolvedFact(state.resolvedFacts, "post-docetaxel");
+        } else if (therapy === "arpi") {
+          addResolvedFact(state.resolvedFacts, resolveArpiFact(state.parsedQuery));
+        } else {
+          addResolvedFact(state.resolvedFacts, `prior ${humanizeTherapyLabel(therapy)}`);
+        }
+        return;
+      }
+
+      state.excludes.push(therapy === "arpi" ? "prior_arpi" : therapy === "docetaxel" || therapy === "taxane" ? "chemotherapy_history" : "therapy_sequence");
+    });
+
+    const significantQueryTherapies = Array.from(new Set([
+      ...Array.from(queryProfile.received),
+      ...Array.from(queryProfile.progressed)
+    ])).filter(therapy => isSignificantProstateTherapy(therapy));
+
+    const unaccountedTherapies = significantQueryTherapies.filter(therapy => !trialAccountsForTherapy(state.trialAxes || {}, profile, therapy));
+    if (unaccountedTherapies.length > 0 && significantQueryTherapies.length > 1) {
+      addFlag(state.flags, "therapy_sequence");
+    }
+  }
+
   function resolveTrialEcogRequirement(text) {
     if (!text) {
       return null;
@@ -509,6 +763,13 @@
     if (value === "ecog_2") return "ECOG 2";
     if (value === "ecog_3_4") return "ECOG 3-4";
     return "";
+  }
+
+  function isObviouslyLocalizedProstateTrial(trial) {
+    const text = `${buildTrialSearchText(trial)} ${buildTrialEligibilityText(trial)}`;
+    const localizedSignals = /(radical prostatectomy|undergoing radical prostatectomy|scheduled to undergo rp|active surveillance|localized prostate cancer|pre-?prostatectomy|before prostatectomy)/i;
+    const advancedSignals = /(mcrpc|nmcrpc|mcspc|metastatic|castration[- ]resistant|castration[- ]sensitive|psma|docetaxel|cabazitaxel|enzalutamide|abiraterone|apalutamide|darolutamide|radioligand|parp)/i;
+    return localizedSignals.test(text) && !advancedSignals.test(text);
   }
 
   function applyTemporalSignals(state) {
@@ -1114,6 +1375,11 @@
     const trialAxes = state.trialAxes;
     const queryAxes = state.queryAxes;
 
+    if (["crpc", "cspc"].includes(parsedQuery.diseaseGroup) && isObviouslyLocalizedProstateTrial(trial)) {
+      state.excludes.push("staging");
+      return finalizeMatch(state);
+    }
+
     applyBinaryAxisRule({
       trialValue: trialAxes.castrationStatus,
       queryValue: queryAxes.castrationStatus,
@@ -1132,6 +1398,8 @@
     } else if (isMeaningfulAxisValue(trialAxes.metastaticStatus) && !queryAxes.metastaticStatus) {
       addFlag(state.flags, "staging");
     }
+
+    applyProstateTherapyProfile(state);
 
     if (isMeaningfulAxisValue(trialAxes.priorArpi)) {
       if (queryAxes.priorArpi) {

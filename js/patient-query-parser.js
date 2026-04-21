@@ -69,6 +69,12 @@
     }
   }
 
+  function addUniqueValue(list, value) {
+    if (value && !list.includes(value)) {
+      list.push(value);
+    }
+  }
+
   function pushDiseaseIds(list, ids) {
     ids.forEach(id => {
       if (id && !list.includes(id)) {
@@ -123,6 +129,13 @@
       recentImagingDays: null,
       progressedAfterTherapies: [],
       persistentMarkersAfterOrchiectomy: ""
+    };
+  }
+
+  function createTherapyHistory() {
+    return {
+      receivedTherapies: [],
+      progressedOnTherapies: []
     };
   }
 
@@ -241,7 +254,7 @@
       return "no";
     }
 
-    if (/prior docetaxel|post[- ]docetaxel|after docetaxel|received docetaxel/i.test(text)) {
+    if (/prior docetaxel|post[- ]docetaxel|after docetaxel|received docetaxel|progressed on .*docetaxel|failed docetaxel/i.test(text)) {
       return "yes";
     }
 
@@ -377,12 +390,15 @@
   function normalizeTherapyLabel(raw) {
     const token = normalizeToken(raw).replace(/[^a-z0-9]+/g, " ").trim();
     if (!token) return "";
+    if (token.includes("androgen deprivation") || token.includes("adt") || token.includes("lhrh") || token.includes("gnrh") || token.includes("leuprolide") || token.includes("goserelin") || token.includes("degarelix") || token.includes("relugolix")) return "adt";
     if (token.includes("enzalutamide")) return "enzalutamide";
     if (token.includes("abiraterone")) return "abiraterone";
     if (token.includes("apalutamide")) return "apalutamide";
     if (token.includes("darolutamide")) return "darolutamide";
+    if (token.includes("arpi") || token.includes("androgen receptor pathway inhibitor") || token.includes("novel hormonal")) return "arpi";
     if (token.includes("docetaxel")) return "docetaxel";
     if (token.includes("cabazitaxel")) return "cabazitaxel";
+    if (token.includes("taxane")) return "taxane";
     if (token.includes("platinum") || token.includes("cisplatin") || token.includes("carboplatin")) return "platinum";
     if (token.includes("pembrolizumab")) return "pembrolizumab";
     if (token.includes("nivolumab")) return "nivolumab";
@@ -391,8 +407,28 @@
     if (token.includes("cabozantinib")) return "cabozantinib";
     if (token.includes("axitinib")) return "axitinib";
     if (token.includes("lenvatinib")) return "lenvatinib";
+    if (token.includes("olaparib")) return "olaparib";
+    if (token.includes("rucaparib")) return "rucaparib";
+    if (token.includes("niraparib")) return "niraparib";
+    if (token.includes("talazoparib")) return "talazoparib";
+    if (token.includes("parp")) return "parp";
+    if (token.includes("radioligand") || token.includes("lutetium") || token.includes("177lu") || token.includes("lu psma") || token.includes("psma 617")) return "radioligand";
     if (token.includes("systemic therapy") || token.includes("therapy") || token.includes("treatment")) return "systemic therapy";
     return token;
+  }
+
+  function addTherapy(list, value) {
+    const normalized = normalizeTherapyLabel(value);
+    addUniqueValue(list, normalized);
+  }
+
+  function splitTherapyCandidates(raw) {
+    return normalizeWhitespace(raw)
+      .replace(/\bplus\b/ig, " and ")
+      .replace(/[+/]/g, " and ")
+      .split(/\s*(?:,|\band\b|&)\s*/i)
+      .map(candidate => normalizeTherapyLabel(candidate))
+      .filter(Boolean);
   }
 
   function detectProgressedAfterTherapies(text) {
@@ -401,7 +437,7 @@
       /progress(?:ed|ion)?\s+(?:on|after|following)\s+([a-z0-9+\/ -]{3,40})/ig,
       /(?:failed|failure of)\s+([a-z0-9+\/ -]{3,40})/ig
     ];
-    const stopTokens = /\b(and|with|without|who|after|before|for|while|because|due|no prior|phase|trial)\b/i;
+    const stopTokens = /\b(with|without|who|after|before|for|while|because|due|no prior|phase|trial)\b/i;
 
     patterns.forEach(pattern => {
       let match;
@@ -415,14 +451,51 @@
         if (stop && stop.index > 0) {
           raw = raw.slice(0, stop.index);
         }
-        const normalized = normalizeTherapyLabel(raw);
-        if (normalized && !therapies.includes(normalized)) {
-          therapies.push(normalized);
-        }
+        splitTherapyCandidates(raw).forEach(therapy => addTherapy(therapies, therapy));
       }
     });
 
     return therapies;
+  }
+
+  function hasExplicitNegativeTherapyContext(text, therapy) {
+    const escaped = therapy.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/_/g, "[ _-]?");
+    return new RegExp(`(?:no prior|without prior|never received|not previously treated with|naive to)[^.;,\\n]{0,24}${escaped}`, "i").test(text)
+      || new RegExp(`${escaped}[- ]naive`, "i").test(text);
+  }
+
+  function detectExplicitTherapyMentions(text) {
+    const mentions = [];
+    const explicitTherapies = [
+      "adt",
+      "enzalutamide",
+      "abiraterone",
+      "apalutamide",
+      "darolutamide",
+      "docetaxel",
+      "cabazitaxel",
+      "platinum",
+      "pembrolizumab",
+      "nivolumab",
+      "ipilimumab",
+      "cabozantinib",
+      "axitinib",
+      "lenvatinib",
+      "olaparib",
+      "rucaparib",
+      "niraparib",
+      "talazoparib",
+      "radioligand"
+    ];
+
+    explicitTherapies.forEach(therapy => {
+      const escaped = therapy.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/_/g, "[ _-]?");
+      if (!hasExplicitNegativeTherapyContext(text, therapy) && new RegExp(escaped, "i").test(text)) {
+        addTherapy(mentions, therapy);
+      }
+    });
+
+    return mentions;
   }
 
   function detectSinceLastSystemicTherapyDays(text) {
@@ -1360,6 +1433,31 @@
     parsed.temporalFacts.persistentMarkersAfterOrchiectomy = detectPersistentMarkersAfterOrchiectomy(text);
   }
 
+  function populateTherapyHistory(parsed, text) {
+    const history = parsed.therapyHistory;
+    const temporal = parsed.temporalFacts || {};
+    const axes = parsed.clinicalAxes || {};
+
+    detectExplicitTherapyMentions(text).forEach(therapy => addTherapy(history.receivedTherapies, therapy));
+
+    (temporal.progressedAfterTherapies || []).forEach(therapy => {
+      addTherapy(history.progressedOnTherapies, therapy);
+      addTherapy(history.receivedTherapies, therapy);
+    });
+
+    if (axes.priorArpi === "yes" && !history.receivedTherapies.some(therapy => ["enzalutamide", "abiraterone", "apalutamide", "darolutamide"].includes(therapy))) {
+      addTherapy(history.receivedTherapies, "arpi");
+    }
+
+    if (axes.priorDocetaxel === "yes") {
+      addTherapy(history.receivedTherapies, "docetaxel");
+    }
+
+    if (parsed.cancerType === "Prostate" && /\badt\b|androgen deprivation|lhrh|gnrh|leuprolide|goserelin|degarelix|relugolix/i.test(text)) {
+      addTherapy(history.receivedTherapies, "adt");
+    }
+  }
+
   function populateScreeningFacts(parsed, text) {
     parsed.screeningFacts.ecogStatus = detectEcogStatus(text);
     parsed.screeningFacts.labState = detectLabState(text);
@@ -1418,6 +1516,7 @@
       diseaseSettingIds: [],
       clinicalAxes: createClinicalAxes(),
       temporalFacts: createTemporalFacts(),
+      therapyHistory: createTherapyHistory(),
       screeningFacts: createScreeningFacts(),
       treatmentPreferences: [],
       phasePreference: "",
@@ -1453,6 +1552,7 @@
     }
 
     populateTemporalFacts(parsed, rawQuery);
+    populateTherapyHistory(parsed, rawQuery);
     populateScreeningFacts(parsed, rawQuery);
     addChip(parsed.chips, "Cancer", parsed.cancerType);
     if (parsed.phasePreference) addChip(parsed.chips, "Preference", parsed.phasePreference);
