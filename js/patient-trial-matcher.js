@@ -722,7 +722,11 @@
     ])).filter(therapy => isSignificantProstateTherapy(therapy));
 
     const unaccountedTherapies = significantQueryTherapies.filter(therapy => !trialAccountsForTherapy(state.trialAxes || {}, profile, therapy));
-    if (unaccountedTherapies.length > 0 && significantQueryTherapies.length > 1) {
+    const unaccountedProgressionTherapies = Array.from(queryProfile.progressed).filter(
+      therapy => isSignificantProstateTherapy(therapy) && !trialAccountsForTherapy(state.trialAxes || {}, profile, therapy)
+    );
+
+    if (unaccountedProgressionTherapies.length > 0 || (unaccountedTherapies.length > 0 && significantQueryTherapies.length > 1)) {
       addFlag(state.flags, "therapy_sequence");
     }
   }

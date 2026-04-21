@@ -168,6 +168,22 @@ function buildProstateTrials() {
     inclusionCriteria: 'Participants must have progressed on enzalutamide.'
   });
 
+  const generalCrpcTrial = buildTrial({
+    id: 'general-crpc',
+    title: 'General mCRPC Trial',
+    description: 'Study for metastatic castration-resistant prostate cancer.',
+    cancerType: 'Prostate',
+    diseaseSettingPrimaryId: 'crpc_general',
+    diseaseSettingAllIds: ['crpc_general'],
+    clinicalAxes: {
+      castrationStatus: 'castration_resistant',
+      metastaticStatus: 'metastatic',
+      priorArpi: 'unknown'
+    },
+    conditions: ['prostate cancer'],
+    inclusionCriteria: 'Participants must have metastatic castration-resistant prostate cancer.'
+  });
+
   const misclassifiedLocalizedTrial = buildTrial({
     id: 'misclassified-localized',
     title: 'Localized Prostatectomy Trial',
@@ -183,7 +199,7 @@ function buildProstateTrials() {
     inclusionCriteria: 'Participants must be scheduled to undergo radical prostatectomy in the next 4 weeks.'
   });
 
-  return [radioligandTrial, parpTrial, classifierTrial, tripletTrial, screeningTrial, exactSequenceTrial, genericPostArpiTrial, misclassifiedLocalizedTrial];
+  return [radioligandTrial, parpTrial, classifierTrial, tripletTrial, screeningTrial, exactSequenceTrial, genericPostArpiTrial, generalCrpcTrial, misclassifiedLocalizedTrial];
 }
 
 function buildBladderTrials() {
@@ -488,6 +504,9 @@ function testProstate() {
   );
   assert.equal(findEntry(result, 'screening-gated').match.badge, 'Possible match');
   assert.deepEqual(flagCodes(findEntry(result, 'screening-gated')), ['ecog_status', 'lab_organ_function', 'washout_window']);
+  assert.equal(findEntry(result, 'post-arpi-generic').match.badge, 'Strong match');
+  assert.equal(findEntry(result, 'general-crpc').match.badge, 'Possible match');
+  assert.deepEqual(flagCodes(findEntry(result, 'general-crpc')), ['therapy_sequence']);
 
   result = runQuery(
     trials,
